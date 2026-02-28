@@ -463,7 +463,7 @@ Analyze this audio strictly for musical and production elements.
 
 CONTEXT:
 - Use case: drumless sample chopping, boom bap flipping, AI recreation via Suno and Udio
-- DO NOT include drums, beats, kick, snare, hi-hats, or any rhythmic percussion in ANY prompt
+- NEVER include drums, beats, kick, snare, hi-hats, or any rhythmic percussion anywhere
 - Focus entirely on: melody, harmony, chord texture, mood, timbre, instrumentation, vocal feel, arrangement
 
 OUTPUT FORMAT — use these exact section headers with ## prefix. Nothing else.
@@ -482,13 +482,24 @@ B. [another direction — different tempo, key shift, genre pivot, etc.]
 C. [a third creative direction]
 
 ## SUNO PROMPT (DETAILED)
-[One highly detailed, production-rich Suno prompt. Drumless only — no drums, percussion, or beats mentioned anywhere. Describe: instrumentation, harmonic texture, mood and emotional arc, tempo feel, vocal style and tone if vocals present, era and genre influence, production aesthetic. Single flowing descriptive paragraph — no bullet points. Specific and evocative enough to faithfully recreate the vibe. Ready to paste directly into Suno.]
+Write a single flowing paragraph — NO bullet points, NO line breaks, NO headers. HARD CAP: 1000 characters total. Follow this exact structural order, adapted to what you actually heard in the audio:
+
+1. ERA + RECORDING STYLE: Identify the decade and recording aesthetic (e.g. "Vintage 1970s soul recording", "Late 80s R&B studio session", "Early 2000s neo-soul ballad", "Classic 90s boom bap instrumental") — match what the audio actually sounds like
+2. PRODUCTION TEXTURE: Name the sonic patina — analog tape saturation, lo-fi vinyl warmth, digital clarity, cassette warmth, studio sheen — whatever the audio has
+3. TEMPO FEEL: Describe the pace and feel — slow burn, mid-tempo groove, languid — plus the BPM range
+4. INSTRUMENTATION: List only the instruments actually heard — NO drums, NO percussion, NO beats, NO rhythm section hits
+5. VOCAL CHARACTER: If vocals are present describe tone, register, and style. If no vocals write: "no vocals, purely instrumental"
+6. SONIC TEXTURE + IMPERFECTIONS: reverb character, room ambience, vinyl crackle, wow and flutter, human timing imperfections, breath, warmth
+7. MOOD: Two or three strong descriptors — dark, pensive, melancholic, triumphant, euphoric, tense, nostalgic, brooding
+8. SAMPLE PURPOSE CLOSER: End with "designed to feel loopable" plus one sentence on what kind of producer or genre would chop and flip this record
+
+CRITICAL: No drums. No percussion. No beats. Stay under 1000 characters including spaces.
 
 ## SUNO PROMPT (MINIMAL)
-[Compressed 2–3 sentence version. Drumless. Essential vibe only. Ready to paste into Suno or Udio.]
+[Two sentences max. Under 300 characters total. Drumless. Hit era + key instruments + core mood only. Ready to paste directly into Suno or Udio.]
 
 ## UDIO PROMPT
-[Udio-optimized. Line 1: comma-separated style/mood/genre/instrument tags. Line 2: one directional sentence. Drumless only.]
+[Udio responds best to tags + one sentence. Line 1: comma-separated genre/mood/era/instrument tags — no drums. Line 2: one production direction sentence under 180 characters. Drumless only.]
 """.strip()
 
 
@@ -627,7 +638,11 @@ if uploaded_file and run_btn:
             result   = response.text
 
             st.session_state.analysis     = extract_section(result, "ANALYSIS") or result
-            st.session_state.suno_detail  = extract_section(result, "SUNO PROMPT (DETAILED)")
+            suno_raw = extract_section(result, "SUNO PROMPT (DETAILED)")
+            # Hard-cap at 1000 characters — Suno style field limit
+            if len(suno_raw) > 1000:
+                suno_raw = suno_raw[:997].rsplit(" ", 1)[0] + "..."
+            st.session_state.suno_detail  = suno_raw
             st.session_state.suno_minimal = extract_section(result, "SUNO PROMPT (MINIMAL)")
             st.session_state.udio_prompt  = extract_section(result, "UDIO PROMPT")
             st.session_state.pad_state    = "done"
@@ -652,7 +667,13 @@ if st.session_state.analysis:
     st.markdown('<hr class="neon-divider">', unsafe_allow_html=True)
 
     if st.session_state.suno_detail:
-        st.markdown('<div class="section-label">Suno Prompt — Detailed &nbsp;· tap → select all → copy</div>', unsafe_allow_html=True)
+        char_count = len(st.session_state.suno_detail)
+        char_color = "#ff4444" if char_count > 1000 else "#39FF14"
+        st.markdown(
+            f'<div class="section-label">Suno Prompt — Detailed &nbsp;· tap → select all → copy'
+            f'<span style="margin-left:auto; font-family:JetBrains Mono,monospace; font-size:8px; color:{char_color};">{char_count}/1000 chars</span></div>',
+            unsafe_allow_html=True
+        )
         st.text_area("", value=st.session_state.suno_detail, height=210, key="sd", label_visibility="collapsed")
 
     if st.session_state.suno_minimal:
