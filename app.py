@@ -59,7 +59,7 @@ if uploaded_file:
             try:
                 api_key = st.secrets["GEMINI_KEY"]
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                model = genai.GenerativeModel("gemini-2.0-flash")
 
                 master_prompt = (
                     "Analyze this uploaded audio strictly for musical and production elements. "
