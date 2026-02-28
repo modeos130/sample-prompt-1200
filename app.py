@@ -5,7 +5,6 @@ import re
 
 st.set_page_config(page_title="SP-1200 // 130 MODE", layout="centered")
 
-# ── CSS ────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap');
@@ -36,12 +35,11 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     position: relative;
 }
 
-/* brushed metal top strip */
+/* ── TOP STRIP ── */
 .sp-top-strip {
-    background: linear-gradient(180deg,
-        #3a3a3a 0%, #2e2e2e 30%, #262626 70%, #1e1e1e 100%);
+    background: linear-gradient(180deg, #3a3a3a 0%, #2e2e2e 30%, #262626 70%, #1e1e1e 100%);
     border-bottom: 2px solid #111;
-    padding: 18px 24px 14px 24px;
+    padding: 16px 24px 14px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -59,26 +57,36 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
 .brand-left {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
 }
-.brand-emu {
+.brand-company {
     font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     color: #888;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
     text-transform: uppercase;
 }
 .brand-model {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 900;
     color: #c8a84b;
     letter-spacing: 3px;
     text-shadow: 0 0 20px rgba(200,168,75,0.4);
     line-height: 1;
 }
+.brand-tagline {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 7px;
+    font-weight: 400;
+    color: #555;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 3px;
+}
 
+/* ── 130 MODE BADGE ── */
 .logo-badge {
     width: 72px; height: 72px;
     border-radius: 50%;
@@ -107,7 +115,7 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     text-shadow: 0 0 6px #39FF14;
 }
 
-/* ── LCD DISPLAY ── */
+/* ── LCD ── */
 .sp-display-zone {
     background: #1a1a1a;
     padding: 16px 24px;
@@ -156,7 +164,6 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
 }
 .lcd-sub {
     font-size: 9px;
-    font-weight: 400;
     color: #2a8c2a;
     letter-spacing: 2px;
     margin-top: 6px;
@@ -167,7 +174,7 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
 /* ── DRUM PADS ── */
 .sp-pads-zone {
     background: #1e1e1e;
-    padding: 20px 24px;
+    padding: 18px 24px;
     border-bottom: 2px solid #111;
 }
 .pads-label {
@@ -192,7 +199,6 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     border-right: 2px solid #0a0a0a;
     position: relative;
     overflow: hidden;
-    transition: all 0.1s;
     cursor: default;
 }
 .pad::after {
@@ -201,38 +207,30 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     inset: 0;
     background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.04), transparent 60%);
 }
-/* pad number labels */
 .pad-num {
     position: absolute;
-    bottom: 5px;
-    right: 7px;
+    bottom: 5px; right: 7px;
     font-size: 8px;
     font-family: 'Orbitron', sans-serif;
     color: #444;
     font-weight: 700;
     z-index: 2;
 }
+.pad.idle { box-shadow: none; }
 
-/* IDLE — subtle amber breathing */
-.pad.idle {
-    box-shadow: none;
-}
-
-/* RUNNING — sequence flash green */
-.pad.running-1  { animation: padFlash 1.6s ease-in-out 0.0s infinite; }
-.pad.running-2  { animation: padFlash 1.6s ease-in-out 0.2s infinite; }
-.pad.running-3  { animation: padFlash 1.6s ease-in-out 0.4s infinite; }
-.pad.running-4  { animation: padFlash 1.6s ease-in-out 0.6s infinite; }
-.pad.running-5  { animation: padFlash 1.6s ease-in-out 0.8s infinite; }
-.pad.running-6  { animation: padFlash 1.6s ease-in-out 1.0s infinite; }
-.pad.running-7  { animation: padFlash 1.6s ease-in-out 1.2s infinite; }
-.pad.running-8  { animation: padFlash 1.6s ease-in-out 1.4s infinite; }
+.pad.running-1 { animation: padFlash 1.6s ease-in-out 0.0s infinite; }
+.pad.running-2 { animation: padFlash 1.6s ease-in-out 0.2s infinite; }
+.pad.running-3 { animation: padFlash 1.6s ease-in-out 0.4s infinite; }
+.pad.running-4 { animation: padFlash 1.6s ease-in-out 0.6s infinite; }
+.pad.running-5 { animation: padFlash 1.6s ease-in-out 0.8s infinite; }
+.pad.running-6 { animation: padFlash 1.6s ease-in-out 1.0s infinite; }
+.pad.running-7 { animation: padFlash 1.6s ease-in-out 1.2s infinite; }
+.pad.running-8 { animation: padFlash 1.6s ease-in-out 1.4s infinite; }
 
 @keyframes padFlash {
     0%, 100% {
         background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
-        box-shadow: none;
-        border-color: #333;
+        box-shadow: none; border-color: #333;
     }
     50% {
         background: linear-gradient(145deg, #1a3a1a, #0d200d);
@@ -241,62 +239,53 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     }
 }
 
-/* DONE — all pads lit steady */
-.pad.done {
-    background: linear-gradient(145deg, #1a3a1a, #0d200d);
-    box-shadow: 0 0 12px rgba(57,255,20,0.6), inset 0 0 6px rgba(57,255,20,0.15);
-    border-color: #39FF14;
-    animation: padPulse 3s ease-in-out infinite;
-}
-.pad.done-1 { animation-delay: 0.0s; }
-.pad.done-2 { animation-delay: 0.3s; }
-.pad.done-3 { animation-delay: 0.6s; }
-.pad.done-4 { animation-delay: 0.9s; }
-.pad.done-5 { animation-delay: 1.2s; }
-.pad.done-6 { animation-delay: 1.5s; }
-.pad.done-7 { animation-delay: 1.8s; }
-.pad.done-8 { animation-delay: 2.1s; }
+.pad.done-1 { animation: padPulse 3s ease-in-out 0.0s infinite; }
+.pad.done-2 { animation: padPulse 3s ease-in-out 0.3s infinite; }
+.pad.done-3 { animation: padPulse 3s ease-in-out 0.6s infinite; }
+.pad.done-4 { animation: padPulse 3s ease-in-out 0.9s infinite; }
+.pad.done-5 { animation: padPulse 3s ease-in-out 1.2s infinite; }
+.pad.done-6 { animation: padPulse 3s ease-in-out 1.5s infinite; }
+.pad.done-7 { animation: padPulse 3s ease-in-out 1.8s infinite; }
+.pad.done-8 { animation: padPulse 3s ease-in-out 2.1s infinite; }
 
 @keyframes padPulse {
-    0%, 100% { box-shadow: 0 0 10px rgba(57,255,20,0.5), inset 0 0 5px rgba(57,255,20,0.1); }
-    50%       { box-shadow: 0 0 20px rgba(57,255,20,0.9), inset 0 0 10px rgba(57,255,20,0.25); }
+    0%, 100% {
+        background: linear-gradient(145deg, #1a3a1a, #0d200d);
+        box-shadow: 0 0 10px rgba(57,255,20,0.5), inset 0 0 5px rgba(57,255,20,0.1);
+        border-color: #39FF14;
+    }
+    50% {
+        background: linear-gradient(145deg, #1f4a1f, #112511);
+        box-shadow: 0 0 22px rgba(57,255,20,0.9), inset 0 0 10px rgba(57,255,20,0.25);
+        border-color: #39FF14;
+    }
 }
 
-/* ERROR — red flash all pads */
 .pad.error {
-    background: linear-gradient(145deg, #3a1a1a, #200d0d);
-    box-shadow: 0 0 12px rgba(255,60,60,0.6), inset 0 0 6px rgba(255,60,60,0.15);
-    border-color: #ff3c3c;
-    animation: padError 0.8s ease-in-out infinite;
+    background: linear-gradient(145deg, #3a1a1a, #200d0d) !important;
+    box-shadow: 0 0 12px rgba(255,60,60,0.6), inset 0 0 6px rgba(255,60,60,0.15) !important;
+    border-color: #ff3c3c !important;
+    animation: padError 0.8s ease-in-out infinite !important;
 }
 @keyframes padError {
     0%, 100% { box-shadow: 0 0 8px rgba(255,60,60,0.4); }
     50%       { box-shadow: 0 0 20px rgba(255,60,60,0.9); }
 }
 
-/* ── CONTROLS ZONE ── */
+/* ── KNOBS ROW ── */
 .sp-controls {
     background: #1a1a1a;
-    padding: 14px 24px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 2px solid #111;
     gap: 16px;
 }
-.knobs-row {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-}
-.knob-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
+.knobs-row { display: flex; gap: 14px; align-items: center; }
+.knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .knob {
-    width: 32px; height: 32px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #4a4a4a, #1a1a1a);
     border: 2px solid #111;
@@ -306,80 +295,108 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
 .knob::after {
     content: '';
     position: absolute;
-    top: 4px;
-    left: 50%;
+    top: 4px; left: 50%;
     transform: translateX(-50%);
-    width: 2px; height: 8px;
+    width: 2px; height: 7px;
     background: #c8a84b;
     border-radius: 1px;
 }
-.knob-label {
-    font-size: 7px;
-    color: #555;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'JetBrains Mono', monospace;
-}
+.knob-label { font-size: 7px; color: #555; letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
 
-/* ── FILE LOADER ZONE ── */
+/* ── FILE LOADER ── */
 .sp-loader {
     background: #1c1c1c;
-    padding: 14px 24px;
+    padding: 12px 24px;
     border-bottom: 2px solid #111;
 }
 .loader-label {
-    font-size: 7px;
-    color: #555;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+    font-size: 7px; color: #555;
+    letter-spacing: 3px; text-transform: uppercase;
     margin-bottom: 8px;
     font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── ANALYZE BUTTON ZONE ── */
-.sp-button-zone {
-    background: #1a1a1a;
-    padding: 14px 24px 20px 24px;
+/* ── CONVERT BUTTON ZONE — on-machine panel ── */
+.sp-convert-panel {
+    background: linear-gradient(180deg, #1c1c1c 0%, #161616 100%);
+    border-top: 1px solid #2a2a2a;
+    padding: 16px 24px 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.convert-instruction {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.convert-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.5;
+}
+.convert-arrow {
+    color: #39FF14;
+    font-size: 10px;
+}
+.convert-tag {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 7px;
+    font-weight: 700;
+    color: #39FF14;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: 1px solid #39FF14;
+    border-radius: 3px;
+    padding: 2px 6px;
+    opacity: 0.7;
 }
 
-/* Streamlit component overrides */
+/* Streamlit widget overrides */
 .stFileUploader {
     background: #111 !important;
     border: 1px dashed #39FF14 !important;
     border-radius: 8px !important;
-    padding: 6px !important;
+    padding: 4px !important;
 }
-.stFileUploader label { color: #555 !important; font-size: 11px !important; }
 
 .stButton > button {
-    background: linear-gradient(180deg, #2a2a2a, #1a1a1a) !important;
+    background: linear-gradient(180deg, #242424 0%, #161616 100%) !important;
     color: #39FF14 !important;
-    border: 1px solid #333 !important;
-    border-bottom: 5px solid #080808 !important;
-    border-radius: 8px !important;
+    border: 1px solid #2a2a2a !important;
+    border-top: 1px solid #333 !important;
+    border-bottom: 5px solid #060606 !important;
+    border-radius: 10px !important;
     font-family: 'Orbitron', sans-serif !important;
     font-weight: 900 !important;
-    font-size: 13px !important;
-    letter-spacing: 4px !important;
-    height: 64px !important;
+    font-size: 12px !important;
+    letter-spacing: 3px !important;
+    height: auto !important;
+    min-height: 70px !important;
     width: 100% !important;
     text-transform: uppercase !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04) !important;
     transition: all 0.1s !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    padding: 12px 16px !important;
 }
 .stButton > button:hover {
-    box-shadow: 0 0 20px rgba(57,255,20,0.3) !important;
+    box-shadow: 0 0 24px rgba(57,255,20,0.25), 0 4px 20px rgba(0,0,0,0.6) !important;
     border-color: #39FF14 !important;
+    color: #39FF14 !important;
 }
 .stButton > button:active {
-    border-bottom: 2px solid #080808 !important;
+    border-bottom: 2px solid #060606 !important;
     transform: translateY(3px) !important;
 }
 
 /* ── RESULTS ── */
-.results-outer {
-    margin-top: 20px;
-}
+.results-outer { margin-top: 20px; }
 .section-label {
     font-size: 8px;
     color: #c8a84b;
@@ -393,11 +410,7 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     align-items: center;
     gap: 8px;
 }
-.section-label::before {
-    content: '▶';
-    color: #39FF14;
-    font-size: 8px;
-}
+.section-label::before { content: '▶'; color: #39FF14; font-size: 8px; }
 
 .analysis-block {
     background: #0d0d0d;
@@ -428,13 +441,8 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
 }
 .stTextArea label { display: none !important; }
 
-.neon-divider {
-    border: none;
-    border-top: 1px solid #1d1d1d;
-    margin: 22px 0;
-}
+.neon-divider { border: none; border-top: 1px solid #1d1d1d; margin: 22px 0; }
 
-/* ── FOOTER ── */
 .sp-footer {
     text-align: center;
     margin-top: 28px;
@@ -444,8 +452,6 @@ header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
 }
-
-/* spinner */
 .stSpinner > div { border-top-color: #39FF14 !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -479,7 +485,7 @@ C. [a third creative direction]
 [One highly detailed, production-rich Suno prompt. Drumless only — no drums, percussion, or beats mentioned anywhere. Describe: instrumentation, harmonic texture, mood and emotional arc, tempo feel, vocal style and tone if vocals present, era and genre influence, production aesthetic. Single flowing descriptive paragraph — no bullet points. Specific and evocative enough to faithfully recreate the vibe. Ready to paste directly into Suno.]
 
 ## SUNO PROMPT (MINIMAL)
-[Compressed 2–3 sentence version of the detailed prompt. Drumless. Essential vibe only. Ready to paste into Suno or Udio.]
+[Compressed 2–3 sentence version. Drumless. Essential vibe only. Ready to paste into Suno or Udio.]
 
 ## UDIO PROMPT
 [Udio-optimized. Line 1: comma-separated style/mood/genre/instrument tags. Line 2: one directional sentence. Drumless only.]
@@ -493,10 +499,14 @@ def extract_section(text, header):
 
 
 def render_pads(state="idle"):
-    """Render 8 drum pads with state classes."""
     pads_html = '<div class="pads-grid">'
     for i in range(1, 9):
-        cls = f"pad {state}-{i}" if state in ("running", "done") else f"pad {'error' if state == 'error' else 'idle'}"
+        if state in ("running", "done"):
+            cls = f"pad {state}-{i}"
+        elif state == "error":
+            cls = "pad error"
+        else:
+            cls = "pad idle"
         pads_html += f'<div class="{cls}"><span class="pad-num">{i}</span></div>'
     pads_html += '</div>'
     return pads_html
@@ -517,26 +527,23 @@ def render_knobs():
 
 
 # ── SESSION STATE ──────────────────────────────────────────────────────────────
-if "pad_state" not in st.session_state:
-    st.session_state.pad_state = "idle"
-if "analysis" not in st.session_state:
-    st.session_state.analysis = ""
-if "suno_detail" not in st.session_state:
-    st.session_state.suno_detail = ""
-if "suno_minimal" not in st.session_state:
-    st.session_state.suno_minimal = ""
-if "udio_prompt" not in st.session_state:
-    st.session_state.udio_prompt = ""
+for key, default in [
+    ("pad_state", "idle"), ("analysis", ""),
+    ("suno_detail", ""), ("suno_minimal", ""), ("udio_prompt", "")
+]:
+    if key not in st.session_state:
+        st.session_state[key] = default
 
-# ── RENDER UNIT ────────────────────────────────────────────────────────────────
+# ── RENDER MACHINE ─────────────────────────────────────────────────────────────
 st.markdown('<div class="sp-unit">', unsafe_allow_html=True)
 
-# TOP STRIP
-st.markdown(f"""
+# ── TOP STRIP: BOOMAN SYSTEMS / SP-1200 / SAMPLE PROMPT 1200 ──────────────────
+st.markdown("""
 <div class="sp-top-strip">
     <div class="brand-left">
-        <div class="brand-emu">E-MU Systems</div>
+        <div class="brand-company">Booman Systems</div>
         <div class="brand-model">SP-1200</div>
+        <div class="brand-tagline">Sample Prompt 1200</div>
     </div>
     <div class="logo-badge">
         <div class="n130">130</div>
@@ -545,48 +552,57 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# LCD
+# ── LCD ────────────────────────────────────────────────────────────────────────
 st.markdown('<div class="sp-display-zone">', unsafe_allow_html=True)
 lcd_slot = st.empty()
-
-if st.session_state.pad_state == "idle":
+state = st.session_state.pad_state
+if state == "idle":
     lcd_slot.markdown(render_lcd("READY // BANK A", "load sample to begin"), unsafe_allow_html=True)
-elif st.session_state.pad_state == "running":
+elif state == "running":
     lcd_slot.markdown(render_lcd("ANALYZING...", "quantizing sample data"), unsafe_allow_html=True)
-elif st.session_state.pad_state == "done":
+elif state == "done":
     lcd_slot.markdown(render_lcd("DECODE COMPLETE", "prompts ready to copy"), unsafe_allow_html=True)
-elif st.session_state.pad_state == "error":
+elif state == "error":
     lcd_slot.markdown(render_lcd("HARDWARE ERROR", "check console"), unsafe_allow_html=True)
-
 st.markdown('</div>', unsafe_allow_html=True)
 
-# PADS
+# ── PADS ───────────────────────────────────────────────────────────────────────
 st.markdown('<div class="sp-pads-zone">', unsafe_allow_html=True)
-st.markdown('<div class="pads-label">Drum Pads — Sample Bank A</div>', unsafe_allow_html=True)
+st.markdown('<div class="pads-label">Sample Bank A — Drum Pads</div>', unsafe_allow_html=True)
 pads_slot = st.empty()
 pads_slot.markdown(render_pads(st.session_state.pad_state), unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# KNOBS + secondary controls
+# ── KNOBS ──────────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div class="sp-controls">
     {render_knobs()}
     <div style="text-align:right;">
-        <div style="font-size:7px; color:#444; letter-spacing:2px; font-family:'JetBrains Mono',monospace;">BOOMAN SYSTEMS</div>
-        <div style="font-size:7px; color:#333; letter-spacing:2px; font-family:'JetBrains Mono',monospace; margin-top:2px;">12-BIT LINEAR</div>
+        <div style="font-size:7px; color:#333; letter-spacing:2px; font-family:'JetBrains Mono',monospace;">12-BIT LINEAR</div>
+        <div style="font-size:7px; color:#2a2a2a; letter-spacing:1px; font-family:'JetBrains Mono',monospace; margin-top:2px;">44.1kHz SAMPLE RATE</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# FILE LOADER
+# ── FILE LOADER ────────────────────────────────────────────────────────────────
 st.markdown('<div class="sp-loader">', unsafe_allow_html=True)
-st.markdown('<div class="loader-label">Load Sample Disk — MP3 / WAV</div>', unsafe_allow_html=True)
+st.markdown('<div class="loader-label">① Load Sample — MP3 / WAV</div>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader("", type=["mp3", "wav"])
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ANALYZE BUTTON
-st.markdown('<div class="sp-button-zone">', unsafe_allow_html=True)
-run_btn = st.button("⬡  Run 12-Bit Analysis")
+# ── CONVERT BUTTON — on-machine panel ─────────────────────────────────────────
+st.markdown('<div class="sp-convert-panel">', unsafe_allow_html=True)
+st.markdown("""
+<div class="convert-instruction">
+    <span class="convert-step">② Drop sample above</span>
+    <span class="convert-arrow">→</span>
+    <span class="convert-step">Press button below</span>
+    <span class="convert-arrow">→</span>
+    <span class="convert-tag">CONVERT TO PROMPT</span>
+</div>
+""", unsafe_allow_html=True)
+
+run_btn = st.button("⬡  ANALYZE SAMPLE → CONVERT TO PROMPT")
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)  # close sp-unit
@@ -622,7 +638,6 @@ if uploaded_file and run_btn:
             pads_slot.markdown(render_pads("error"), unsafe_allow_html=True)
             st.error(f"Error: {str(e)}")
 
-    # Update LCD + pads post-run
     if st.session_state.pad_state == "done":
         lcd_slot.markdown(render_lcd("DECODE COMPLETE", "prompts ready to copy"), unsafe_allow_html=True)
         pads_slot.markdown(render_pads("done"), unsafe_allow_html=True)
