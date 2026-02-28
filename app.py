@@ -1,58 +1,97 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- SP-1200 STYLING ---
+# --- 130 MODE x SP-1200 AESTHETIC ---
 st.set_page_config(page_title="Sample Prompt 1200", layout="centered")
 
 st.markdown("""
     <style>
-    .stApp { background-color: #8c8c8c; color: #1a1a1a; font-family: 'Courier New', Courier, monospace; }
-    .lcd-screen {
-        background-color: #3e0a0a; color: #ff3232; padding: 20px;
-        border: 10px solid #222; border-radius: 5px; text-transform: uppercase;
-        box-shadow: inset 0px 0px 15px #000; margin-bottom: 20px;
+    /* The SP-1200 Metal Chassis */
+    .stApp {
+        background-color: #222222;
+        background-image: linear-gradient(45deg, #1a1a1a 25%, transparent 25%), 
+                          linear-gradient(-45deg, #1a1a1a 25%, transparent 25%);
+        background-size: 4px 4px;
+        color: #FFFFFF;
+        font-family: 'Courier New', Courier, monospace;
     }
+
+    /* 130 Mode Neon LCD */
+    .lcd-screen {
+        background-color: #001a00;
+        color: #39FF14; /* 130 Mode Neon Green */
+        padding: 30px;
+        border: 6px solid #444;
+        border-radius: 2px;
+        text-transform: uppercase;
+        box-shadow: 0px 0px 20px #39FF14;
+        margin-bottom: 30px;
+        text-align: center;
+        border-style: inset;
+    }
+
+    /* The 'Pads' and Industrial Buttons */
     .stButton>button {
-        background-color: #e0e0e0; color: #1a1a1a; border: 4px solid #444;
-        border-bottom: 8px solid #222; font-weight: bold; height: 80px; width: 100%;
+        background-color: #333;
+        color: #39FF14;
+        border: 3px solid #39FF14;
+        border-bottom: 6px solid #1a5a0d;
+        font-weight: bold;
+        text-transform: uppercase;
+        height: 100px;
+        width: 100%;
+        font-size: 20px;
+        transition: 0.1s;
+    }
+    .stButton>button:active {
+        border-bottom: 2px solid #39FF14;
+        transform: translateY(4px);
+    }
+
+    /* File Uploader Customization */
+    .stFileUploader {
+        background-color: #111;
+        border: 2px dashed #39FF14;
+        padding: 20px;
+        color: #39FF14;
+    }
+    
+    .logo-container {
+        text-align: center;
+        margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- UI ---
-st.markdown('<div class="lcd-screen"><h1>SP-1200</h1><p>Status: Ready to Sample</p></div>', unsafe_allow_html=True)
+# --- BRANDING & LCD ---
+# Replace the URL below with your raw GitHub logo link once uploaded
+st.markdown('<div class="logo-container"><h1>130 MODE</h1></div>', unsafe_allow_html=True)
+st.markdown('<div class="lcd-screen"><h1>SP-1200</h1><p>STATUS: READY TO SAMPLE</p></div>', unsafe_allow_html=True)
 
-# Access the API key securely from Streamlit Cloud settings
+# --- API LOGIC ---
 api_key = st.secrets["GEMINI_KEY"]
 genai.configure(api_key=api_key)
 
-uploaded_file = st.file_uploader("DROP TRACK", type=["mp3", "wav", "m4a"])
+uploaded_file = st.file_uploader("LOAD SAMPLE DISK", type=["mp3", "wav", "m4a"])
 
-if uploaded_file and st.button("RUN ANALYSIS"):
-    with st.spinner("QUANTIZING..."):
+if uploaded_file and st.button("RUN 12-BIT ANALYSIS"):
+    with st.spinner("QUANTIZING FOR 130 MODE..."):
         model = genai.GenerativeModel('gemini-1.5-flash')
         
-        # Hardcoded conversion prompt
         prompt = """
-        Analyze this uploaded audio strictly for musical and production elements.
-        Assume I am using it for: Drumless sample chopping and Boom bap flipping.
-        Do NOT include drums in any recreation prompts.
-        Provide:
-        - BPM (tight range estimate)
-        - Groove type (straight, swung, triplet feel)
-        - Key + chord movement tendencies
-        - Vocal tone classification
-        - Arrangement arc
-        - Emotional intensity curve
+        Analyze this audio strictly for musical and production elements.
+        Focus: Drumless sample beds for Boom Bap production.
+        STRICT RULE: Do NOT include drums in any recreation prompts.
         
-        Then generate:
-        - One highly detailed Suno prompt (drumless style string, no percussion)
-        - One minimal Suno prompt (compressed tags)
-        - A 16-bar flip blueprint for DAW execution.
+        Output:
+        1. BPM & Groove (Swung/Straight)
+        2. Key & Chord Mood
+        3. Vocal Texture
+        4. Suno/Udio Style String (12-15 comma-separated tags, drumless only)
+        5. The 16-Bar Flip Blueprint
         """
         
         response = model.generate_content([prompt, {"mime_type": "audio/mp3", "data": uploaded_file.getvalue()}])
         
-        st.markdown('<div class="lcd-screen">PROMPT GENERATED // DISK READY</div>', unsafe_allow_html=True)
+        st.markdown('<div class="lcd-screen">DISK ANALYSIS COMPLETE // READY</div>', unsafe_allow_html=True)
         st.code(response.text, language="markdown")
-        st.info("Files are processed in RAM. Refreshing the browser purges all data.")
