@@ -1,37 +1,33 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- SP-1200 / 130 MODE HARDWARE SKIN ---
+# --- 130 MODE SP-1200 FINAL BUILD ---
 st.set_page_config(page_title="Sample Prompt 1200", layout="centered")
 
+# Custom CSS for the Industrial Hardware Look
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
     
-    /* Background & Chassis */
     .stApp {
         background-color: #121212;
         font-family: 'JetBrains Mono', monospace;
         color: #e0e0e0;
     }
-    
-    .main .block-container {
-        padding-top: 2rem;
-        max-width: 600px;
-    }
 
-    /* THE CHASSIS - Carbon Fiber Texture */
-    .stMarkdown div[data-testid="stVerticalBlock"] > div:has(.chassis-marker) {
+    /* THE CHASSIS */
+    .chassis {
         background-color: #2d2d2d;
         background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         border: 4px solid #1a1a1a;
         border-radius: 24px;
-        padding: 40px !important;
+        padding: 40px;
         box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         border-bottom: 12px solid #111;
+        margin-top: 20px;
     }
 
-    /* 130 MODE INTEGRATED LOGO */
+    /* 130 MODE NEON LOGO */
     .logo-container {
         width: 100px;
         height: 100px;
@@ -69,11 +65,19 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 3px;
         text-shadow: 0 0 12px rgba(57,255,20,0.9);
-        font-size: 20px;
+        font-size: 18px;
         text-align: center;
     }
 
-    /* PADS / BUTTONS */
+    /* DRAG & DROP ZONE STYLING */
+    .stFileUploader {
+        background-color: #1a1a1a;
+        border: 2px dashed #39FF14;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    /* HARDWARE PADS */
     .stButton>button {
         background-color: #3d3d3d !important;
         color: #39FF14 !important;
@@ -84,7 +88,6 @@ st.markdown("""
         height: 80px !important;
         width: 100%;
         font-size: 18px !important;
-        letter-spacing: 2px !important;
         transition: 0.1s !important;
     }
     .stButton>button:active {
@@ -92,59 +95,71 @@ st.markdown("""
         transform: translateY(4px) !important;
     }
 
-    /* Hide Streamlit UI */
     header, footer {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- THE SAMPLER INTERFACE ---
-st.markdown('<div class="chassis-marker"></div>', unsafe_allow_html=True)
-
-# Branding Header
+# --- BRANDING ---
 st.markdown("""
 <div class="logo-container">
     <div class="logo-130">130</div>
     <div class="logo-mode">Mode</div>
 </div>
 <div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #8e8e8e; font-size: 28px; font-weight: 900; margin:0; letter-spacing:-1px;">BOOMAN SYSTEMS</h1>
+    <h1 style="color: #8e8e8e; font-size: 28px; font-weight: 900; margin:0;">BOOMAN SYSTEMS</h1>
     <p style="color: #444; font-size: 10px; font-weight: bold; letter-spacing: 4px; margin:0;">SP-1200 PROMPT GENERATOR</p>
 </div>
 """, unsafe_allow_html=True)
 
-# LCD Display
+# --- SAMPLER ENGINE ---
+st.markdown('<div class="chassis">', unsafe_allow_html=True)
+
 lcd_placeholder = st.empty()
 lcd_placeholder.markdown('<div class="lcd-screen"><div class="lcd-text">READY: BANK A</div></div>', unsafe_allow_html=True)
 
-# File Input (Disguised as a Disk Slot)
-st.markdown('<p style="color:#555; font-size:9px; font-weight:bold; margin-bottom:5px; text-transform:uppercase;">Load Sample Disk</p>', unsafe_allow_html=True)
+st.markdown('<p style="color:#555; font-size:9px; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">Load Sample Disk / Drag Track Below</p>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader("", type=["mp3", "wav"])
 
-# Action Pad
 if uploaded_file:
     if st.button("RUN 12-BIT ANALYSIS"):
         with st.spinner("QUANTIZING..."):
             try:
+                # Access the secret key from Streamlit Settings
                 api_key = st.secrets["GEMINI_KEY"]
                 genai.configure(api_key=api_key)
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 
-                # Conversion logic from Step 3
-                prompt = "Analyze audio for BPM, Key, Vocal Tone, and a drumless Suno prompt."
+                # Your specific hardcoded prompt
+                prompt = """
+                Analyze this uploaded audio strictly for musical and production elements.
+                Assume I am using it for: Drumless sample chopping and Boom bap flipping.
+                Do NOT include drums in any recreation prompts.
+                Provide:
+                BPM (tight range estimate), Groove type, Key + chord movement tendencies, 
+                Vocal tone classification, Arrangement arc, Emotional intensity curve.
+                
+                Then generate:
+                - One highly detailed Suno prompt (drumless only)
+                - One minimal Suno prompt (compressed version)
+                - A 16-bar flip blueprint for DAW execution.
+                """
+                
                 response = model.generate_content([prompt, {"mime_type": "audio/mp3", "data": uploaded_file.getvalue()}])
                 
-                # Result rendered in Neon LCD
+                # Update LCD with response
                 lcd_placeholder.markdown(f"""
-                    <div class="lcd-screen" style="height:320px; overflow-y:auto; align-items:flex-start; text-align:left;">
-                        <div class="lcd-text" style="font-size:13px; text-transform:none; text-shadow:none;">
+                    <div class="lcd-screen" style="height:350px; overflow-y:auto; align-items:flex-start; text-align:left;">
+                        <div class="lcd-text" style="font-size:13px; text-transform:none; text-shadow:none; line-height:1.5;">
                             {response.text.replace(chr(10), '<br>')}
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
                 
+                # Copyable code block
                 st.code(response.text, language="markdown")
+                
             except Exception as e:
-                st.error("Check Secrets/API Key.")
+                st.error(f"Hardware Error: {str(e)}")
 
-# Bottom Utility Info
-st.markdown('<p style="text-align:center; color:#222; font-size:8px; margin-top:40px; letter-spacing:3px;">12-BIT LINEAR // BOOMAN SYSTEMS &copy; 2026</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#222; font-size:8px; margin-top:30px; letter-spacing:3px;">12-BIT LINEAR // 130 MODE &copy; 2026</p>', unsafe_allow_html=True)
