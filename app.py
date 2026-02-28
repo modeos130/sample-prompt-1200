@@ -65,7 +65,7 @@ st.markdown("""
 
 # --- BRANDING & LCD ---
 # Replace the URL below with your raw GitHub logo link once uploaded
-st.markdown('<div class="logo-container"><h1>130 MODE</h1></div>', unsafe_allow_html=True)
+st.markdown('<div class="logo-container"><img src="https://github.com/modeos130/sample-prompt-1200/blob/main/130%20Mode%20Logo%203000%20x%203000.png?raw=true" width="200"></div>', unsafe_allow_html=True)
 st.markdown('<div class="lcd-screen"><h1>SP-1200</h1><p>STATUS: READY TO SAMPLE</p></div>', unsafe_allow_html=True)
 
 # --- API LOGIC ---
