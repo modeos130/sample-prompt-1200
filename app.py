@@ -199,17 +199,43 @@ header, footer, #MainMenu, .stDeployButton,
 .section-label .lbadge.warn { color: var(--orange); }
 .section-label .lbadge.over { color: var(--red); }
 
-/* ── RESULT CARDS ── */
-.result-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
+/* ── PROMPT SUBLABEL ── */
+.prompt-sublabel {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+    margin: -6px 0 10px 0;
+}
+
+/* ── PROMPT ERROR ── */
+.prompt-error {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    padding: 12px 16px;
+    border: 1px solid var(--red);
+    border-radius: 8px;
     margin-bottom: 16px;
 }
-.result-card.gold-left { border-left: 3px solid var(--gold); }
-.result-card.green-left { border-left: 3px solid var(--green); }
-.result-card.orange-left { border-left: 3px solid var(--orange); }
+
+/* ── COPY BUTTON ── */
+.copy-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+.copy-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+.copy-btn.copied { border-color: var(--green) !important; color: var(--green) !important; }
 
 /* ── ANALYSIS TEXT ── */
 .analysis-text {
@@ -240,28 +266,6 @@ header, footer, #MainMenu, .stDeployButton,
     outline: none !important;
 }
 .stTextArea label { display: none !important; }
-
-/* ── COPY BUTTON ROW ── */
-.copy-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
-.copy-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    padding: 7px 14px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-}
-.copy-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
-.copy-btn.copied { border-color: var(--green); color: var(--green); }
 
 
 
@@ -532,70 +536,62 @@ if st.session_state.analysis:
     if st.session_state.clone_prompt:
         n  = len(st.session_state.clone_prompt)
         cc = char_color(n)
-        st.markdown(f"""
-<div class="section-label">
-    Clone Prompt
-    <span class="lbadge {cc}">{n} / 700 chars</span>
-</div>
-<div class="result-card green-left" style="padding-bottom:12px;">
-    <div style="font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:10px;font-family:'DM Mono',monospace;">
-        FAITHFUL SONIC RECREATION · SUNO / UDIO / SAMPLA.AI
-    </div>
-""", unsafe_allow_html=True)
-        st.text_area("", value=st.session_state.clone_prompt, height=130, key="cp_ta", label_visibility="collapsed")
-        st.markdown("""
-    <div class="copy-row">
-        <button class="copy-btn" data-copy="cp_ta"
-            onclick="(function(){
-                var areas=document.querySelectorAll('textarea');
-                var txt='';
-                areas.forEach(function(a){if(a.getAttribute('aria-label')==='cp_ta'||a.id==='cp_ta')txt=a.value;});
-                if(!txt){areas.forEach(function(a,i){if(i===0)txt=a.value;});}
-                navigator.clipboard.writeText(txt);
-                var b=document.querySelectorAll('.copy-btn')[0];
-                b.style.color='var(--green)';b.style.borderColor='var(--green)';
-                b.innerHTML='&#10003; Copied';
-                setTimeout(function(){b.style.color='';b.style.borderColor='';b.innerHTML='&#9632; Copy Prompt';},2000);
-            })()">
-            &#9632; Copy Prompt
-        </button>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="section-label">Clone Prompt'
+            f'<span class="lbadge {cc}">{n} / 700 chars</span></div>'
+            f'<div class="prompt-sublabel">Faithful sonic recreation · Suno / Udio / Sampla.ai</div>',
+            unsafe_allow_html=True
+        )
+        st.text_area("clone", value=st.session_state.clone_prompt, height=130,
+                     key="cp_ta", label_visibility="collapsed")
+        st.markdown(
+            '<button class="copy-btn" onclick="(function(){'
+            'var t=document.querySelectorAll(\'textarea\')[0];'
+            'if(t){navigator.clipboard.writeText(t.value);}'
+            'var b=document.querySelectorAll(\'.copy-btn\')[0];'
+            'b.classList.add(\'copied\');b.innerHTML=\'&#10003; Copied\';'
+            'setTimeout(function(){b.classList.remove(\'copied\');'
+            'b.innerHTML=\'&#9632; Copy Prompt\';},2000);})()">'
+            '&#9632; Copy Prompt</button>',
+            unsafe_allow_html=True
+        )
+
+    else:
+        if st.session_state.analysis:
+            st.markdown(
+                '<div class="prompt-error">Clone prompt not generated — try analyzing again.</div>',
+                unsafe_allow_html=True
+            )
 
     # SAMPLER PROMPT
     if st.session_state.sampler_prompt:
         n  = len(st.session_state.sampler_prompt)
         cc = char_color(n)
-        st.markdown(f"""
-<div class="section-label" style="margin-top:20px;">
-    Sampler Prompt
-    <span class="lbadge {cc}">{n} / 700 chars</span>
-</div>
-<div class="result-card green-left" style="padding-bottom:12px;">
-    <div style="font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:10px;font-family:'DM Mono',monospace;">
-        FLIP-READY · LOOPABLE · CHOPPABLE · SUNO / UDIO / SAMPLA.AI
-    </div>
-""", unsafe_allow_html=True)
-        st.text_area("", value=st.session_state.sampler_prompt, height=130, key="sp_ta", label_visibility="collapsed")
-        st.markdown("""
-    <div class="copy-row">
-        <button class="copy-btn"
-            onclick="(function(){
-                var areas=document.querySelectorAll('textarea');
-                var txt='';
-                if(areas.length>=2)txt=areas[1].value;
-                navigator.clipboard.writeText(txt);
-                var b=document.querySelectorAll('.copy-btn')[1];
-                b.style.color='var(--green)';b.style.borderColor='var(--green)';
-                b.innerHTML='&#10003; Copied';
-                setTimeout(function(){b.style.color='';b.style.borderColor='';b.innerHTML='&#9632; Copy Prompt';},2000);
-            })()">
-            &#9632; Copy Prompt
-        </button>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="section-label" style="margin-top:24px;">Sampler Prompt'
+            f'<span class="lbadge {cc}">{n} / 700 chars</span></div>'
+            f'<div class="prompt-sublabel">Flip-ready · loopable · choppable · Suno / Udio / Sampla.ai</div>',
+            unsafe_allow_html=True
+        )
+        st.text_area("sampler", value=st.session_state.sampler_prompt, height=130,
+                     key="sp_ta", label_visibility="collapsed")
+        st.markdown(
+            '<button class="copy-btn" onclick="(function(){'
+            'var t=document.querySelectorAll(\'textarea\')[1];'
+            'if(t){navigator.clipboard.writeText(t.value);}'
+            'var b=document.querySelectorAll(\'.copy-btn\')[1];'
+            'b.classList.add(\'copied\');b.innerHTML=\'&#10003; Copied\';'
+            'setTimeout(function(){b.classList.remove(\'copied\');'
+            'b.innerHTML=\'&#9632; Copy Prompt\';},2000);})()">'
+            '&#9632; Copy Prompt</button>',
+            unsafe_allow_html=True
+        )
+    else:
+        if st.session_state.analysis:
+            st.markdown(
+                '<div class="prompt-error">Sampler prompt not generated — try analyzing again.</div>',
+                unsafe_allow_html=True
+            )
 
 
 
