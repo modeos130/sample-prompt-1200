@@ -3,345 +3,406 @@ import google.generativeai as genai
 import base64
 import re
 
-st.set_page_config(page_title="SP-1200 // 130 MODE", layout="centered")
+st.set_page_config(page_title="Sample Prompt 1200", layout="centered", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+:root {
+    --bg:        #141618;
+    --surface:   #1c1f23;
+    --surface2:  #22262b;
+    --border:    #2a2f36;
+    --border2:   #343b44;
+    --gold:      #c9a84c;
+    --gold-dim:  #7a6530;
+    --green:     #3ddc84;
+    --text:      #e8eaed;
+    --text-dim:  #8a9099;
+    --text-faint:#454c56;
+    --red:       #ff5555;
+    --orange:    #ff9640;
+}
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, .stApp {
-    background: #111 !important;
-    font-family: 'JetBrains Mono', monospace;
-    color: #e0e0e0;
+    background: var(--bg) !important;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
 }
 
-header, footer, #MainMenu, .stDeployButton { visibility: hidden !important; }
-.block-container { padding: 1rem 1rem 3rem 1rem !important; max-width: 680px !important; }
-
-.sp-unit {
-    background: linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 40%, #222 100%);
-    border-radius: 16px 16px 10px 10px;
-    border: 2px solid #333;
-    border-bottom: 6px solid #0a0a0a;
-    box-shadow: 0 0 0 1px #444 inset, 0 20px 60px rgba(0,0,0,0.9), 0 4px 0 #000;
-    padding: 0;
-    overflow: hidden;
-    position: relative;
+header, footer, #MainMenu, .stDeployButton,
+[data-testid="stToolbar"], [data-testid="stDecoration"] {
+    visibility: hidden !important; display: none !important;
 }
 
-.sp-top-strip {
-    background: linear-gradient(180deg, #3a3a3a 0%, #2e2e2e 30%, #262626 70%, #1e1e1e 100%);
-    border-bottom: 2px solid #111;
-    padding: 16px 24px 14px 24px;
+.block-container {
+    padding: 0 !important;
+    max-width: 720px !important;
+    margin: 0 auto !important;
+}
+
+/* ── PAGE WRAPPER ── */
+.page { padding: 32px 24px 80px 24px; }
+
+/* ── HEADER ── */
+.app-header {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    position: relative;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
 }
-.sp-top-strip::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #555, transparent);
+.header-left {}
+.app-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
 }
-
-.brand-left { display: flex; flex-direction: column; gap: 1px; }
-.brand-company {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px; font-weight: 700;
-    color: #888; letter-spacing: 4px; text-transform: uppercase;
+.app-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1;
 }
-.brand-model {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 26px; font-weight: 900;
-    color: #c8a84b; letter-spacing: 3px;
-    text-shadow: 0 0 20px rgba(200,168,75,0.4); line-height: 1;
+.app-title span { color: var(--gold); }
+.app-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold-dim);
+    background: var(--surface);
 }
-.brand-tagline {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 7px; font-weight: 400;
-    color: #555; letter-spacing: 3px;
-    text-transform: uppercase; margin-top: 3px;
+.badge-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 800;
+    color: var(--gold); line-height: 1;
 }
-
-.logo-badge {
-    width: 72px; height: 72px;
-    border-radius: 50%; background: #0a0a0a;
-    border: 2px solid #39FF14;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    box-shadow: 0 0 20px rgba(57,255,20,0.5), inset 0 0 10px rgba(57,255,20,0.05);
-}
-.logo-badge .n130 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 22px; font-weight: 900;
-    color: #39FF14; line-height: 1;
-    text-shadow: 0 0 10px #39FF14;
-}
-.logo-badge .mode {
-    font-size: 8px; font-weight: 700;
-    color: #39FF14; letter-spacing: 2px;
-    text-transform: uppercase; text-shadow: 0 0 6px #39FF14;
+.badge-txt {
+    font-size: 7px; font-weight: 500;
+    color: var(--gold-dim); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-top: 1px;
 }
 
-.sp-display-zone {
-    background: #1a1a1a;
-    padding: 16px 24px;
-    border-bottom: 2px solid #111;
+/* ── STATUS BAR ── */
+.status-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
 }
-.lcd-outer {
-    background: #0c1a0c;
-    border: 2px solid #0a0a0a;
-    border-radius: 6px; padding: 16px 20px;
-    min-height: 80px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), inset 0 0 60px rgba(57,255,20,0.04), 0 2px 4px rgba(0,0,0,0.5);
-    position: relative; overflow: hidden;
+.status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    flex-shrink: 0;
 }
-.lcd-outer::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 3px);
-    pointer-events: none;
+.status-dot.idle    { background: var(--text-faint); }
+.status-dot.active  { background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
+.status-dot.done    { background: var(--green); }
+.status-dot.error   { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── UPLOAD ZONE ── */
+.upload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
 }
-.lcd-text {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px; font-weight: 700;
-    color: #39FF14; letter-spacing: 4px; text-align: center;
-    text-shadow: 0 0 10px #39FF14, 0 0 20px rgba(57,255,20,0.5);
-    text-transform: uppercase; position: relative; z-index: 1;
+.upload-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px;
 }
-.lcd-sub {
-    font-size: 9px; color: #2a8c2a; letter-spacing: 2px;
-    margin-top: 6px; text-align: center;
-    font-family: 'JetBrains Mono', monospace;
+.stFileUploader {
+    background: var(--surface2) !important;
+    border: 1px dashed var(--border2) !important;
+    border-radius: 8px !important;
+}
+.stFileUploader:hover {
+    border-color: var(--gold-dim) !important;
+}
+[data-testid="stFileUploaderDropzone"] {
+    background: transparent !important;
+    padding: 20px !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] {
+    color: var(--text-dim) !important;
+    font-size: 12px !important;
 }
 
-.sp-pads-zone {
-    background: #1e1e1e; padding: 18px 24px;
-    border-bottom: 2px solid #111;
-}
-.pads-label {
-    font-size: 7px; color: #444; letter-spacing: 4px;
-    text-transform: uppercase; margin-bottom: 10px;
-    font-family: 'JetBrains Mono', monospace;
-}
-.pads-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.pad {
-    aspect-ratio: 1.2; border-radius: 6px;
-    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
-    border: 1px solid #333;
-    border-bottom: 3px solid #0a0a0a; border-right: 2px solid #0a0a0a;
-    position: relative; overflow: hidden; cursor: default;
-}
-.pad::after {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.04), transparent 60%);
-}
-.pad-num {
-    position: absolute; bottom: 5px; right: 7px;
-    font-size: 8px; font-family: 'Orbitron', sans-serif;
-    color: #444; font-weight: 700; z-index: 2;
-}
-.pad.idle { box-shadow: none; }
-
-.pad.running-1 { animation: padFlash 1.6s ease-in-out 0.0s infinite; }
-.pad.running-2 { animation: padFlash 1.6s ease-in-out 0.2s infinite; }
-.pad.running-3 { animation: padFlash 1.6s ease-in-out 0.4s infinite; }
-.pad.running-4 { animation: padFlash 1.6s ease-in-out 0.6s infinite; }
-.pad.running-5 { animation: padFlash 1.6s ease-in-out 0.8s infinite; }
-.pad.running-6 { animation: padFlash 1.6s ease-in-out 1.0s infinite; }
-.pad.running-7 { animation: padFlash 1.6s ease-in-out 1.2s infinite; }
-.pad.running-8 { animation: padFlash 1.6s ease-in-out 1.4s infinite; }
-
-@keyframes padFlash {
-    0%, 100% { background: linear-gradient(145deg, #2c2c2c, #1a1a1a); box-shadow: none; border-color: #333; }
-    50%       { background: linear-gradient(145deg, #1a3a1a, #0d200d); box-shadow: 0 0 14px rgba(57,255,20,0.7), inset 0 0 8px rgba(57,255,20,0.2); border-color: #39FF14; }
-}
-
-.pad.done-1 { animation: padPulse 3s ease-in-out 0.0s infinite; }
-.pad.done-2 { animation: padPulse 3s ease-in-out 0.3s infinite; }
-.pad.done-3 { animation: padPulse 3s ease-in-out 0.6s infinite; }
-.pad.done-4 { animation: padPulse 3s ease-in-out 0.9s infinite; }
-.pad.done-5 { animation: padPulse 3s ease-in-out 1.2s infinite; }
-.pad.done-6 { animation: padPulse 3s ease-in-out 1.5s infinite; }
-.pad.done-7 { animation: padPulse 3s ease-in-out 1.8s infinite; }
-.pad.done-8 { animation: padPulse 3s ease-in-out 2.1s infinite; }
-
-@keyframes padPulse {
-    0%, 100% { background: linear-gradient(145deg, #1a3a1a, #0d200d); box-shadow: 0 0 10px rgba(57,255,20,0.5), inset 0 0 5px rgba(57,255,20,0.1); border-color: #39FF14; }
-    50%       { background: linear-gradient(145deg, #1f4a1f, #112511); box-shadow: 0 0 22px rgba(57,255,20,0.9), inset 0 0 10px rgba(57,255,20,0.25); border-color: #39FF14; }
-}
-
-.pad.error {
-    background: linear-gradient(145deg, #3a1a1a, #200d0d) !important;
-    box-shadow: 0 0 12px rgba(255,60,60,0.6), inset 0 0 6px rgba(255,60,60,0.15) !important;
-    border-color: #ff3c3c !important;
-    animation: padError 0.8s ease-in-out infinite !important;
-}
-@keyframes padError {
-    0%, 100% { box-shadow: 0 0 8px rgba(255,60,60,0.4); }
-    50%       { box-shadow: 0 0 20px rgba(255,60,60,0.9); }
-}
-
-.sp-controls {
-    background: #1a1a1a; padding: 12px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 2px solid #111; gap: 16px;
-}
-.knobs-row { display: flex; gap: 14px; align-items: center; }
-.knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.knob {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #4a4a4a, #1a1a1a);
-    border: 2px solid #111;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08);
-    position: relative;
-}
-.knob::after {
-    content: ''; position: absolute; top: 4px; left: 50%;
-    transform: translateX(-50%);
-    width: 2px; height: 7px; background: #c8a84b; border-radius: 1px;
-}
-.knob-label { font-size: 7px; color: #555; letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
-
-.sp-loader { background: #1c1c1c; padding: 12px 24px; border-bottom: 2px solid #111; }
-.loader-label { font-size: 7px; color: #555; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
-
-.sp-convert-panel {
-    background: linear-gradient(180deg, #1c1c1c 0%, #161616 100%);
-    border-top: 1px solid #2a2a2a;
-    padding: 16px 24px 22px 24px;
-    display: flex; flex-direction: column; gap: 6px;
-}
-.convert-instruction { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
-.convert-step { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #555; letter-spacing: 2px; text-transform: uppercase; }
-.convert-arrow { color: #39FF14; font-size: 10px; }
-.convert-tag {
-    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 700;
-    color: #39FF14; letter-spacing: 3px; text-transform: uppercase;
-    border: 1px solid #39FF14; border-radius: 3px; padding: 2px 6px; opacity: 0.7;
-}
-
-.stFileUploader { background: #111 !important; border: 1px dashed #39FF14 !important; border-radius: 8px !important; padding: 4px !important; }
-
+/* ── ANALYZE BUTTON ── */
 .stButton > button {
-    background: linear-gradient(180deg, #242424 0%, #161616 100%) !important;
-    color: #39FF14 !important;
-    border: 1px solid #2a2a2a !important;
-    border-top: 1px solid #333 !important;
-    border-bottom: 5px solid #060606 !important;
-    border-radius: 10px !important;
-    font-family: 'Orbitron', sans-serif !important;
-    font-weight: 900 !important; font-size: 12px !important;
-    letter-spacing: 3px !important;
-    height: auto !important; min-height: 70px !important; width: 100% !important;
+    background: var(--gold) !important;
+    color: #0d0e10 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04) !important;
-    transition: all 0.1s !important;
-    white-space: normal !important; line-height: 1.4 !important; padding: 12px 16px !important;
+    height: 52px !important;
+    width: 100% !important;
+    box-shadow: 0 0 0 0 rgba(201,168,76,0) !important;
+    transition: all 0.2s ease !important;
+    padding: 0 24px !important;
+    margin-bottom: 16px !important;
 }
-.stButton > button:hover { box-shadow: 0 0 24px rgba(57,255,20,0.25), 0 4px 20px rgba(0,0,0,0.6) !important; border-color: #39FF14 !important; }
-.stButton > button:active { border-bottom: 2px solid #060606 !important; transform: translateY(3px) !important; }
+.stButton > button:hover {
+    background: #d4b05a !important;
+    box-shadow: 0 4px 24px rgba(201,168,76,0.25) !important;
+    transform: translateY(-1px) !important;
+}
+.stButton > button:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+}
 
-.results-outer { margin-top: 20px; }
-
+/* ── SECTION LABEL ── */
 .section-label {
-    font-size: 8px; color: #c8a84b; letter-spacing: 4px; text-transform: uppercase;
-    font-family: 'Orbitron', sans-serif;
-    margin: 20px 0 8px 0; padding-bottom: 5px;
-    border-bottom: 1px solid #252525;
-    display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px; font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 3px; text-transform: uppercase;
+    margin: 0 0 12px 0;
+    display: flex; align-items: center; gap: 10px;
 }
-.section-label::before { content: '▶'; color: #39FF14; font-size: 8px; }
+.section-label .lbadge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; font-weight: 400;
+    color: var(--text-faint);
+    letter-spacing: 0;
+    text-transform: none;
+    margin-left: auto;
+}
+.section-label .lbadge.ok   { color: var(--green); }
+.section-label .lbadge.warn { color: var(--orange); }
+.section-label .lbadge.over { color: var(--red); }
 
-.section-label-sub {
-    font-size: 7px; color: #444; letter-spacing: 2px;
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 8px; padding-left: 14px;
-    line-height: 1.6;
+/* ── RESULT CARDS ── */
+.result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+.result-card.gold-left { border-left: 3px solid var(--gold); }
+.result-card.green-left { border-left: 3px solid var(--green); }
+.result-card.orange-left { border-left: 3px solid var(--orange); }
+
+/* ── ANALYSIS TEXT ── */
+.analysis-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 2;
+    color: #9aa3ae;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
-.analysis-block {
-    background: #0d0d0d; border: 1px solid #222;
-    border-left: 3px solid #c8a84b; border-radius: 6px;
-    padding: 16px 18px; font-size: 11.5px; line-height: 1.9;
-    color: #bbb; white-space: pre-wrap; word-break: break-word;
-    font-family: 'JetBrains Mono', monospace;
-}
-
+/* ── PROMPT OUTPUT ── */
 .stTextArea textarea {
-    background-color: #080808 !important; color: #39FF14 !important;
-    border: 1px solid #333 !important; border-left: 3px solid #39FF14 !important;
-    border-radius: 6px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 12px !important; line-height: 1.7 !important; padding: 14px !important;
-    box-shadow: inset 0 0 20px rgba(57,255,20,0.03) !important;
-    resize: vertical !important;
+    background: var(--surface2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 8px !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 12.5px !important;
+    line-height: 1.75 !important;
+    padding: 14px 16px !important;
+    resize: none !important;
+    caret-color: var(--gold) !important;
+}
+.stTextArea textarea:focus {
+    border-color: var(--gold-dim) !important;
+    box-shadow: 0 0 0 2px rgba(201,168,76,0.1) !important;
+    outline: none !important;
 }
 .stTextArea label { display: none !important; }
 
-.neon-divider { border: none; border-top: 1px solid #1d1d1d; margin: 22px 0; }
-
-.sp-footer {
-    text-align: center; margin-top: 28px; font-size: 7px; color: #2a2a2a;
-    letter-spacing: 4px; font-family: 'Orbitron', sans-serif; text-transform: uppercase;
+/* ── COPY BUTTON ROW ── */
+.copy-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
 }
-.stSpinner > div { border-top-color: #39FF14 !important; }
+.copy-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+}
+.copy-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+/* ── STEM TIP CARD ── */
+.stem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+.stem-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px; font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+}
+.stem-body {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.9;
+    color: var(--text-dim);
+}
+.stem-body strong { color: var(--text); font-weight: 500; }
+.stem-body a { color: var(--green); text-decoration: none; }
+.stem-body a:hover { text-decoration: underline; }
+.stem-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 10px;
+}
+.stem-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+}
+
+/* ── DIVIDER ── */
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+}
+
+/* ── FOOTER ── */
+.app-footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+}
+.footer-brand { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text-faint); }
+
+/* ── SPINNER ── */
+.stSpinner > div { border-top-color: var(--gold) !important; }
+
+/* ── COPY SCRIPT injected once ── */
 </style>
+
+<script>
+function copyPrompt(id) {
+    const ta = document.getElementById(id);
+    if (!ta) return;
+    navigator.clipboard.writeText(ta.value).then(() => {
+        const btn = document.querySelector('[data-copy="' + id + '"]');
+        if (btn) {
+            btn.classList.add('copied');
+            btn.innerHTML = '&#10003; Copied';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '&#9112; Copy Prompt';
+            }, 2000);
+        }
+    });
+}
+</script>
 """, unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 1 — Pure audio analysis. No prompt generation. No template hints.
-# Let Gemini hear what it hears without any leading language.
+# PASS 1 — Pure audio analysis
 # ══════════════════════════════════════════════════════════════════════════════
 ANALYSIS_PROMPT = """
-You are an expert musicologist and audio analyst. Listen to this recording carefully and describe exactly what you hear.
-
-Your job is ONLY analysis — do not generate any AI music prompts yet.
-
-Be precise and specific. Do not guess or generalize. If something is ambiguous, say so.
-Do not use template language or fill in defaults — every field must reflect this specific recording.
+You are an expert musicologist and audio analyst. Listen to this recording and describe exactly what you hear.
+Your job is ONLY analysis — no AI music prompts yet. Be precise. Never fill in defaults.
 
 Output using these exact headers:
 
 ## ANALYSIS
-ERA: [Identify the most likely decade and recording period this was made — e.g. "Late 1950s", "Early 1970s", "Mid 1980s", "Early 1990s". Base this on instrumentation, recording quality, production style, and sonic character. Be specific.]
-RECORDING AESTHETIC: [Describe the sonic character — e.g. "Blue Note jazz studio", "Motown studio production", "DIY lo-fi bedroom recording", "major label 70s soul session", "70mm orchestral scoring stage". Be evocative and specific.]
-PRODUCTION TEXTURE: [What is the sonic patina of the recording itself? Analog tape warmth, vinyl surface noise, digital clarity, cassette saturation, room bleed, etc.]
-BPM: [Estimated tempo range — two numbers e.g. 72–78. If there is no clear pulse, describe the rhythmic feel instead.]
-GROOVE: [Straight, swung, triplet feel, rubato, free time — describe the rhythmic character with nuance]
-KEY + MODE: [e.g. "Bb minor", "D Dorian", "G Mixolydian", "ambiguous / modal". Include the scale character.]
-CHORD MOVEMENT: [Describe the harmonic progression in plain language — what chords are implied, how they move, what the cycle feels like]
-INSTRUMENTATION: [List every instrument you can identify. Be specific — not just "bass" but "upright bass" or "electric bass". Not just "keys" but "Rhodes electric piano" or "Hammond B3". DO NOT mention drums, kick, snare, or hi-hats.]
-VOCAL TONE: [If vocals are present: describe register, texture, style, and delivery — e.g. "low baritone, smoky and restrained, phrasing like a jazz balladeer". If no vocals: "Instrumental — no vocals detected."]
-ARRANGEMENT ARC: [How does the recording build and evolve? Describe the dynamics, what enters and exits, the shape of the performance.]
-EMOTIONAL CHARACTER: [What is the emotional core of this recording? Use 3–5 specific descriptors. Go beyond genre — describe the feeling.]
-SAMPLE POTENTIAL: [From a producer's perspective — what makes this recording interesting to chop? What melodic or harmonic moments stand out? What would a boom bap or soul sample producer gravitate toward?]
+ERA: [Most likely decade and period — e.g. "Late 1950s", "Early 1970s", "Mid 1980s". Base on instrumentation, recording quality, sonic character. Be specific — not just "vintage".]
+RECORDING AESTHETIC: [Evocative description — e.g. "Blue Note hard bop session", "Motown studio production", "Major label 70s soul", "DIY 90s lo-fi bedroom recording", "Classic 80s new wave".]
+PRODUCTION TEXTURE: [Sonic patina — analog tape warmth, vinyl surface noise, digital clarity, cassette saturation, room bleed, etc. What does the recording feel like?]
+BPM: [Tight 2-number range — e.g. "72-78". If no clear pulse, describe rhythmic feel instead.]
+GROOVE: [Straight / swung / triplet / rubato / free — with nuance about how it feels.]
+KEY + MODE: [e.g. "Bb minor", "D Dorian", "G Mixolydian". Include scale character.]
+CHORD MOVEMENT: [Harmonic progression in plain language — what moves, what cycles, what the harmony implies emotionally.]
+INSTRUMENTATION: [Every instrument identified, named specifically — "upright bass" not "bass", "Rhodes electric piano" not "keys". NO drums, kick, snare, or hi-hats mentioned.]
+VOCAL TONE: [If vocals: register, texture, delivery style. If none: "Instrumental — no vocals."]
+EMOTIONAL CHARACTER: [3-5 specific mood descriptors. Describe the actual feeling, not the genre label.]
+SAMPLE POTENTIAL: [What would a boom bap or soul producer gravitate toward. What melodic or harmonic moments stand out for chopping and pitching.]
 FLIP DIRECTIONS:
-A. [Specific production direction grounded in what you heard — different tempo, pitch shift, genre context]
+A. [Specific direction grounded in what you heard]
 B. [Second direction]
 C. [Third direction]
 """.strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 2 — Prompt generation from analysis. Text-only, no audio re-upload.
-# Three prompts: Clone / Sampler / Drumless Variant
-# Target 800 chars so output stays well under Suno's 1000-char style limit.
-# Python cap_prompt() is the hard enforcer — model instructions are guidance.
+# PASS 2 — Prompt generation from analysis only
+# Research applied:
+# - 4-7 descriptors = proven sweet spot across 1000+ tested generations
+# - Era as first anchor = strongest structural signal for Suno/Udio
+# - Specific instrument names = single most powerful lever
+# - Production/texture/mood language > music theory terms
+# - "No drums" negation makes things worse — stem sep is the real answer
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
     return f"""
-You are a specialist in writing AI music generation prompts for sample-based hip-hop producers.
+You are a specialist writing AI music generation prompts for sample-based hip-hop producers.
 
-Below is a detailed musical analysis of a specific recording. Write three prompts based EXCLUSIVELY on this analysis. Do not invent details not in the analysis. Do not default to generic 1970s language unless the analysis identifies that era.
+Write two prompts from the analysis below. Base everything ONLY on what the analysis found.
+Do NOT default to generic era language unless the analysis specifically identifies it.
 
-STRICT LENGTH RULE: Every prompt must be a single flowing paragraph, NO bullet points, NO internal line breaks. TARGET: 750–850 characters. ABSOLUTE MAXIMUM: 950 characters. Count carefully — shorter is better.
+STRICT RULES:
+1. Single flowing paragraph per prompt — no bullets, no line breaks inside, no sub-headers
+2. TARGET 420-560 characters. HARD MAX 700 characters. Punchy beats dense.
+3. 4-7 strong descriptors produce better AI output than exhaustive paragraphs
+4. Lead with ERA + RECORDING AESTHETIC — this is Suno and Udio's strongest signal
+5. Name instruments specifically — "Rhodes electric piano", "upright bass" — biggest quality lever
+6. Use production and mood language — outperforms music theory terms with these models
+7. NO drums, percussion, kick, snare, hi-hats, or beats in either prompt, ever
+8. End both prompts with: "designed to feel loopable"
 
 ANALYSIS:
 {analysis_text}
@@ -349,24 +410,15 @@ ANALYSIS:
 ---
 
 ## CLONE PROMPT
-Single paragraph, 750–850 chars max, no drums no percussion no beats anywhere.
-
-Recreate the source recording faithfully using only what the analysis found:
-ERA + RECORDING AESTHETIC → specific instruments named → key and chord feel → vocal tone or "no vocals, purely instrumental" → production texture (tape/vinyl/digital) → emotional character → end with "designed to feel loopable."
+Single paragraph, 420-560 chars target, no drums anywhere.
+Build as: [ERA + RECORDING AESTHETIC from analysis] — [specific instruments named from analysis] — [key and chord feel translated into vibe/emotional language, not theory] — [vocal tone or "no vocals, purely instrumental"] — [production texture from analysis] — [2-3 emotional character words] — "designed to feel loopable."
+Goal: someone pasting this should get something that sounds like the original recording.
 
 ## SAMPLER PROMPT
-Single paragraph, 750–850 chars max, no drums no percussion no beats anywhere.
-
-Same analysis reframed for sample flipping. Structure: ERA + recording type (exact era from analysis, not a placeholder) → production texture → tempo feel + BPM range → specific instruments → vocals or "no vocals" → sonic imperfections (crackle, human timing, room) → 2–3 mood words → end with "designed to feel loopable. The kind of record that would be sampled, chopped and pitched up."
-
-Works in Suno, Udio, and Sampla.ai.
-
-## DRUMLESS PROMPT
-Single paragraph, 750–850 chars max.
-
-This is the most important prompt for producers. Take the SAMPLER PROMPT content and layer in aggressive drumless direction throughout — not just at the end. Weave in: "no drums", "no percussion", "no rhythm section", "purely melodic and harmonic", "drumless", "no kick no snare no hi-hat" at natural points in the paragraph. The goal is to overwhelm any tendency for the AI to add drums. Start the prompt with "Drumless instrumental —" and end with "no drums no percussion no beats of any kind, designed to be chopped and flipped."
-
-This prompt is specifically engineered so Suno, Udio, and Sampla.ai generate a clean drumless result every time.
+Single paragraph, 420-560 chars target, no drums anywhere.
+Same analysis reframed for maximum sample-flip value.
+Build as: [ERA + RECORDING AESTHETIC] — [specific instruments] — [tempo feel + BPM range in vibe language not numbers theory] — [vocals or "no vocals"] — [sonic imperfections: crackle, tape hiss, human timing, room feel — pull from production texture in the analysis] — [2-3 mood words from emotional character] — "designed to feel loopable, the kind of record that would be sampled, chopped and pitched up."
+Works identically in Suno, Udio, and Sampla.ai.
 """.strip()
 
 
@@ -376,126 +428,77 @@ def extract_section(text, header):
     return match.group(1).strip() if match else ""
 
 
-def cap_prompt(text, limit=1000):
+def cap_prompt(text, limit=700):
     if len(text) > limit:
         return text[:limit - 3].rsplit(" ", 1)[0] + "..."
     return text
 
 
-def render_pads(state="idle"):
-    pads_html = '<div class="pads-grid">'
-    for i in range(1, 9):
-        if state in ("running", "done"):
-            cls = f"pad {state}-{i}"
-        elif state == "error":
-            cls = "pad error"
-        else:
-            cls = "pad idle"
-        pads_html += f'<div class="{cls}"><span class="pad-num">{i}</span></div>'
-    pads_html += '</div>'
-    return pads_html
-
-
-def render_lcd(line1, line2=""):
-    sub = f'<div class="lcd-sub">{line2}</div>' if line2 else ""
-    return f'<div class="lcd-outer"><div><div class="lcd-text">{line1}</div>{sub}</div></div>'
-
-
-def render_knobs():
-    labels = ["TUNE", "CUTOFF", "LEVEL", "PITCH"]
-    knobs = "".join(
-        f'<div class="knob-wrap"><div class="knob"></div><div class="knob-label">{l}</div></div>'
-        for l in labels
-    )
-    return f'<div class="knobs-row">{knobs}</div>'
+def char_color(n, limit=700):
+    if n > limit: return "over"
+    if n > 580:   return "warn"
+    return "ok"
 
 
 # ── SESSION STATE ──────────────────────────────────────────────────────────────
 for key, default in [
-    ("pad_state", "idle"), ("analysis", ""),
-    ("clone_prompt", ""), ("sampler_prompt", ""), ("drumless_prompt", "")
+    ("pad_state", "idle"),
+    ("analysis", ""),
+    ("clone_prompt", ""),
+    ("sampler_prompt", ""),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
 
-# ── RENDER MACHINE ─────────────────────────────────────────────────────────────
-st.markdown('<div class="sp-unit">', unsafe_allow_html=True)
 
+# ══════════════════════════════════════════════════════════════════════════════
+# RENDER
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown('<div class="page">', unsafe_allow_html=True)
+
+# ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div class="sp-top-strip">
-    <div class="brand-left">
-        <div class="brand-company">Booman Systems</div>
-        <div class="brand-model">SP-1200</div>
-        <div class="brand-tagline">Sample Prompt 1200</div>
+<div class="app-header">
+    <div class="header-left">
+        <div class="app-eyebrow">130 MODE · Booman Systems</div>
+        <div class="app-title">Sample Prompt <span>1200</span></div>
     </div>
-    <div class="logo-badge">
-        <div class="n130">130</div>
-        <div class="mode">MODE</div>
+    <div class="app-badge">
+        <div class="badge-num">130</div>
+        <div class="badge-txt">MODE</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── LCD ────────────────────────────────────────────────────────────────────────
-st.markdown('<div class="sp-display-zone">', unsafe_allow_html=True)
-lcd_slot = st.empty()
+# ── STATUS BAR ────────────────────────────────────────────────────────────────
 state = st.session_state.pad_state
-if state == "idle":
-    lcd_slot.markdown(render_lcd("READY // BANK A", "load sample to begin"), unsafe_allow_html=True)
-elif state == "pass1":
-    lcd_slot.markdown(render_lcd("PASS 1 — READING SAMPLE", "analyzing audio..."), unsafe_allow_html=True)
-elif state == "pass2":
-    lcd_slot.markdown(render_lcd("PASS 2 — BUILDING PROMPTS", "generating from analysis..."), unsafe_allow_html=True)
-elif state == "done":
-    lcd_slot.markdown(render_lcd("DECODE COMPLETE", "prompts ready to copy"), unsafe_allow_html=True)
-elif state == "error":
-    lcd_slot.markdown(render_lcd("HARDWARE ERROR", "check console"), unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ── PADS ───────────────────────────────────────────────────────────────────────
-st.markdown('<div class="sp-pads-zone">', unsafe_allow_html=True)
-st.markdown('<div class="pads-label">Sample Bank A — Drum Pads</div>', unsafe_allow_html=True)
-pads_slot = st.empty()
-pads_slot.markdown(render_pads(st.session_state.pad_state if st.session_state.pad_state in ("done",) else
-                               "running" if st.session_state.pad_state in ("pass1","pass2") else
-                               st.session_state.pad_state), unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ── KNOBS ──────────────────────────────────────────────────────────────────────
-st.markdown(f"""
-<div class="sp-controls">
-    {render_knobs()}
-    <div style="text-align:right;">
-        <div style="font-size:7px; color:#333; letter-spacing:2px; font-family:'JetBrains Mono',monospace;">12-BIT LINEAR</div>
-        <div style="font-size:7px; color:#2a2a2a; letter-spacing:1px; font-family:'JetBrains Mono',monospace; margin-top:2px;">44.1kHz SAMPLE RATE</div>
-    </div>
+status_messages = {
+    "idle":  ("idle",   "Ready — drop a sample to begin"),
+    "pass1": ("active", "Pass 1 — Reading and analyzing audio..."),
+    "pass2": ("active", "Pass 2 — Building prompts from analysis..."),
+    "done":  ("done",   "Decode complete — prompts ready to copy"),
+    "error": ("error",  "Error — check details below"),
+}
+dot_class, status_text = status_messages.get(state, ("idle", "Ready"))
+status_slot = st.empty()
+status_slot.markdown(f"""
+<div class="status-bar">
+    <div class="status-dot {dot_class}"></div>
+    <span>{status_text}</span>
 </div>
 """, unsafe_allow_html=True)
 
-# ── FILE LOADER ────────────────────────────────────────────────────────────────
-st.markdown('<div class="sp-loader">', unsafe_allow_html=True)
-st.markdown('<div class="loader-label">① Load Sample — MP3 / WAV</div>', unsafe_allow_html=True)
-uploaded_file = st.file_uploader("", type=["mp3", "wav"])
+# ── UPLOAD ────────────────────────────────────────────────────────────────────
+st.markdown('<div class="upload-card">', unsafe_allow_html=True)
+st.markdown('<div class="upload-label">Load Sample</div>', unsafe_allow_html=True)
+uploaded_file = st.file_uploader("", type=["mp3", "wav"], label_visibility="collapsed")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ── CONVERT PANEL ──────────────────────────────────────────────────────────────
-st.markdown('<div class="sp-convert-panel">', unsafe_allow_html=True)
-st.markdown("""
-<div class="convert-instruction">
-    <span class="convert-step">② Drop sample above</span>
-    <span class="convert-arrow">→</span>
-    <span class="convert-step">Press button below</span>
-    <span class="convert-arrow">→</span>
-    <span class="convert-tag">CONVERT TO PROMPT</span>
-</div>
-""", unsafe_allow_html=True)
-run_btn = st.button("⬡  ANALYZE SAMPLE → CONVERT TO PROMPT")
-st.markdown('</div>', unsafe_allow_html=True)
+# ── ANALYZE BUTTON ────────────────────────────────────────────────────────────
+run_btn = st.button("Analyze Sample → Generate Prompts")
 
-st.markdown('</div>', unsafe_allow_html=True)  # close sp-unit
-
-# ── TWO-PASS ANALYSIS ──────────────────────────────────────────────────────────
+# ── TWO-PASS ANALYSIS ─────────────────────────────────────────────────────────
 if uploaded_file and run_btn:
-
     ext  = uploaded_file.name.rsplit(".", 1)[-1].lower()
     mime = "audio/wav" if ext == "wav" else "audio/mpeg"
     b64  = base64.b64encode(uploaded_file.getvalue()).decode("utf-8")
@@ -505,78 +508,170 @@ if uploaded_file and run_btn:
         genai.configure(api_key=st.secrets["GEMINI_KEY"])
         model = genai.GenerativeModel("gemini-2.5-flash")
 
-        # ── PASS 1: Audio analysis ─────────────────────────────────────────
+        # PASS 1
         st.session_state.pad_state = "pass1"
-        lcd_slot.markdown(render_lcd("PASS 1 — READING SAMPLE", "analyzing audio..."), unsafe_allow_html=True)
-        pads_slot.markdown(render_pads("running"), unsafe_allow_html=True)
+        status_slot.markdown("""
+<div class="status-bar">
+    <div class="status-dot active"></div>
+    <span>Pass 1 — Reading and analyzing audio...</span>
+</div>""", unsafe_allow_html=True)
 
         with st.spinner(""):
             r1 = model.generate_content([ANALYSIS_PROMPT, audio_part])
-            analysis_raw = r1.text
-            st.session_state.analysis = extract_section(analysis_raw, "ANALYSIS") or analysis_raw
+            st.session_state.analysis = extract_section(r1.text, "ANALYSIS") or r1.text
 
-        # ── PASS 2: Prompt generation (text only, no audio re-upload) ──────
+        # PASS 2
         st.session_state.pad_state = "pass2"
-        lcd_slot.markdown(render_lcd("PASS 2 — BUILDING PROMPTS", "generating from analysis..."), unsafe_allow_html=True)
+        status_slot.markdown("""
+<div class="status-bar">
+    <div class="status-dot active"></div>
+    <span>Pass 2 — Building prompts from analysis...</span>
+</div>""", unsafe_allow_html=True)
 
         with st.spinner(""):
-            prompt_gen = build_prompt_generation(st.session_state.analysis)
-            r2 = model.generate_content(prompt_gen)
-            prompts_raw = r2.text
-
-            st.session_state.clone_prompt    = cap_prompt(extract_section(prompts_raw, "CLONE PROMPT"))
-            st.session_state.sampler_prompt  = cap_prompt(extract_section(prompts_raw, "SAMPLER PROMPT"))
-            st.session_state.drumless_prompt = cap_prompt(extract_section(prompts_raw, "DRUMLESS PROMPT"))
+            r2 = model.generate_content(build_prompt_generation(st.session_state.analysis))
+            raw = r2.text
+            st.session_state.clone_prompt   = cap_prompt(extract_section(raw, "CLONE PROMPT"))
+            st.session_state.sampler_prompt = cap_prompt(extract_section(raw, "SAMPLER PROMPT"))
 
         st.session_state.pad_state = "done"
-        lcd_slot.markdown(render_lcd("DECODE COMPLETE", "prompts ready to copy"), unsafe_allow_html=True)
-        pads_slot.markdown(render_pads("done"), unsafe_allow_html=True)
+        status_slot.markdown("""
+<div class="status-bar">
+    <div class="status-dot done"></div>
+    <span>Decode complete — prompts ready to copy</span>
+</div>""", unsafe_allow_html=True)
 
     except Exception as e:
         st.session_state.pad_state = "error"
-        lcd_slot.markdown(render_lcd("HARDWARE ERROR", str(e)[:40]), unsafe_allow_html=True)
-        pads_slot.markdown(render_pads("error"), unsafe_allow_html=True)
+        status_slot.markdown(f"""
+<div class="status-bar">
+    <div class="status-dot error"></div>
+    <span>Error: {str(e)[:80]}</span>
+</div>""", unsafe_allow_html=True)
         st.error(f"Error: {str(e)}")
 
 
-# ── RESULTS ────────────────────────────────────────────────────────────────────
-def char_badge(n, limit=1000):
-    col = "#ff4444" if n > limit else "#c8a84b" if n > 900 else "#39FF14"
-    return f'<span style="margin-left:auto;font-family:JetBrains Mono,monospace;font-size:8px;color:{col};">{n}/{limit}</span>'
-
+# ── RESULTS ───────────────────────────────────────────────────────────────────
 if st.session_state.analysis:
-    st.markdown('<div class="results-outer">', unsafe_allow_html=True)
 
-    # ANALYSIS
-    st.markdown('<div class="section-label">Sample Analysis</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="analysis-block">{st.session_state.analysis}</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
-    st.markdown('<hr class="neon-divider">', unsafe_allow_html=True)
+    # ANALYSIS CARD
+    st.markdown("""
+<div class="section-label">Sample Analysis</div>
+""", unsafe_allow_html=True)
+    st.markdown(f"""
+<div class="result-card gold-left">
+    <div class="analysis-text">{st.session_state.analysis}</div>
+</div>
+""", unsafe_allow_html=True)
 
     # CLONE PROMPT
     if st.session_state.clone_prompt:
-        n = len(st.session_state.clone_prompt)
-        st.markdown(f'<div class="section-label">Clone Prompt {char_badge(n)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-label-sub">Faithful sonic recreation — paste into Suno, Udio, or Sampla.ai</div>', unsafe_allow_html=True)
-        st.text_area("", value=st.session_state.clone_prompt, height=185, key="cp", label_visibility="collapsed")
+        n  = len(st.session_state.clone_prompt)
+        cc = char_color(n)
+        st.markdown(f"""
+<div class="section-label">
+    Clone Prompt
+    <span class="lbadge {cc}">{n} / 700 chars</span>
+</div>
+<div class="result-card green-left" style="padding-bottom:12px;">
+    <div style="font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:10px;font-family:'DM Mono',monospace;">
+        FAITHFUL SONIC RECREATION · SUNO / UDIO / SAMPLA.AI
+    </div>
+""", unsafe_allow_html=True)
+        st.text_area("", value=st.session_state.clone_prompt, height=130, key="cp_ta", label_visibility="collapsed")
+        st.markdown("""
+    <div class="copy-row">
+        <button class="copy-btn" data-copy="cp_ta"
+            onclick="(function(){
+                var areas=document.querySelectorAll('textarea');
+                var txt='';
+                areas.forEach(function(a){if(a.getAttribute('aria-label')==='cp_ta'||a.id==='cp_ta')txt=a.value;});
+                if(!txt){areas.forEach(function(a,i){if(i===0)txt=a.value;});}
+                navigator.clipboard.writeText(txt);
+                var b=document.querySelectorAll('.copy-btn')[0];
+                b.style.color='var(--green)';b.style.borderColor='var(--green)';
+                b.innerHTML='&#10003; Copied';
+                setTimeout(function(){b.style.color='';b.style.borderColor='';b.innerHTML='&#9632; Copy Prompt';},2000);
+            })()">
+            &#9632; Copy Prompt
+        </button>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # SAMPLER PROMPT
     if st.session_state.sampler_prompt:
-        n = len(st.session_state.sampler_prompt)
-        st.markdown(f'<div class="section-label">Sampler Prompt {char_badge(n)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-label-sub">Flip-ready reframe — loopable, choppable, designed to be sampled — Suno / Udio / Sampla.ai</div>', unsafe_allow_html=True)
-        st.text_area("", value=st.session_state.sampler_prompt, height=185, key="sp", label_visibility="collapsed")
+        n  = len(st.session_state.sampler_prompt)
+        cc = char_color(n)
+        st.markdown(f"""
+<div class="section-label" style="margin-top:20px;">
+    Sampler Prompt
+    <span class="lbadge {cc}">{n} / 700 chars</span>
+</div>
+<div class="result-card green-left" style="padding-bottom:12px;">
+    <div style="font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:10px;font-family:'DM Mono',monospace;">
+        FLIP-READY · LOOPABLE · CHOPPABLE · SUNO / UDIO / SAMPLA.AI
+    </div>
+""", unsafe_allow_html=True)
+        st.text_area("", value=st.session_state.sampler_prompt, height=130, key="sp_ta", label_visibility="collapsed")
+        st.markdown("""
+    <div class="copy-row">
+        <button class="copy-btn"
+            onclick="(function(){
+                var areas=document.querySelectorAll('textarea');
+                var txt='';
+                if(areas.length>=2)txt=areas[1].value;
+                navigator.clipboard.writeText(txt);
+                var b=document.querySelectorAll('.copy-btn')[1];
+                b.style.color='var(--green)';b.style.borderColor='var(--green)';
+                b.innerHTML='&#10003; Copied';
+                setTimeout(function(){b.style.color='';b.style.borderColor='';b.innerHTML='&#9632; Copy Prompt';},2000);
+            })()">
+            &#9632; Copy Prompt
+        </button>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-    # DRUMLESS PROMPT
-    if st.session_state.drumless_prompt:
-        n = len(st.session_state.drumless_prompt)
-        st.markdown(f'<div class="section-label">Drumless Variant {char_badge(n)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-label-sub">Engineered to force drumless output — no kick, no snare, no hi-hat — Suno / Udio / Sampla.ai</div>', unsafe_allow_html=True)
-        st.text_area("", value=st.session_state.drumless_prompt, height=185, key="dp", label_visibility="collapsed")
+    # DRUMLESS WORKFLOW TIP
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.markdown("""
+<div class="stem-card">
+    <div class="stem-card-title">&#9888; Getting Drumless Results</div>
+    <div class="stem-body">
+        <strong>Why "no drums" in a prompt doesn't work:</strong> Suno, Udio, and Sampla.ai are trained
+        on music concepts — not negations. Saying "no drums" makes the model think harder about drums.
+        Repeating it makes it worse. This is a known limitation of how these models process language.<br><br>
 
-    st.markdown('</div>', unsafe_allow_html=True)
+        <strong>Option 1 — Generate then strip (most reliable):</strong><br>
+        Run your prompt as-is, then remove the drums from the rendered audio using a stem separator.
+        <br><br>
+        <a href="https://neuralanalog.com/remove-drums" target="_blank">neuralanalog.com</a> — paste any Suno or Udio share link, download a clean drumless stem instantly<br>
+        <strong>Suno Studio</strong> has a built-in stem tool under each generated track<br>
+        <strong>Moises · lalal.ai · Adobe Podcast</strong> all handle drum isolation cleanly<br><br>
 
-st.markdown(
-    '<div class="sp-footer">12-Bit Linear &nbsp;·&nbsp; 130 MODE © 2026 &nbsp;·&nbsp; Booman Systems</div>',
-    unsafe_allow_html=True
-)
+        <strong>Option 2 — Genre-lock to naturally sparse styles:</strong><br>
+        Add one of these to your prompt — these genres almost never generate drums:
+    </div>
+    <div class="stem-pills">
+        <span class="stem-pill">solo piano ballad</span>
+        <span class="stem-pill">string quartet</span>
+        <span class="stem-pill">jazz trio, bass and keys only</span>
+        <span class="stem-pill">ambient orchestral</span>
+        <span class="stem-pill">chamber music</span>
+        <span class="stem-pill">acoustic guitar and voice only</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ── FOOTER ────────────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="app-footer">
+    <span class="footer-brand">Sample Prompt 1200</span>
+    <span>130 MODE · Booman Systems · 2026</span>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # close .page
