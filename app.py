@@ -331,51 +331,42 @@ C. [Third direction]
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PASS 2 — Prompt generation from analysis. Text-only, no audio re-upload.
-# Two prompts: Clone (faithful recreation) + Sampler (flip-ready reframe).
+# Three prompts: Clone / Sampler / Drumless Variant
+# Target 800 chars so output stays well under Suno's 1000-char style limit.
+# Python cap_prompt() is the hard enforcer — model instructions are guidance.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
     return f"""
 You are a specialist in writing AI music generation prompts for sample-based hip-hop producers.
 
-Below is a detailed musical analysis of a specific recording. Your job is to write two prompts based EXCLUSIVELY on this analysis. Do not invent details not present in the analysis. Do not default to generic 1970s soul language unless the analysis specifically identifies that era.
+Below is a detailed musical analysis of a specific recording. Write three prompts based EXCLUSIVELY on this analysis. Do not invent details not in the analysis. Do not default to generic 1970s language unless the analysis identifies that era.
+
+STRICT LENGTH RULE: Every prompt must be a single flowing paragraph, NO bullet points, NO internal line breaks. TARGET: 750–850 characters. ABSOLUTE MAXIMUM: 950 characters. Count carefully — shorter is better.
 
 ANALYSIS:
 {analysis_text}
 
 ---
 
-Write two prompts using these exact headers:
-
 ## CLONE PROMPT
-A single flowing paragraph. Hard cap: 1000 characters including spaces. No bullet points. No line breaks within the paragraph. No drums, no percussion, no beats mentioned anywhere.
+Single paragraph, 750–850 chars max, no drums no percussion no beats anywhere.
 
-This prompt should recreate the source recording as faithfully as possible. Pull directly from the analysis:
-- Use the exact ERA identified (not a guess — what the analysis says)
-- Use the exact RECORDING AESTHETIC identified
-- Name the specific instruments identified
-- Use the KEY and CHORD MOVEMENT detected
-- Use the VOCAL TONE if vocals were detected, or state "no vocals, purely instrumental"
-- Use the PRODUCTION TEXTURE (tape, vinyl, digital, etc.)
-- Use the EMOTIONAL CHARACTER descriptors
-- End with: "designed to feel loopable"
-
-The goal: someone reading this prompt should be able to generate something that sounds like the original recording. Stay faithful to what was actually heard.
+Recreate the source recording faithfully using only what the analysis found:
+ERA + RECORDING AESTHETIC → specific instruments named → key and chord feel → vocal tone or "no vocals, purely instrumental" → production texture (tape/vinyl/digital) → emotional character → end with "designed to feel loopable."
 
 ## SAMPLER PROMPT
-A single flowing paragraph. Hard cap: 1000 characters including spaces. No bullet points. No line breaks within the paragraph. No drums, no percussion, no beats mentioned anywhere.
+Single paragraph, 750–850 chars max, no drums no percussion no beats anywhere.
 
-This prompt takes the same analysis but reframes it through a sample-flipping lens. Use this structure, populated entirely from the analysis above — not from defaults:
+Same analysis reframed for sample flipping. Structure: ERA + recording type (exact era from analysis, not a placeholder) → production texture → tempo feel + BPM range → specific instruments → vocals or "no vocals" → sonic imperfections (crackle, human timing, room) → 2–3 mood words → end with "designed to feel loopable. The kind of record that would be sampled, chopped and pitched up."
 
-1. ERA + RECORDING TYPE: Use the actual era and aesthetic from the analysis (e.g. "Vintage late 1950s hard bop jazz session" not a generic placeholder)
-2. PRODUCTION TEXTURE: Use the actual sonic patina detected — tape hiss, vinyl warmth, digital sheen, whatever was found
-3. TEMPO FEEL: Use the actual BPM range and groove character detected
-4. INSTRUMENTATION: Use the specific instruments identified — no drums, no percussion
-5. VOCAL CHARACTER: Use what was detected, or "no vocals"
-6. SONIC IMPERFECTIONS: Pull from the production texture — crackle, wow and flutter, room bleed, human timing, breath
-7. MOOD: Use the emotional character descriptors from the analysis — 2 or 3 strong words
-8. End with: "designed to feel loopable. Dramatic and [mood word from analysis], the kind of record that would be sampled, chopped and pitched up."
+Works in Suno, Udio, and Sampla.ai.
 
-This prompt should work equally well pasted into Suno, Udio, or Sampla.ai.
+## DRUMLESS PROMPT
+Single paragraph, 750–850 chars max.
+
+This is the most important prompt for producers. Take the SAMPLER PROMPT content and layer in aggressive drumless direction throughout — not just at the end. Weave in: "no drums", "no percussion", "no rhythm section", "purely melodic and harmonic", "drumless", "no kick no snare no hi-hat" at natural points in the paragraph. The goal is to overwhelm any tendency for the AI to add drums. Start the prompt with "Drumless instrumental —" and end with "no drums no percussion no beats of any kind, designed to be chopped and flipped."
+
+This prompt is specifically engineered so Suno, Udio, and Sampla.ai generate a clean drumless result every time.
 """.strip()
 
 
@@ -422,7 +413,7 @@ def render_knobs():
 # ── SESSION STATE ──────────────────────────────────────────────────────────────
 for key, default in [
     ("pad_state", "idle"), ("analysis", ""),
-    ("clone_prompt", ""), ("sampler_prompt", "")
+    ("clone_prompt", ""), ("sampler_prompt", ""), ("drumless_prompt", "")
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -533,8 +524,9 @@ if uploaded_file and run_btn:
             r2 = model.generate_content(prompt_gen)
             prompts_raw = r2.text
 
-            st.session_state.clone_prompt   = cap_prompt(extract_section(prompts_raw, "CLONE PROMPT"))
-            st.session_state.sampler_prompt = cap_prompt(extract_section(prompts_raw, "SAMPLER PROMPT"))
+            st.session_state.clone_prompt    = cap_prompt(extract_section(prompts_raw, "CLONE PROMPT"))
+            st.session_state.sampler_prompt  = cap_prompt(extract_section(prompts_raw, "SAMPLER PROMPT"))
+            st.session_state.drumless_prompt = cap_prompt(extract_section(prompts_raw, "DRUMLESS PROMPT"))
 
         st.session_state.pad_state = "done"
         lcd_slot.markdown(render_lcd("DECODE COMPLETE", "prompts ready to copy"), unsafe_allow_html=True)
@@ -548,6 +540,10 @@ if uploaded_file and run_btn:
 
 
 # ── RESULTS ────────────────────────────────────────────────────────────────────
+def char_badge(n, limit=1000):
+    col = "#ff4444" if n > limit else "#c8a84b" if n > 900 else "#39FF14"
+    return f'<span style="margin-left:auto;font-family:JetBrains Mono,monospace;font-size:8px;color:{col};">{n}/{limit}</span>'
+
 if st.session_state.analysis:
     st.markdown('<div class="results-outer">', unsafe_allow_html=True)
 
@@ -559,35 +555,24 @@ if st.session_state.analysis:
 
     # CLONE PROMPT
     if st.session_state.clone_prompt:
-        char_c = len(st.session_state.clone_prompt)
-        col = "#ff4444" if char_c > 1000 else "#39FF14"
-        st.markdown(
-            f'<div class="section-label">Clone Prompt'
-            f'<span style="margin-left:auto;font-family:JetBrains Mono,monospace;font-size:8px;color:{col};">{char_c}/1000</span>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            '<div class="section-label-sub">Faithful sonic recreation of the source — paste into Suno, Udio, or Sampla.ai</div>',
-            unsafe_allow_html=True
-        )
-        st.text_area("", value=st.session_state.clone_prompt, height=200, key="cp", label_visibility="collapsed")
+        n = len(st.session_state.clone_prompt)
+        st.markdown(f'<div class="section-label">Clone Prompt {char_badge(n)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-label-sub">Faithful sonic recreation — paste into Suno, Udio, or Sampla.ai</div>', unsafe_allow_html=True)
+        st.text_area("", value=st.session_state.clone_prompt, height=185, key="cp", label_visibility="collapsed")
 
     # SAMPLER PROMPT
     if st.session_state.sampler_prompt:
-        char_s = len(st.session_state.sampler_prompt)
-        col = "#ff4444" if char_s > 1000 else "#39FF14"
-        st.markdown(
-            f'<div class="section-label">Sampler Prompt'
-            f'<span style="margin-left:auto;font-family:JetBrains Mono,monospace;font-size:8px;color:{col};">{char_s}/1000</span>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            '<div class="section-label-sub">Flip-ready reframe — loopable, choppable, designed to be sampled — paste into Suno, Udio, or Sampla.ai</div>',
-            unsafe_allow_html=True
-        )
-        st.text_area("", value=st.session_state.sampler_prompt, height=200, key="sp", label_visibility="collapsed")
+        n = len(st.session_state.sampler_prompt)
+        st.markdown(f'<div class="section-label">Sampler Prompt {char_badge(n)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-label-sub">Flip-ready reframe — loopable, choppable, designed to be sampled — Suno / Udio / Sampla.ai</div>', unsafe_allow_html=True)
+        st.text_area("", value=st.session_state.sampler_prompt, height=185, key="sp", label_visibility="collapsed")
+
+    # DRUMLESS PROMPT
+    if st.session_state.drumless_prompt:
+        n = len(st.session_state.drumless_prompt)
+        st.markdown(f'<div class="section-label">Drumless Variant {char_badge(n)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-label-sub">Engineered to force drumless output — no kick, no snare, no hi-hat — Suno / Udio / Sampla.ai</div>', unsafe_allow_html=True)
+        st.text_area("", value=st.session_state.drumless_prompt, height=185, key="dp", label_visibility="collapsed")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
