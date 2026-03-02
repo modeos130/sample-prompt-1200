@@ -637,34 +637,43 @@ if st.session_state.analysis:
 
     # DRUMLESS WORKFLOW TIP
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown("""
-<div class="stem-card">
-    <div class="stem-card-title">&#9888; Getting Drumless Results</div>
-    <div class="stem-body">
-        <strong>Why "no drums" in a prompt doesn't work:</strong> Suno, Udio, and Sampla.ai are trained
-        on music concepts — not negations. Saying "no drums" makes the model think harder about drums.
-        Repeating it makes it worse. This is a known limitation of how these models process language.<br><br>
 
-        <strong>Option 1 — Generate then strip (most reliable):</strong><br>
-        Run your prompt as-is, then remove the drums from the rendered audio using a stem separator.
-        <br><br>
-        <a href="https://neuralanalog.com/remove-drums" target="_blank">neuralanalog.com</a> — paste any Suno or Udio share link, download a clean drumless stem instantly<br>
-        <strong>Suno Studio</strong> has a built-in stem tool under each generated track<br>
-        <strong>Moises · lalal.ai · Adobe Podcast</strong> all handle drum isolation cleanly<br><br>
-
-        <strong>Option 2 — Genre-lock to naturally sparse styles:</strong><br>
-        Add one of these to your prompt — these genres almost never generate drums:
-    </div>
-    <div class="stem-pills">
-        <span class="stem-pill">solo piano ballad</span>
-        <span class="stem-pill">string quartet</span>
-        <span class="stem-pill">jazz trio, bass and keys only</span>
-        <span class="stem-pill">ambient orchestral</span>
-        <span class="stem-pill">chamber music</span>
-        <span class="stem-pill">acoustic guitar and voice only</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    stem_html = (
+        '<div class="stem-card">'
+        '<div class="stem-card-title">&#9888;&nbsp; Getting Drumless Results</div>'
+        '<div class="stem-body">'
+        '<strong>Why &quot;no drums&quot; in a prompt does not work:</strong> Suno, Udio, and Sampla.ai are trained '
+        'on music concepts, not negations. Saying "no drums" makes the model think harder about drums. '
+        'Repeating it makes it worse. This is a known limitation of how these models process language.'
+        '</div>'
+        '<br>'
+        '<div class="stem-body">'
+        '<strong>Option 1 — Generate then strip (most reliable):</strong> Run your prompt as-is, then '
+        'remove the drums from the rendered audio using a stem separator.'
+        '<br><br>'
+        '&nbsp;&nbsp;<a href="https://neuralanalog.com/remove-drums" target="_blank">neuralanalog.com/remove-drums</a>'
+        ' — paste any Suno or Udio share link, download a clean drumless stem instantly'
+        '<br>'
+        '&nbsp;&nbsp;<strong>Suno Studio</strong> has a built-in stem tool under each generated track'
+        '<br>'
+        '&nbsp;&nbsp;<strong>Moises &middot; lalal.ai &middot; Adobe Podcast</strong> all handle drum isolation cleanly'
+        '</div>'
+        '<br>'
+        '<div class="stem-body">'
+        '<strong>Option 2 — Genre-lock to naturally sparse styles:</strong> Add one of these phrases '
+        'to your prompt. These genres almost never generate drums:'
+        '</div>'
+        '<div class="stem-pills">'
+        '<span class="stem-pill">solo piano ballad</span>'
+        '<span class="stem-pill">string quartet</span>'
+        '<span class="stem-pill">jazz trio, bass and keys only</span>'
+        '<span class="stem-pill">ambient orchestral</span>'
+        '<span class="stem-pill">chamber music</span>'
+        '<span class="stem-pill">acoustic guitar and voice only</span>'
+        '</div>'
+        '</div>'
+    )
+    st.markdown(stem_html, unsafe_allow_html=True)
 
 # ── FOOTER ────────────────────────────────────────────────────────────────────
 st.markdown("""
