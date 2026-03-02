@@ -751,18 +751,20 @@ def render_analysis(raw: str) -> None:
 
 
 def copy_button(text: str, btn_id: str, style: str = "default") -> None:
-    """Embeds text directly in onclick via JSON — no DOM traversal."""
-    safe  = json.dumps(text)
-    cls   = "cp-btn-quick" if style == "quick" else "cp-btn"
-    label = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
-    reset = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
+    """Embeds text in onclick — double quotes HTML-escaped so the attribute stays valid."""
+    # json.dumps wraps in double quotes; those must become &quot; inside onclick="..."
+    safe       = json.dumps(text).replace('"', '&quot;')
+    cls        = "cp-btn-quick" if style == "quick" else "cp-btn"
+    label      = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
+    reset_str  = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
+    safe_reset = json.dumps(reset_str).replace('"', '&quot;')
     st.markdown(
         f'<button class="{cls}" id="{btn_id}" '
         f'onclick="(function(b){{'
         f'navigator.clipboard.writeText({safe}).then(function(){{'
         f'b.classList.add(\'copied\');b.innerHTML=\'&#10003;&nbsp;Copied!\';'
         f'setTimeout(function(){{b.classList.remove(\'copied\');'
-        f'b.innerHTML={json.dumps(reset)};}},2000);}});'
+        f'b.innerHTML={safe_reset};}},2000);}});'
         f'}})(document.getElementById(\'{btn_id}\'))">'
         f'{label}</button>',
         unsafe_allow_html=True,
@@ -1005,20 +1007,19 @@ if st.session_state.analysis:
     with col_l:
         if st.session_state.clone_prompt:
             n = len(st.session_state.clone_prompt)
+            # Each st.markdown call must be self-contained (balanced tags).
+            # Splitting an opening <div> across calls breaks the DOM and causes
+            # subsequent elements to render as raw HTML text.
             st.markdown(
-                f'<div class="prompt-card">'
-                f'<div class="prompt-card-title">Clone Prompt</div>'
-                f'<div class="prompt-card-sub">Faithful sonic recreation</div>',
+                '<div class="prompt-card-title">Clone Prompt</div>'
+                '<div class="prompt-card-sub">Faithful sonic recreation</div>',
                 unsafe_allow_html=True,
             )
             st.text_area(
                 "clone", value=st.session_state.clone_prompt,
                 height=160, key="ta_clone", label_visibility="collapsed",
             )
-            st.markdown(
-                char_chips(n) + '</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown(char_chips(n), unsafe_allow_html=True)
             copy_button(st.session_state.clone_prompt, "cb_clone")
         elif st.session_state.app_state == "done":
             st.markdown(
@@ -1031,19 +1032,15 @@ if st.session_state.analysis:
         if st.session_state.sampler_prompt:
             n = len(st.session_state.sampler_prompt)
             st.markdown(
-                f'<div class="prompt-card">'
-                f'<div class="prompt-card-title">Sampler Prompt</div>'
-                f'<div class="prompt-card-sub">Hip-hop flip optimized</div>',
+                '<div class="prompt-card-title">Sampler Prompt</div>'
+                '<div class="prompt-card-sub">Hip-hop flip optimized</div>',
                 unsafe_allow_html=True,
             )
             st.text_area(
                 "sampler", value=st.session_state.sampler_prompt,
                 height=160, key="ta_sampler", label_visibility="collapsed",
             )
-            st.markdown(
-                char_chips(n) + '</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown(char_chips(n), unsafe_allow_html=True)
             copy_button(st.session_state.sampler_prompt, "cb_sampler")
         elif st.session_state.app_state == "done":
             st.markdown(
@@ -1055,18 +1052,17 @@ if st.session_state.analysis:
     if st.session_state.suno_quick:
         n = len(st.session_state.suno_quick)
         st.markdown(
-            f'<div class="quick-card">'
-            f'<div class="quick-card-title">&#9632; Suno Quick Prompt</div>'
-            f'<div class="quick-card-sub">'
-            f'~120-char optimized format · Suno generates highest quality output at this length'
-            f'</div>',
+            '<div class="quick-card-title">&#9632; Suno Quick Prompt</div>'
+            '<div class="quick-card-sub">'
+            '~120-char optimized format · Suno generates highest quality output at this length'
+            '</div>',
             unsafe_allow_html=True,
         )
         st.text_area(
             "quick", value=st.session_state.suno_quick,
             height=80, key="ta_quick", label_visibility="collapsed",
         )
-        st.markdown(quick_char_chips(n) + '</div>', unsafe_allow_html=True)
+        st.markdown(quick_char_chips(n), unsafe_allow_html=True)
         copy_button(st.session_state.suno_quick, "cb_quick", style="quick")
     elif st.session_state.app_state == "done":
         st.markdown(
