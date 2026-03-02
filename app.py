@@ -263,45 +263,7 @@ header, footer, #MainMenu, .stDeployButton,
 .copy-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
 .copy-btn.copied { border-color: var(--green); color: var(--green); }
 
-/* ── STEM TIP CARD ── */
-.stem-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--orange);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-}
-.stem-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    color: var(--orange);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-}
-.stem-body {
-    font-family: 'DM Mono', monospace;
-    font-size: 11.5px;
-    line-height: 1.9;
-    color: var(--text-dim);
-}
-.stem-body strong { color: var(--text); font-weight: 500; }
-.stem-body a { color: var(--green); text-decoration: none; }
-.stem-body a:hover { text-decoration: underline; }
-.stem-pills {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    margin-top: 10px;
-}
-.stem-pill {
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 100px;
-    padding: 4px 12px;
-    font-size: 10.5px;
-    color: var(--text-dim);
-    font-family: 'DM Mono', monospace;
-}
+
 
 /* ── DIVIDER ── */
 .divider {
@@ -635,45 +597,7 @@ if st.session_state.analysis:
 </div>
 """, unsafe_allow_html=True)
 
-    # DRUMLESS WORKFLOW TIP
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
-    stem_html = (
-        '<div class="stem-card">'
-        '<div class="stem-card-title">&#9888;&nbsp; Getting Drumless Results</div>'
-        '<div class="stem-body">'
-        '<strong>Why &quot;no drums&quot; in a prompt does not work:</strong> Suno, Udio, and Sampla.ai are trained '
-        'on music concepts, not negations. Saying "no drums" makes the model think harder about drums. '
-        'Repeating it makes it worse. This is a known limitation of how these models process language.'
-        '</div>'
-        '<br>'
-        '<div class="stem-body">'
-        '<strong>Option 1 — Generate then strip (most reliable):</strong> Run your prompt as-is, then '
-        'remove the drums from the rendered audio using a stem separator.'
-        '<br><br>'
-        '&nbsp;&nbsp;<a href="https://neuralanalog.com/remove-drums" target="_blank">neuralanalog.com/remove-drums</a>'
-        ' — paste any Suno or Udio share link, download a clean drumless stem instantly'
-        '<br>'
-        '&nbsp;&nbsp;<strong>Suno Studio</strong> has a built-in stem tool under each generated track'
-        '<br>'
-        '&nbsp;&nbsp;<strong>Moises &middot; lalal.ai &middot; Adobe Podcast</strong> all handle drum isolation cleanly'
-        '</div>'
-        '<br>'
-        '<div class="stem-body">'
-        '<strong>Option 2 — Genre-lock to naturally sparse styles:</strong> Add one of these phrases '
-        'to your prompt. These genres almost never generate drums:'
-        '</div>'
-        '<div class="stem-pills">'
-        '<span class="stem-pill">solo piano ballad</span>'
-        '<span class="stem-pill">string quartet</span>'
-        '<span class="stem-pill">jazz trio, bass and keys only</span>'
-        '<span class="stem-pill">ambient orchestral</span>'
-        '<span class="stem-pill">chamber music</span>'
-        '<span class="stem-pill">acoustic guitar and voice only</span>'
-        '</div>'
-        '</div>'
-    )
-    st.markdown(stem_html, unsafe_allow_html=True)
 
 # ── FOOTER ────────────────────────────────────────────────────────────────────
 st.markdown("""
