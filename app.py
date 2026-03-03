@@ -11,6 +11,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ══════════════════════════════════════════════════════════════════════════════
+# STYLES — Commercial Grade
+# ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
@@ -63,6 +66,7 @@ header, footer, #MainMenu, .stDeployButton,
 
 .page { padding: 40px 28px 100px; }
 
+/* ── HEADER ───────────────────────────────────────────────────────────────── */
 .hdr {
     margin-bottom: 36px;
     padding-bottom: 28px;
@@ -136,6 +140,7 @@ header, footer, #MainMenu, .stDeployButton,
     text-transform: uppercase;
 }
 
+/* ── STATUS BAR ──────────────────────────────────────────────────────────── */
 .statusbar {
     display: flex; align-items: center; gap: 10px;
     background: var(--s1);
@@ -144,13 +149,16 @@ header, footer, #MainMenu, .stDeployButton,
     padding: 11px 16px; margin-bottom: 20px;
     font-size: 10.5px; color: var(--text2); letter-spacing: 0.4px;
 }
-.sdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sdot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
 .sdot.idle   { background: var(--text3); }
 .sdot.active { background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
 .sdot.done   { background: var(--green); }
 .sdot.error  { background: var(--red); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
 
+/* ── UPLOAD ──────────────────────────────────────────────────────────────── */
 .upload-label {
     font-family: 'Syne', sans-serif;
     font-size: 9.5px; font-weight: 700;
@@ -184,6 +192,7 @@ header, footer, #MainMenu, .stDeployButton,
 .file-chip-name { color: var(--text); font-weight: 500; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-chip-size { color: var(--text3); }
 
+/* ── BUTTONS ──────────────────────────────────────────────────────────────── */
 .stButton > button {
     background: var(--gold) !important;
     color: #0a0c0e !important;
@@ -210,6 +219,7 @@ header, footer, #MainMenu, .stDeployButton,
     opacity: 0.3 !important; cursor: not-allowed !important; transform: none !important;
 }
 
+/* ── SECTION LABEL ──────────────────────────────────────────────────────── */
 .sec-label {
     font-family: 'Syne', sans-serif;
     font-size: 9px; font-weight: 700;
@@ -220,6 +230,7 @@ header, footer, #MainMenu, .stDeployButton,
 }
 .sec-rule { flex: 1; height: 1px; background: var(--bd); }
 
+/* ── ALERT ───────────────────────────────────────────────────────────────── */
 .alert {
     background: var(--red-tint);
     border: 1px solid var(--red);
@@ -229,6 +240,7 @@ header, footer, #MainMenu, .stDeployButton,
     margin-bottom: 20px; line-height: 1.65;
 }
 
+/* ── ANALYSIS CARD ──────────────────────────────────────────────────────── */
 .analysis-card {
     background: var(--s1);
     border: 1px solid var(--bd);
@@ -237,7 +249,10 @@ header, footer, #MainMenu, .stDeployButton,
     overflow: hidden;
     margin-bottom: 6px;
 }
-.ar { display: flex; gap: 0; border-bottom: 1px solid var(--bd); }
+.ar {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--bd);
+}
 .ar:last-child { border-bottom: none; }
 .ar-k {
     font-family: 'Syne', sans-serif;
@@ -245,10 +260,11 @@ header, footer, #MainMenu, .stDeployButton,
     color: var(--gold);
     letter-spacing: 1.5px; text-transform: uppercase;
     width: 124px; min-width: 124px;
-    padding: 12px 14px;
+    padding: 10px 14px;
     border-right: 1px solid var(--bd);
     background: rgba(201,168,76,0.03);
     display: flex; align-items: flex-start;
+    padding-top: 12px;
 }
 .ar-v {
     font-family: 'DM Mono', monospace;
@@ -257,6 +273,7 @@ header, footer, #MainMenu, .stDeployButton,
     flex: 1; word-break: break-word; line-height: 1.6;
 }
 
+/* ── PRODUCER DNA — special treatment ──────────────────────────────────── */
 .dna-card {
     background: linear-gradient(135deg, var(--gold-tint), transparent);
     border: 1px solid var(--gold-dim);
@@ -277,6 +294,7 @@ header, footer, #MainMenu, .stDeployButton,
     line-height: 1.65;
 }
 
+/* ── FLIP CARD ──────────────────────────────────────────────────────────── */
 .flip-card {
     background: var(--s1);
     border: 1px solid var(--bd);
@@ -291,14 +309,21 @@ header, footer, #MainMenu, .stDeployButton,
     letter-spacing: 2px; text-transform: uppercase;
     margin-bottom: 10px;
 }
-.flip-item { font-size: 11px; color: var(--text2); padding: 3px 0; line-height: 1.6; }
-.flip-ltr { color: var(--gold-lt); margin-right: 8px; font-weight: 500; }
+.flip-item {
+    font-size: 11px; color: var(--text2);
+    padding: 3px 0; line-height: 1.6;
+}
+.flip-ltr {
+    color: var(--gold-lt); margin-right: 8px; font-weight: 500;
+}
 
+/* ── PROMPT CARD ─────────────────────────────────────────────────────────── */
 .prompt-card-title {
     font-family: 'Syne', sans-serif;
     font-size: 9px; font-weight: 700;
     color: var(--text2);
     letter-spacing: 2.5px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
     margin-bottom: 4px;
 }
 .prompt-card-sub {
@@ -308,11 +333,13 @@ header, footer, #MainMenu, .stDeployButton,
     line-height: 1.5;
 }
 
+/* ── QUICK PROMPT CARD — highlighted treatment ─────────────────────────── */
 .quick-card-title {
     font-family: 'Syne', sans-serif;
     font-size: 9px; font-weight: 700;
     color: var(--gold);
     letter-spacing: 2.5px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
     margin-bottom: 4px;
 }
 .quick-card-sub {
@@ -321,6 +348,7 @@ header, footer, #MainMenu, .stDeployButton,
     margin-bottom: 12px;
 }
 
+/* ── TEXTAREA ───────────────────────────────────────────────────────────── */
 .stTextArea textarea {
     background: var(--s2) !important;
     color: var(--text) !important;
@@ -338,6 +366,7 @@ header, footer, #MainMenu, .stDeployButton,
 }
 .stTextArea label { display: none !important; }
 
+/* ── COPY BUTTON ─────────────────────────────────────────────────────────── */
 .cp-btn {
     display: inline-flex; align-items: center; gap: 7px;
     background: var(--s3);
@@ -365,6 +394,7 @@ header, footer, #MainMenu, .stDeployButton,
 .cp-btn-quick:hover { background: var(--gold-lt); box-shadow: 0 4px 16px rgba(201,168,76,0.25); }
 .cp-btn-quick.copied { background: var(--green) !important; }
 
+/* ── CHAR LIMIT BAR ─────────────────────────────────────────────────────── */
 .char-bar {
     display: flex; gap: 10px; align-items: center;
     margin-top: 8px; flex-wrap: wrap;
@@ -379,8 +409,10 @@ header, footer, #MainMenu, .stDeployButton,
 .char-chip.warn { color: var(--orange); }
 .char-chip.over { color: var(--red);    }
 
+/* ── DIVIDER ─────────────────────────────────────────────────────────────── */
 .divider { height: 1px; background: var(--bd); margin: 28px 0; }
 
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
 .app-footer {
     margin-top: 48px; padding-top: 24px;
     border-top: 1px solid var(--bd);
@@ -389,12 +421,18 @@ header, footer, #MainMenu, .stDeployButton,
 }
 .footer-brand { font-family: 'Syne', sans-serif; font-weight: 700; }
 
+/* ── SPINNER ─────────────────────────────────────────────────────────────── */
 .stSpinner > div { border-top-color: var(--gold) !important; }
+
+/* ── COLUMN GAP ─────────────────────────────────────────────────────────── */
 [data-testid="stHorizontalBlock"] { gap: 16px !important; }
 </style>
 """, unsafe_allow_html=True)
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# PASS 1 — Deep audio analysis
+# ══════════════════════════════════════════════════════════════════════════════
 ANALYSIS_PROMPT = """
 You are an expert musicologist and audio analyst. Listen to this recording and describe exactly what you hear.
 Your job is ONLY analysis — no AI music prompts yet. Be precise. Never fill in defaults.
@@ -421,60 +459,91 @@ C. [Third direction]
 """.strip()
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# PASS 2 — Two-output prompt generation
+#
+# Research-informed design principles:
+#
+#   BPM: Classic boom bap / underground hip-hop sweet spot is 88–92 BPM.
+#        Hardcoded to 90 BPM — the canonical walking-pace standard.
+#        Wu-Tang C.R.E.A.M. = 92 BPM. Dilla groove = ~85 BPM. 90 splits it.
+#
+#   SAMPLER PROMPT: 460–580 chars. Era leads. Instrument specificity is the
+#        single highest quality lever. Texture language creates emotional soul.
+#        Producer names as callout = focuses the model on the right aesthetic.
+#
+#   SUNO QUICK: Under 110 chars. No texture, no "loopable". Just the sharpest
+#        possible sonic snapshot. 90 BPM always included.
+#
+#   NO DRUM NEGATION: Genre-locking (jazz trio, solo piano, string quartet)
+#        is dramatically more effective than saying "no drums".
+#
+#   PRODUCER DNA: The greatest sample-based producers each had a distinct
+#        sonic fingerprint — encoding their aesthetic into the prompt forces
+#        the model to generate music that FEELS like it was made to be flipped.
+# ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
-    return f"""
-You are a specialist writing AI music generation prompts for sample-based hip-hop producers.
-The goal: generate audio that the greatest sample-based producers in history — Pete Rock,
-J Dilla, Madlib, DJ Premier, RZA, Large Professor, Kanye (soul-flip era), Just Blaze,
-Alchemist, Knxwledge — would want to chop and flip.
+    return f"""You are writing AI music generation prompts for the greatest sample-based hip-hop producers who ever lived.
 
-Write THREE prompts from this analysis. Base EVERYTHING on what the analysis found.
-Do NOT use generic era language — use the EXACT era, aesthetic, and instruments detected.
+Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD that legends would excavate from a dusty crate and immediately flip. You know their aesthetic DNA cold:
 
-RULES FOR ALL PROMPTS:
-- Never mention drums, percussion, kick, snare, hi-hat, or beats of any kind
-- Genre-lock to instrumental styles that naturally exclude drums (jazz trio, solo piano,
-  string ensemble, chamber group) — this is MORE effective than writing "no drums"
-- Lead with ERA + RECORDING AESTHETIC — strongest signal for Suno and Udio
-- Specific instrument names are the single most powerful quality lever
-- Production texture language (tape warmth, vinyl crackle, room bleed) = emotional depth
-- End Sampler Prompt with: "the kind of record the greatest hip-hop producers would sample"
+RZA: 50s–70s soul and jazz (Thelonious Monk, Stax Records), blaxploitation/kung-fu cinema scores, heavy low-pass filtering, eerie minor keys, ancient-feeling cinematic menace.
+Alchemist: obscure dark jazz, film scores, world music, psychedelic rock, melancholic melodies, cold hypnotic tension — the underground's cinematic architect.
+J Dilla: intimate Detroit soul, deep obscure cuts (Eastern European psych-rock, Japanese jazz fusion), woozy cassette-worn warmth, humanly imperfect feel — music with soul in every wrong note.
+DJ Premier: surgically chopped jazz/soul (Blue Note, Verve), 2–3 second loops with strong melodic hooks, organic New York grit, records that hit hard with minimal transformation.
+Pete Rock: jazz/soul/R&B/Brazilian/Bollywood (90,000-record collection), horn-heavy soul jazz, CTI/Stax aesthetic, warm and dusty, sophisticated and grooving, SP-1200 character.
+Q-Tip: sophisticated jazz (Blue Note, Prestige, CTI), upright bass-forward, warm Rhodes, positive and swinging, 60s–70s jazz with emotional sophistication.
+Havoc (Mobb Deep): sparse piano loops over minor-key soul, Al Green/Quincy Jones flipped dark, Queensbridge bleakness, menacing and cold, buried in shadow and low-pass filter.
+Buckwild (D.I.T.C.): 60s–70s jazz/soul/funk/blaxploitation, fat staccato chops, Bronx rawness, the crispest New York golden-era boom bap aesthetic.
+Da Beatminerz: raw NYC soul/jazz, unpolished severity, dark and claustrophobic, no-nonsense grit, the underground's most menacing basement sound.
+Large Professor: 70s jazz-funk, smooth-hard East Coast, sophisticated loops that still knock hard, bridge between jazz sophistication and street impact.
+No I.D.: Chicago soul and gospel-adjacent, emotionally devastating in simplicity, records that feel destined to be flipped.
+Madlib: eclectic and lo-fi — Brazilian tropicália, African records, psych-soul, the most unpredictable crate-digger, anything with soul qualifies.
+Knxwledge: chopped R&B/soul/jazz, cassette saturation, spiritual and intimate, lo-fi beat-tape culture.
+Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
+Conductor Williams: orchestral soul chops (SP-606), Griselda/Shaolin-style grit meets symphony, loop-heavy vinyl-esque textures, the modern RZA lineage.
+
+BASE EVERYTHING on the analysis below. Use EXACT era, aesthetic, and instruments found. No generic language. Write like a producer with 30 years in the crates.
 
 ANALYSIS:
 {analysis_text}
 
 ---
 
-## CLONE PROMPT
-Single flowing paragraph. TARGET 420–560 characters, HARD MAX 700 chars.
-Faithful sonic recreation of the original recording.
-Structure: [ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis] —
-[key/harmony translated into vibe language, not theory] — [vocal tone or "purely instrumental"] —
-[production texture: tape/vinyl/room] — [2–3 emotional character words] — "designed to feel loopable."
-Goal: paste into Suno custom mode or Udio and get something that sounds like the analyzed recording.
+CRITICAL FORMAT RULES — FOLLOW EXACTLY:
+- Use ONLY "## SECTION NAME" (two hashes) for section headers — never ###, never bold
+- Write exactly TWO sections in this exact order: ## SAMPLER PROMPT, then ## SUNO QUICK
+- Do not add any other sections, headers, or labels
+
+CRITICAL CONTENT RULES — ALL PROMPTS:
+- NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
+- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — this beats "no drums" every time
+- ALWAYS state "90 BPM" explicitly — this is the classic boom bap standard, non-negotiable
+- ERA + RECORDING AESTHETIC leads every prompt — the strongest signal for Suno and Udio
+- Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
+- Production texture IS emotional depth: vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection — make it feel real and sampleable
 
 ## SAMPLER PROMPT
-Single flowing paragraph. TARGET 420–560 characters, HARD MAX 700 chars.
-Same analysis reframed for maximum hip-hop flip potential.
-Structure: [ERA] [RECORDING AESTHETIC] — [specific instruments] — [tempo feel from BPM in
-vibe language, not raw numbers] — [vocal or "purely instrumental"] —
-[sonic imperfections from production texture: vinyl surface noise, tape saturation, room bleed,
-human timing imperfection] — [emotional character] — "designed to feel loopable,
-the kind of record the greatest hip-hop producers would sample."
-Works identically in Suno custom mode, Udio, and Sampla.ai.
+One single flowing paragraph. TARGET 460–580 characters, HARD MAX 700 characters.
+This is the definitive prompt — the producer DNA from the analysis shapes the entire emotional register.
+
+Follow this exact structure, in this order:
+[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [production texture: choose 2 from: vinyl surface noise / tape saturation / room bleed / analog warmth / human timing imperfection] — [2–3 emotional character words matching the producer DNA] — end with: "the kind of record [pick 2–3 specific producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
 
 ## SUNO QUICK
-One dense sentence. ABSOLUTE MAXIMUM 130 characters — shorter is better.
-This is the highest-quality prompt format for Suno. Fewer words = sharper output.
-Structure: [Mood adjective] [era/decade] [genre/label aesthetic], [instrument 1], [instrument 2],
-["purely instrumental" or vocal type]
-Example length target: "Melancholy late-60s Blue Note jazz, Rhodes piano, upright bass, purely instrumental" = 83 chars
-No "loopable", no texture description — just the sharpest possible sonic snapshot.
-""".strip()
+One dense sentence only. ABSOLUTE MAXIMUM 130 characters. Shorter is always better. Target under 110.
+Suno's highest-quality format: fewer words = sharper output. Never use more than needed.
+Structure: [Mood adjective] [era] [genre/aesthetic], [instrument 1], [instrument 2], [vocal or "purely instrumental"], 90 BPM
+The phrase "90 BPM" must always appear. No texture language. No "loopable". Pure sonic snapshot.
+Example at target length: "Brooding mid-70s Blue Note jazz trio, Rhodes electric piano, upright bass, purely instrumental, 90 BPM" = 102 chars""".strip()
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# HELPERS
+# ══════════════════════════════════════════════════════════════════════════════
 def extract_section(text: str, header: str) -> str:
-    pattern = rf"##\s*{re.escape(header)}\s*\n(.*?)(?=\n##\s|\Z)"
+    # Match any markdown header level (## or ###) as a section boundary
+    pattern = rf"##\s*{re.escape(header)}\s*\n(.*?)(?=\n#{{1,6}}\s|\Z)"
     m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
     return m.group(1).strip() if m else ""
 
@@ -515,14 +584,19 @@ MAX_FILE_MB = 15
 
 
 def parse_analysis(raw: str):
+    """Return (fields, producer_dna, flip_block)."""
     key_pat  = re.compile(r'^([A-Z][A-Z\s+]*?):\s*(.*)')
     flip_re  = re.compile(r'^FLIP\s+DIRECTIONS\s*:', re.IGNORECASE)
     dna_re   = re.compile(r'^PRODUCER\s+DNA\s*:', re.IGNORECASE)
 
-    fields, flip_lines, dna_parts = [], [], []
+    fields     = []
+    flip_lines = []
     producer_dna = ""
-    in_flip = in_dna = False
-    cur_key, cur_val = None, []
+    in_flip    = False
+    in_dna     = False
+    cur_key    = None
+    cur_val    = []
+    dna_parts  = []
 
     for raw_line in raw.split('\n'):
         line = raw_line.strip()
@@ -535,7 +609,8 @@ def parse_analysis(raw: str):
             cur_key, cur_val = None, []
             in_flip, in_dna = True, False
             after = flip_re.sub('', line).strip()
-            if after: flip_lines.append(after)
+            if after:
+                flip_lines.append(after)
             continue
 
         if dna_re.match(line):
@@ -544,7 +619,8 @@ def parse_analysis(raw: str):
             cur_key, cur_val = None, []
             in_dna, in_flip = True, False
             after = dna_re.sub('', line).strip()
-            if after: dna_parts.append(after)
+            if after:
+                dna_parts.append(after)
             continue
 
         if in_flip:
@@ -555,10 +631,11 @@ def parse_analysis(raw: str):
             m = key_pat.match(line)
             if m and len(m.group(1).strip()) >= 2 and re.match(r'^[A-Z][A-Z\s+]*$', m.group(1).strip()):
                 producer_dna = ' '.join(dna_parts)
-                in_dna = False; dna_parts = []
-                cur_key = m.group(1).strip()
+                in_dna = False
+                dna_parts = []
+                cur_key  = m.group(1).strip()
                 val_start = m.group(2).strip()
-                cur_val = [val_start] if val_start else []
+                cur_val  = [val_start] if val_start else []
             else:
                 dna_parts.append(line)
             continue
@@ -569,9 +646,9 @@ def parse_analysis(raw: str):
             if len(candidate) >= 2 and re.match(r'^[A-Z][A-Z\s+]*$', candidate):
                 if cur_key and cur_val:
                     fields.append((cur_key, ' '.join(cur_val)))
-                cur_key = candidate
+                cur_key   = candidate
                 val_start = m.group(2).strip()
-                cur_val = [val_start] if val_start else []
+                cur_val   = [val_start] if val_start else []
                 continue
 
         if cur_key:
@@ -599,16 +676,20 @@ def render_analysis(raw: str) -> None:
         return
 
     rows = "".join(
-        f'<div class="ar"><div class="ar-k">{html_module.escape(k)}</div>'
-        f'<div class="ar-v">{html_module.escape(v)}</div></div>'
+        f'<div class="ar">'
+        f'<div class="ar-k">{html_module.escape(k)}</div>'
+        f'<div class="ar-v">{html_module.escape(v)}</div>'
+        f'</div>'
         for k, v in fields
     )
     st.markdown(f'<div class="analysis-card">{rows}</div>', unsafe_allow_html=True)
 
     if producer_dna:
         st.markdown(
-            f'<div class="dna-card"><div class="dna-label">Producer DNA</div>'
-            f'<div class="dna-text">{html_module.escape(producer_dna)}</div></div>',
+            f'<div class="dna-card">'
+            f'<div class="dna-label">Producer DNA</div>'
+            f'<div class="dna-text">{html_module.escape(producer_dna)}</div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
@@ -616,24 +697,27 @@ def render_analysis(raw: str) -> None:
         items_html = ""
         for line in flip_block.split('\n'):
             line = line.strip()
-            if not line: continue
+            if not line:
+                continue
             fm = re.match(r'^([A-C])[\.\)]\s*(.+)', line)
             if fm:
                 items_html += (
-                    f'<div class="flip-item"><span class="flip-ltr">{html_module.escape(fm.group(1))}.</span>'
+                    f'<div class="flip-item">'
+                    f'<span class="flip-ltr">{html_module.escape(fm.group(1))}.</span>'
                     f'{html_module.escape(fm.group(2))}</div>'
                 )
             else:
                 items_html += f'<div class="flip-item">{html_module.escape(line)}</div>'
         if items_html:
             st.markdown(
-                f'<div class="flip-card"><div class="flip-hdr">Flip Directions</div>{items_html}</div>',
+                f'<div class="flip-card">'
+                f'<div class="flip-hdr">Flip Directions</div>'
+                f'{items_html}</div>',
                 unsafe_allow_html=True,
             )
 
 
 def copy_button(text: str, btn_id: str, style: str = "default") -> None:
-    # json.dumps wraps in double quotes — must become &quot; inside onclick="..."
     safe       = json.dumps(text).replace('"', '&quot;')
     cls        = "cp-btn-quick" if style == "quick" else "cp-btn"
     label      = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
@@ -654,11 +738,12 @@ def copy_button(text: str, btn_id: str, style: str = "default") -> None:
 
 def char_chips(n: int, suno_custom: int = 700) -> str:
     sc = char_status(n, int(suno_custom * 0.85), suno_custom)
+    uc = "ok"
     return (
         f'<div class="char-bar">'
         f'<span class="char-chip {sc}">Suno Custom&nbsp;{n}/{suno_custom}</span>'
-        f'<span class="char-chip ok">Udio&nbsp;&#10003;</span>'
-        f'<span class="char-chip ok">Sampla.ai&nbsp;&#10003;</span>'
+        f'<span class="char-chip {uc}">Udio&nbsp;&#10003;</span>'
+        f'<span class="char-chip {uc}">Sampla.ai&nbsp;&#10003;</span>'
         f'</div>'
     )
 
@@ -673,10 +758,12 @@ def quick_char_chips(n: int) -> str:
     )
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# SESSION STATE
+# ══════════════════════════════════════════════════════════════════════════════
 for _k, _v in [
     ("app_state",      "idle"),
     ("analysis",       ""),
-    ("clone_prompt",   ""),
     ("sampler_prompt", ""),
     ("suno_quick",     ""),
     ("upload_key",     0),
@@ -685,6 +772,9 @@ for _k, _v in [
         st.session_state[_k] = _v
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# API KEY
+# ══════════════════════════════════════════════════════════════════════════════
 _api_key   = None
 _key_error = None
 try:
@@ -699,8 +789,12 @@ except Exception:
     _key_error = "Could not read app secrets. Add GEMINI_KEY in Streamlit Cloud → Settings → Secrets."
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# RENDER
+# ══════════════════════════════════════════════════════════════════════════════
 st.markdown('<div class="page">', unsafe_allow_html=True)
 
+# ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hdr">
   <div class="hdr-top">
@@ -723,9 +817,14 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ── API KEY ERROR ─────────────────────────────────────────────────────────────
 if _key_error:
-    st.markdown(f'<div class="alert">{html_module.escape(_key_error)}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="alert">{html_module.escape(_key_error)}</div>',
+        unsafe_allow_html=True,
+    )
 
+# ── STATUS BAR ────────────────────────────────────────────────────────────────
 _status_map = {
     "idle":  ("idle",   "Ready — drop a sample to begin"),
     "pass1": ("active", "Pass 1 of 2 — Reading and analyzing audio..."),
@@ -736,11 +835,14 @@ _status_map = {
 _dot, _stxt = _status_map.get(st.session_state.app_state, ("idle", "Ready"))
 status_slot = st.empty()
 status_slot.markdown(
-    f'<div class="statusbar"><div class="sdot {_dot}"></div>'
-    f'<span>{html_module.escape(_stxt)}</span></div>',
+    f'<div class="statusbar">'
+    f'<div class="sdot {_dot}"></div>'
+    f'<span>{html_module.escape(_stxt)}</span>'
+    f'</div>',
     unsafe_allow_html=True,
 )
 
+# ── UPLOAD ────────────────────────────────────────────────────────────────────
 st.markdown('<span class="upload-label">Load Sample</span>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader(
     "",
@@ -760,8 +862,13 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-run_btn = st.button("Analyze Sample → Generate Prompts", disabled=bool(_key_error))
+# ── ANALYZE BUTTON ────────────────────────────────────────────────────────────
+run_btn = st.button(
+    "Analyze Sample → Generate Prompts",
+    disabled=bool(_key_error),
+)
 
+# ── TWO-PASS ANALYSIS ─────────────────────────────────────────────────────────
 if uploaded_file and run_btn and not _key_error:
     raw_bytes = uploaded_file.getvalue()
 
@@ -782,6 +889,7 @@ if uploaded_file and run_btn and not _key_error:
             genai.configure(api_key=_api_key)
             model = genai.GenerativeModel("gemini-2.5-flash")
 
+            # PASS 1 — audio analysis
             st.session_state.app_state = "pass1"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot active"></div>'
@@ -790,8 +898,11 @@ if uploaded_file and run_btn and not _key_error:
             )
             with st.spinner(""):
                 r1 = model.generate_content([ANALYSIS_PROMPT, audio_part])
-                st.session_state.analysis = extract_section(r1.text, "ANALYSIS") or r1.text
+                st.session_state.analysis = (
+                    extract_section(r1.text, "ANALYSIS") or r1.text
+                )
 
+            # PASS 2 — text-only prompt generation
             st.session_state.app_state = "pass2"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot active"></div>'
@@ -799,11 +910,16 @@ if uploaded_file and run_btn and not _key_error:
                 unsafe_allow_html=True,
             )
             with st.spinner(""):
-                r2   = model.generate_content(build_prompt_generation(st.session_state.analysis))
+                r2   = model.generate_content(
+                    build_prompt_generation(st.session_state.analysis)
+                )
                 raw2 = r2.text
-                st.session_state.clone_prompt   = cap_prompt(extract_section(raw2, "CLONE PROMPT"), 700)
-                st.session_state.sampler_prompt = cap_prompt(extract_section(raw2, "SAMPLER PROMPT"), 700)
-                st.session_state.suno_quick     = cap_prompt(extract_section(raw2, "SUNO QUICK"), 130)
+                st.session_state.sampler_prompt = cap_prompt(
+                    extract_section(raw2, "SAMPLER PROMPT"), 700
+                )
+                st.session_state.suno_quick = cap_prompt(
+                    extract_section(raw2, "SUNO QUICK"), 130
+                )
 
             st.session_state.app_state = "done"
             status_slot.markdown(
@@ -820,12 +936,17 @@ if uploaded_file and run_btn and not _key_error:
                 f'<span>{html_module.escape(err_msg[:90])}</span></div>',
                 unsafe_allow_html=True,
             )
-            st.markdown(f'<div class="alert">{html_module.escape(err_msg)}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="alert">{html_module.escape(err_msg)}</div>',
+                unsafe_allow_html=True,
+            )
 
 
+# ── RESULTS ───────────────────────────────────────────────────────────────────
 if st.session_state.analysis:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
+    # ── ANALYSIS ──
     st.markdown(
         '<div class="sec-label">Sample Analysis<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
@@ -834,68 +955,69 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
 
+    # ── SAMPLER PROMPT — full width ──
     st.markdown(
         '<div class="sec-label">Generated Prompts<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
     )
 
-    col_l, col_r = st.columns(2, gap="medium")
+    if st.session_state.sampler_prompt:
+        n = len(st.session_state.sampler_prompt)
+        st.markdown(
+            '<div class="prompt-card-title">Sampler Prompt</div>'
+            '<div class="prompt-card-sub">'
+            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        st.text_area(
+            "sampler", value=st.session_state.sampler_prompt,
+            height=200, key="ta_sampler", label_visibility="collapsed",
+        )
+        st.markdown(char_chips(n), unsafe_allow_html=True)
+        copy_button(st.session_state.sampler_prompt, "cb_sampler")
+    elif st.session_state.app_state == "done":
+        st.markdown(
+            '<div class="alert">Sampler prompt not generated — try again.</div>',
+            unsafe_allow_html=True,
+        )
 
-    with col_l:
-        if st.session_state.clone_prompt:
-            n = len(st.session_state.clone_prompt)
-            st.markdown(
-                '<div class="prompt-card-title">Clone Prompt</div>'
-                '<div class="prompt-card-sub">Faithful sonic recreation</div>',
-                unsafe_allow_html=True,
-            )
-            st.text_area("clone", value=st.session_state.clone_prompt,
-                         height=160, key="ta_clone", label_visibility="collapsed")
-            st.markdown(char_chips(n), unsafe_allow_html=True)
-            copy_button(st.session_state.clone_prompt, "cb_clone")
-        elif st.session_state.app_state == "done":
-            st.markdown('<div class="alert">Clone prompt not generated — try again.</div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
 
-    with col_r:
-        if st.session_state.sampler_prompt:
-            n = len(st.session_state.sampler_prompt)
-            st.markdown(
-                '<div class="prompt-card-title">Sampler Prompt</div>'
-                '<div class="prompt-card-sub">Hip-hop flip optimized</div>',
-                unsafe_allow_html=True,
-            )
-            st.text_area("sampler", value=st.session_state.sampler_prompt,
-                         height=160, key="ta_sampler", label_visibility="collapsed")
-            st.markdown(char_chips(n), unsafe_allow_html=True)
-            copy_button(st.session_state.sampler_prompt, "cb_sampler")
-        elif st.session_state.app_state == "done":
-            st.markdown('<div class="alert">Sampler prompt not generated — try again.</div>', unsafe_allow_html=True)
-
+    # SUNO QUICK — full width, gold treatment
     if st.session_state.suno_quick:
         n = len(st.session_state.suno_quick)
         st.markdown(
             '<div class="quick-card-title">&#9632; Suno Quick Prompt</div>'
-            '<div class="quick-card-sub">~120-char optimized format · Suno generates highest quality output at this length</div>',
+            '<div class="quick-card-sub">'
+            'Under-110-char optimized format · 90 BPM hardcoded · Suno generates highest quality at this length'
+            '</div>',
             unsafe_allow_html=True,
         )
-        st.text_area("quick", value=st.session_state.suno_quick,
-                     height=80, key="ta_quick", label_visibility="collapsed")
+        st.text_area(
+            "quick", value=st.session_state.suno_quick,
+            height=80, key="ta_quick", label_visibility="collapsed",
+        )
         st.markdown(quick_char_chips(n), unsafe_allow_html=True)
         copy_button(st.session_state.suno_quick, "cb_quick", style="quick")
     elif st.session_state.app_state == "done":
-        st.markdown('<div class="alert">Suno Quick prompt not generated — try again.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="alert">Suno Quick prompt not generated — try again.</div>',
+            unsafe_allow_html=True,
+        )
 
+    # ── RESET ──
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     if st.button("↺  New Analysis", key="reset_btn"):
         st.session_state.app_state      = "idle"
         st.session_state.analysis       = ""
-        st.session_state.clone_prompt   = ""
         st.session_state.sampler_prompt = ""
         st.session_state.suno_quick     = ""
         st.session_state.upload_key    += 1
         st.rerun()
 
 
+# ── FOOTER ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="app-footer">
   <span class="footer-brand">Sample Prompt 1200</span>
