@@ -3,7 +3,6 @@ import google.generativeai as genai
 import base64
 import re
 import html as html_module
-import json
 
 st.set_page_config(
     page_title="Sample Prompt 1200",
@@ -53,8 +52,17 @@ html, body, .stApp {
     -webkit-font-smoothing: antialiased;
 }
 
+/* ── HIDE ALL STREAMLIT CHROME ───────────────────────────────────────────── */
 header, footer, #MainMenu, .stDeployButton,
-[data-testid="stToolbar"], [data-testid="stDecoration"] {
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+[data-testid="stBottom"],
+[data-testid="stSidebar"],
+[data-testid="collapsedControl"],
+[data-testid="manage-app-button"],
+.stAppToolbar,
+.stAppDeployButton {
     visibility: hidden !important; display: none !important;
 }
 
@@ -273,50 +281,6 @@ header, footer, #MainMenu, .stDeployButton,
     flex: 1; word-break: break-word; line-height: 1.6;
 }
 
-/* ── PRODUCER DNA — special treatment ──────────────────────────────────── */
-.dna-card {
-    background: linear-gradient(135deg, var(--gold-tint), transparent);
-    border: 1px solid var(--gold-dim);
-    border-left: 3px solid var(--gold);
-    border-radius: var(--radius);
-    padding: 14px 16px; margin-bottom: 6px;
-}
-.dna-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 8px; font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 7px;
-}
-.dna-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 11.5px; color: var(--text);
-    line-height: 1.65;
-}
-
-/* ── FLIP CARD ──────────────────────────────────────────────────────────── */
-.flip-card {
-    background: var(--s1);
-    border: 1px solid var(--bd);
-    border-left: 3px solid var(--bd3);
-    border-radius: var(--radius);
-    padding: 14px 16px; margin-top: 4px; margin-bottom: 6px;
-}
-.flip-hdr {
-    font-family: 'Syne', sans-serif;
-    font-size: 8px; font-weight: 700;
-    color: var(--text3);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 10px;
-}
-.flip-item {
-    font-size: 11px; color: var(--text2);
-    padding: 3px 0; line-height: 1.6;
-}
-.flip-ltr {
-    color: var(--gold-lt); margin-right: 8px; font-weight: 500;
-}
-
 /* ── PROMPT CARD ─────────────────────────────────────────────────────────── */
 .prompt-card-title {
     font-family: 'Syne', sans-serif;
@@ -331,21 +295,6 @@ header, footer, #MainMenu, .stDeployButton,
     letter-spacing: 0.5px;
     margin-bottom: 12px;
     line-height: 1.5;
-}
-
-/* ── QUICK PROMPT CARD — highlighted treatment ─────────────────────────── */
-.quick-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 9px; font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 2.5px; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 4px;
-}
-.quick-card-sub {
-    font-size: 9.5px; color: var(--gold-dim);
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
 }
 
 /* ── TEXTAREA ───────────────────────────────────────────────────────────── */
@@ -380,19 +329,6 @@ header, footer, #MainMenu, .stDeployButton,
 }
 .cp-btn:hover { border-color: var(--gold-dim); color: var(--gold-lt); background: var(--gold-tint); }
 .cp-btn.copied { border-color: var(--green) !important; color: var(--green) !important; background: var(--green-dim) !important; }
-.cp-btn-quick {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: var(--gold);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 9px 20px;
-    font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 500;
-    color: #0a0c0e;
-    cursor: pointer; transition: all 0.15s;
-    margin-top: 10px; letter-spacing: 0.5px;
-}
-.cp-btn-quick:hover { background: var(--gold-lt); box-shadow: 0 4px 16px rgba(201,168,76,0.25); }
-.cp-btn-quick.copied { background: var(--green) !important; }
 
 /* ── CHAR LIMIT BAR ─────────────────────────────────────────────────────── */
 .char-bar {
@@ -460,7 +396,7 @@ C. [Third direction]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 2 — Two-output prompt generation
+# PASS 2 — Prompt generation
 #
 # Research-informed design principles:
 #
@@ -470,10 +406,6 @@ C. [Third direction]
 #
 #   SAMPLER PROMPT: 460–580 chars. Era leads. Instrument specificity is the
 #        single highest quality lever. Texture language creates emotional soul.
-#        Producer names as callout = focuses the model on the right aesthetic.
-#
-#   SUNO QUICK: Under 110 chars. No texture, no "loopable". Just the sharpest
-#        possible sonic snapshot. 90 BPM always included.
 #
 #   NO DRUM NEGATION: Genre-locking (jazz trio, solo piano, string quartet)
 #        is dramatically more effective than saying "no drums".
@@ -512,37 +444,30 @@ ANALYSIS:
 
 CRITICAL FORMAT RULES — FOLLOW EXACTLY:
 - Use ONLY "## SECTION NAME" (two hashes) for section headers — never ###, never bold
-- Write exactly TWO sections in this exact order: ## SAMPLER PROMPT, then ## SUNO QUICK
+- Write exactly ONE section: ## SAMPLER PROMPT
 - Do not add any other sections, headers, or labels
 
-CRITICAL CONTENT RULES — ALL PROMPTS:
+CRITICAL CONTENT RULES:
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
 - Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — this beats "no drums" every time
 - ALWAYS state "90 BPM" explicitly — this is the classic boom bap standard, non-negotiable
 - ERA + RECORDING AESTHETIC leads every prompt — the strongest signal for Suno and Udio
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
 - Production texture IS emotional depth: vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection — make it feel real and sampleable
+- NEVER mention any producer names in the generated prompt — express the aesthetic through sonic and emotional descriptors only
 
 ## SAMPLER PROMPT
 One single flowing paragraph. TARGET 460–580 characters, HARD MAX 700 characters.
-This is the definitive prompt — the producer DNA from the analysis shapes the entire emotional register.
+The producer DNA from the analysis shapes the entire emotional register — but express it through sound, not names.
 
 Follow this exact structure, in this order:
-[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [production texture: choose 2 from: vinyl surface noise / tape saturation / room bleed / analog warmth / human timing imperfection] — [2–3 emotional character words matching the producer DNA] — end with: "the kind of record [pick 2–3 specific producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
-
-## SUNO QUICK
-One dense sentence only. ABSOLUTE MAXIMUM 130 characters. Shorter is always better. Target under 110.
-Suno's highest-quality format: fewer words = sharper output. Never use more than needed.
-Structure: [Mood adjective] [era] [genre/aesthetic], [instrument 1], [instrument 2], [vocal or "purely instrumental"], 90 BPM
-The phrase "90 BPM" must always appear. No texture language. No "loopable". Pure sonic snapshot.
-Example at target length: "Brooding mid-70s Blue Note jazz trio, Rhodes electric piano, upright bass, purely instrumental, 90 BPM" = 102 chars""".strip()
+[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [production texture: choose 2 from: vinyl surface noise / tape saturation / room bleed / analog warmth / human timing imperfection] — [2–3 emotional character words] — end with a phrase that captures the timeless, crate-worthy soul of the record.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # HELPERS
 # ══════════════════════════════════════════════════════════════════════════════
 def extract_section(text: str, header: str) -> str:
-    # Match any markdown header level (## or ###) as a section boundary
     pattern = rf"##\s*{re.escape(header)}\s*\n(.*?)(?=\n#{{1,6}}\s|\Z)"
     m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
     return m.group(1).strip() if m else ""
@@ -584,19 +509,19 @@ MAX_FILE_MB = 15
 
 
 def parse_analysis(raw: str):
-    """Return (fields, producer_dna, flip_block)."""
+    """Return (fields, producer_dna, flip_block) — DNA and flip parsed but not displayed."""
     key_pat  = re.compile(r'^([A-Z][A-Z\s+]*?):\s*(.*)')
     flip_re  = re.compile(r'^FLIP\s+DIRECTIONS\s*:', re.IGNORECASE)
     dna_re   = re.compile(r'^PRODUCER\s+DNA\s*:', re.IGNORECASE)
 
-    fields     = []
-    flip_lines = []
+    fields       = []
+    flip_lines   = []
     producer_dna = ""
-    in_flip    = False
-    in_dna     = False
-    cur_key    = None
-    cur_val    = []
-    dna_parts  = []
+    in_flip      = False
+    in_dna       = False
+    cur_key      = None
+    cur_val      = []
+    dna_parts    = []
 
     for raw_line in raw.split('\n'):
         line = raw_line.strip()
@@ -633,9 +558,9 @@ def parse_analysis(raw: str):
                 producer_dna = ' '.join(dna_parts)
                 in_dna = False
                 dna_parts = []
-                cur_key  = m.group(1).strip()
+                cur_key   = m.group(1).strip()
                 val_start = m.group(2).strip()
-                cur_val  = [val_start] if val_start else []
+                cur_val   = [val_start] if val_start else []
             else:
                 dna_parts.append(line)
             continue
@@ -663,7 +588,7 @@ def parse_analysis(raw: str):
 
 
 def render_analysis(raw: str) -> None:
-    fields, producer_dna, flip_block = parse_analysis(raw)
+    fields, _, _ = parse_analysis(raw)
 
     if not fields:
         escaped = html_module.escape(raw)
@@ -684,54 +609,27 @@ def render_analysis(raw: str) -> None:
     )
     st.markdown(f'<div class="analysis-card">{rows}</div>', unsafe_allow_html=True)
 
-    if producer_dna:
-        st.markdown(
-            f'<div class="dna-card">'
-            f'<div class="dna-label">Producer DNA</div>'
-            f'<div class="dna-text">{html_module.escape(producer_dna)}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
 
-    if flip_block:
-        items_html = ""
-        for line in flip_block.split('\n'):
-            line = line.strip()
-            if not line:
-                continue
-            fm = re.match(r'^([A-C])[\.\)]\s*(.+)', line)
-            if fm:
-                items_html += (
-                    f'<div class="flip-item">'
-                    f'<span class="flip-ltr">{html_module.escape(fm.group(1))}.</span>'
-                    f'{html_module.escape(fm.group(2))}</div>'
-                )
-            else:
-                items_html += f'<div class="flip-item">{html_module.escape(line)}</div>'
-        if items_html:
-            st.markdown(
-                f'<div class="flip-card">'
-                f'<div class="flip-hdr">Flip Directions</div>'
-                f'{items_html}</div>',
-                unsafe_allow_html=True,
-            )
-
-
-def copy_button(text: str, btn_id: str, style: str = "default") -> None:
-    safe       = json.dumps(text).replace('"', '&quot;')
-    cls        = "cp-btn-quick" if style == "quick" else "cp-btn"
-    label      = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
-    reset_str  = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
-    safe_reset = json.dumps(reset_str).replace('"', '&quot;')
+def copy_button(text: str, btn_id: str) -> None:
+    """Stores text as base64 in a data attribute — avoids all JS string escaping issues."""
+    b64 = base64.b64encode(text.encode("utf-8")).decode("ascii")
+    onclick = (
+        "(function(b){"
+        "var bytes=Uint8Array.from(atob(b.dataset.b64),function(c){return c.charCodeAt(0)});"
+        "var t=new TextDecoder().decode(bytes);"
+        "navigator.clipboard.writeText(t).then(function(){"
+        "b.classList.add('copied');"
+        "b.innerHTML='&#10003;&nbsp;Copied!';"
+        "setTimeout(function(){"
+        "b.classList.remove('copied');"
+        "b.innerHTML='&#9632;&nbsp;Copy Prompt';"
+        "},2000);"
+        "}).catch(function(err){console.error(err);});"
+        "})(this)"
+    )
     st.markdown(
-        f'<button class="{cls}" id="{btn_id}" '
-        f'onclick="(function(b){{'
-        f'navigator.clipboard.writeText({safe}).then(function(){{'
-        f'b.classList.add(\'copied\');b.innerHTML=\'&#10003;&nbsp;Copied!\';'
-        f'setTimeout(function(){{b.classList.remove(\'copied\');'
-        f'b.innerHTML={safe_reset};}},2000);}});'
-        f'}})(document.getElementById(\'{btn_id}\'))">'
-        f'{label}</button>',
+        f'<button class="cp-btn" id="{btn_id}" data-b64="{b64}" onclick="{onclick}">'
+        f'&#9632;&nbsp;Copy Prompt</button>',
         unsafe_allow_html=True,
     )
 
@@ -748,16 +646,6 @@ def char_chips(n: int, suno_custom: int = 700) -> str:
     )
 
 
-def quick_char_chips(n: int) -> str:
-    sc = char_status(n, 100, 130)
-    return (
-        f'<div class="char-bar">'
-        f'<span class="char-chip {sc}">Suno&nbsp;{n}/130 chars</span>'
-        f'<span class="char-chip ok">Optimal&nbsp;quality&nbsp;range</span>'
-        f'</div>'
-    )
-
-
 # ══════════════════════════════════════════════════════════════════════════════
 # SESSION STATE
 # ══════════════════════════════════════════════════════════════════════════════
@@ -765,7 +653,6 @@ for _k, _v in [
     ("app_state",      "idle"),
     ("analysis",       ""),
     ("sampler_prompt", ""),
-    ("suno_quick",     ""),
     ("upload_key",     0),
 ]:
     if _k not in st.session_state:
@@ -828,8 +715,8 @@ if _key_error:
 _status_map = {
     "idle":  ("idle",   "Ready — drop a sample to begin"),
     "pass1": ("active", "Pass 1 of 2 — Reading and analyzing audio..."),
-    "pass2": ("active", "Pass 2 of 2 — Building prompts from analysis..."),
-    "done":  ("done",   "Analysis complete — prompts ready to copy"),
+    "pass2": ("active", "Pass 2 of 2 — Building prompt from analysis..."),
+    "done":  ("done",   "Analysis complete — prompt ready to copy"),
     "error": ("error",  "Error — see details below"),
 }
 _dot, _stxt = _status_map.get(st.session_state.app_state, ("idle", "Ready"))
@@ -864,7 +751,7 @@ if uploaded_file:
 
 # ── ANALYZE BUTTON ────────────────────────────────────────────────────────────
 run_btn = st.button(
-    "Analyze Sample → Generate Prompts",
+    "Analyze Sample → Generate Prompt",
     disabled=bool(_key_error),
 )
 
@@ -906,25 +793,21 @@ if uploaded_file and run_btn and not _key_error:
             st.session_state.app_state = "pass2"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot active"></div>'
-                '<span>Pass 2 of 2 — Crafting prompts from analysis...</span></div>',
+                '<span>Pass 2 of 2 — Crafting prompt from analysis...</span></div>',
                 unsafe_allow_html=True,
             )
             with st.spinner(""):
-                r2   = model.generate_content(
+                r2 = model.generate_content(
                     build_prompt_generation(st.session_state.analysis)
                 )
-                raw2 = r2.text
                 st.session_state.sampler_prompt = cap_prompt(
-                    extract_section(raw2, "SAMPLER PROMPT"), 700
-                )
-                st.session_state.suno_quick = cap_prompt(
-                    extract_section(raw2, "SUNO QUICK"), 130
+                    extract_section(r2.text, "SAMPLER PROMPT"), 700
                 )
 
             st.session_state.app_state = "done"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot done"></div>'
-                '<span>Analysis complete — prompts ready to copy</span></div>',
+                '<span>Analysis complete — prompt ready to copy</span></div>',
                 unsafe_allow_html=True,
             )
 
@@ -955,9 +838,9 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
 
-    # ── SAMPLER PROMPT — full width ──
+    # ── SAMPLER PROMPT ──
     st.markdown(
-        '<div class="sec-label">Generated Prompts<div class="sec-rule"></div></div>',
+        '<div class="sec-label">Generated Prompt<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
     )
 
@@ -966,7 +849,7 @@ if st.session_state.analysis:
         st.markdown(
             '<div class="prompt-card-title">Sampler Prompt</div>'
             '<div class="prompt-card-sub">'
-            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded'
+            'Crafted from the sonic DNA of the record · 90 BPM hardcoded'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -982,37 +865,12 @@ if st.session_state.analysis:
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
-
-    # SUNO QUICK — full width, gold treatment
-    if st.session_state.suno_quick:
-        n = len(st.session_state.suno_quick)
-        st.markdown(
-            '<div class="quick-card-title">&#9632; Suno Quick Prompt</div>'
-            '<div class="quick-card-sub">'
-            'Under-110-char optimized format · 90 BPM hardcoded · Suno generates highest quality at this length'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        st.text_area(
-            "quick", value=st.session_state.suno_quick,
-            height=80, key="ta_quick", label_visibility="collapsed",
-        )
-        st.markdown(quick_char_chips(n), unsafe_allow_html=True)
-        copy_button(st.session_state.suno_quick, "cb_quick", style="quick")
-    elif st.session_state.app_state == "done":
-        st.markdown(
-            '<div class="alert">Suno Quick prompt not generated — try again.</div>',
-            unsafe_allow_html=True,
-        )
-
     # ── RESET ──
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     if st.button("↺  New Analysis", key="reset_btn"):
         st.session_state.app_state      = "idle"
         st.session_state.analysis       = ""
         st.session_state.sampler_prompt = ""
-        st.session_state.suno_quick     = ""
         st.session_state.upload_key    += 1
         st.rerun()
 
