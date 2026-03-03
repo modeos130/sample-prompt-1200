@@ -3,6 +3,7 @@ import google.generativeai as genai
 import base64
 import re
 import html as html_module
+import json
 
 st.set_page_config(
     page_title="Sample Prompt 1200",
@@ -187,6 +188,28 @@ header, footer, #MainMenu, .stDeployButton,
 [data-testid="stFileUploaderDropzoneInstructions"] {
     color: var(--text2) !important; font-size: 12px !important;
 }
+
+/* ── BROWSE BUTTON ───────────────────────────────────────────────────────── */
+[data-testid="stFileUploaderDropzone"] button,
+.stFileUploader button {
+    background: var(--gold) !important;
+    color: #0a0c0e !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.8px !important;
+    padding: 6px 18px !important;
+    cursor: pointer !important;
+    transition: background 0.15s, box-shadow 0.15s !important;
+}
+[data-testid="stFileUploaderDropzone"] button:hover,
+.stFileUploader button:hover {
+    background: var(--gold-lt) !important;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.25) !important;
+}
+
 .file-chip {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 8px 14px;
@@ -237,6 +260,14 @@ header, footer, #MainMenu, .stDeployButton,
     display: flex; align-items: center; gap: 8px;
 }
 .sec-rule { flex: 1; height: 1px; background: var(--bd); }
+.cbadge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--text3); letter-spacing: 0;
+    font-weight: 400; text-transform: none;
+}
+.cbadge.ok   { color: var(--green); }
+.cbadge.warn { color: var(--orange); }
+.cbadge.over { color: var(--red); }
 
 /* ── ALERT ───────────────────────────────────────────────────────────────── */
 .alert {
@@ -282,6 +313,13 @@ header, footer, #MainMenu, .stDeployButton,
 }
 
 /* ── PROMPT CARD ─────────────────────────────────────────────────────────── */
+.prompt-card {
+    background: var(--s1);
+    border: 1px solid var(--bd);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+}
 .prompt-card-title {
     font-family: 'Syne', sans-serif;
     font-size: 9px; font-weight: 700;
@@ -396,16 +434,16 @@ C. [Third direction]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 2 — Prompt generation
+# PASS 2 — Single prompt generation
 #
 # Research-informed design principles:
 #
 #   BPM: Classic boom bap / underground hip-hop sweet spot is 88–92 BPM.
 #        Hardcoded to 90 BPM — the canonical walking-pace standard.
-#        Wu-Tang C.R.E.A.M. = 92 BPM. Dilla groove = ~85 BPM. 90 splits it.
 #
-#   SAMPLER PROMPT: 460–580 chars. Era leads. Instrument specificity is the
+#   SINGLE PROMPT: Under 1000 chars. Era leads. Instrument specificity is the
 #        single highest quality lever. Texture language creates emotional soul.
+#        Producer names as callout = focuses the model on the right aesthetic.
 #
 #   NO DRUM NEGATION: Genre-locking (jazz trio, solo piano, string quartet)
 #        is dramatically more effective than saying "no drums".
@@ -415,7 +453,7 @@ C. [Third direction]
 #        the model to generate music that FEELS like it was made to be flipped.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
-    return f"""You are writing AI music generation prompts for the greatest sample-based hip-hop producers who ever lived.
+    return f"""You are writing an AI music generation prompt for the greatest sample-based hip-hop producers who ever lived.
 
 Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD that legends would excavate from a dusty crate and immediately flip. You know their aesthetic DNA cold:
 
@@ -427,13 +465,19 @@ Pete Rock: jazz/soul/R&B/Brazilian/Bollywood (90,000-record collection), horn-he
 Q-Tip: sophisticated jazz (Blue Note, Prestige, CTI), upright bass-forward, warm Rhodes, positive and swinging, 60s–70s jazz with emotional sophistication.
 Havoc (Mobb Deep): sparse piano loops over minor-key soul, Al Green/Quincy Jones flipped dark, Queensbridge bleakness, menacing and cold, buried in shadow and low-pass filter.
 Buckwild (D.I.T.C.): 60s–70s jazz/soul/funk/blaxploitation, fat staccato chops, Bronx rawness, the crispest New York golden-era boom bap aesthetic.
-Da Beatminerz: raw NYC soul/jazz, unpolished severity, dark and claustrophobic, no-nonsense grit, the underground's most menacing basement sound.
 Large Professor: 70s jazz-funk, smooth-hard East Coast, sophisticated loops that still knock hard, bridge between jazz sophistication and street impact.
+Lord Finesse (D.I.T.C.): jazz-funk with attitude, Bronx swing and soul, hard-grooving records that feel competitive and alive.
+Diamond D (D.I.T.C.): Bronx jazz-funk, dusty and hard, warm horns and dark basslines, golden-era New York grit with deep musicianship.
+Marley Marl: Queensbridge pioneer, classic soul and R&B sources, the father of the boom bap aesthetic, warm and hard simultaneously.
+Easy Mo Bee: jazz-soul with a Brooklyn edge, warm analog textures, sophisticated but street, BIG-era production authority.
+DJ Muggs (Cypress Hill): dark psychedelic soul, heavy low-end, cinematic doom, Latin-tinged darkness, hazy and menacing.
 No I.D.: Chicago soul and gospel-adjacent, emotionally devastating in simplicity, records that feel destined to be flipped.
 Madlib: eclectic and lo-fi — Brazilian tropicália, African records, psych-soul, the most unpredictable crate-digger, anything with soul qualifies.
-Knxwledge: chopped R&B/soul/jazz, cassette saturation, spiritual and intimate, lo-fi beat-tape culture.
+9th Wonder: Southern soul, gospel, classic R&B, warm and organic, sample-driven emotion over everything.
+Nottz: deep soul and funk, warm analog character, Virginia underground heat, rich harmonic textures.
+Evidence: West Coast soul-jazz, introspective and cinematic, muted and weathered, records that feel lived-in.
 Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
-Conductor Williams: orchestral soul chops (SP-606), Griselda/Shaolin-style grit meets symphony, loop-heavy vinyl-esque textures, the modern RZA lineage.
+Kanye West (early): sped-up soul samples, chipmunk soul era, warm gospel-adjacent flip energy, emotionally direct and undeniable.
 
 BASE EVERYTHING on the analysis below. Use EXACT era, aesthetic, and instruments found. No generic language. Write like a producer with 30 years in the crates.
 
@@ -442,26 +486,19 @@ ANALYSIS:
 
 ---
 
-CRITICAL FORMAT RULES — FOLLOW EXACTLY:
-- Use ONLY "## SECTION NAME" (two hashes) for section headers — never ###, never bold
-- Write exactly ONE section: ## SAMPLER PROMPT
-- Do not add any other sections, headers, or labels
-
-CRITICAL CONTENT RULES:
+OUTPUT RULES — FOLLOW EXACTLY:
+- Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
+- HARD MAX 1000 characters. Count carefully before outputting.
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
-- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — this beats "no drums" every time
-- ALWAYS state "90 BPM" explicitly — this is the classic boom bap standard, non-negotiable
-- ERA + RECORDING AESTHETIC leads every prompt — the strongest signal for Suno and Udio
+- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — never say "no drums"
+- ALWAYS include "90 BPM" — the classic boom bap standard, non-negotiable
+- ERA + RECORDING AESTHETIC leads first — strongest signal for Suno, Udio, and Sampla.ai
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
-- Production texture IS emotional depth: vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection — make it feel real and sampleable
-- NEVER mention any producer names in the generated prompt — express the aesthetic through sonic and emotional descriptors only
+- Production texture creates emotional soul: choose 2 from vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection
+- End exactly with: "the kind of record [pick 2–3 producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
 
-## SAMPLER PROMPT
-One single flowing paragraph. TARGET 460–580 characters, HARD MAX 700 characters.
-The producer DNA from the analysis shapes the entire emotional register — but express it through sound, not names.
-
-Follow this exact structure, in this order:
-[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [production texture: choose 2 from: vinyl surface noise / tape saturation / room bleed / analog warmth / human timing imperfection] — [2–3 emotional character words] — end with a phrase that captures the timeless, crate-worthy soul of the record.""".strip()
+Follow this structure:
+[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [2 production texture descriptors] — [2–3 emotional character words] — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -509,7 +546,7 @@ MAX_FILE_MB = 15
 
 
 def parse_analysis(raw: str):
-    """Return (fields, producer_dna, flip_block) — DNA and flip parsed but not displayed."""
+    """Return (fields, producer_dna, flip_block)."""
     key_pat  = re.compile(r'^([A-Z][A-Z\s+]*?):\s*(.*)')
     flip_re  = re.compile(r'^FLIP\s+DIRECTIONS\s*:', re.IGNORECASE)
     dna_re   = re.compile(r'^PRODUCER\s+DNA\s*:', re.IGNORECASE)
@@ -588,7 +625,7 @@ def parse_analysis(raw: str):
 
 
 def render_analysis(raw: str) -> None:
-    fields, _, _ = parse_analysis(raw)
+    fields, producer_dna, flip_block = parse_analysis(raw)
 
     if not fields:
         escaped = html_module.escape(raw)
@@ -611,35 +648,31 @@ def render_analysis(raw: str) -> None:
 
 
 def copy_button(text: str, btn_id: str) -> None:
-    """Stores text as base64 in a data attribute — avoids all JS string escaping issues."""
-    b64 = base64.b64encode(text.encode("utf-8")).decode("ascii")
-    onclick = (
-        "(function(b){"
-        "var bytes=Uint8Array.from(atob(b.dataset.b64),function(c){return c.charCodeAt(0)});"
-        "var t=new TextDecoder().decode(bytes);"
-        "navigator.clipboard.writeText(t).then(function(){"
-        "b.classList.add('copied');"
-        "b.innerHTML='&#10003;&nbsp;Copied!';"
-        "setTimeout(function(){"
-        "b.classList.remove('copied');"
-        "b.innerHTML='&#9632;&nbsp;Copy Prompt';"
-        "},2000);"
-        "}).catch(function(err){console.error(err);});"
-        "})(this)"
-    )
+    """Embeds text in onclick — double quotes HTML-escaped so the attribute stays valid."""
+    safe       = json.dumps(text).replace('"', '&quot;')
+    label      = "&#9632;&nbsp;Copy Prompt"
+    reset_str  = "&#9632;&nbsp;Copy Prompt"
+    safe_reset = json.dumps(reset_str).replace('"', '&quot;')
     st.markdown(
-        f'<button class="cp-btn" id="{btn_id}" data-b64="{b64}" onclick="{onclick}">'
-        f'&#9632;&nbsp;Copy Prompt</button>',
+        f'<button class="cp-btn" id="{btn_id}" '
+        f'onclick="(function(b){{'
+        f'navigator.clipboard.writeText({safe}).then(function(){{'
+        f'b.classList.add(\'copied\');b.innerHTML=\'&#10003;&nbsp;Copied!\';'
+        f'setTimeout(function(){{b.classList.remove(\'copied\');'
+        f'b.innerHTML={safe_reset};}},2000);}});'
+        f'}})(document.getElementById(\'{btn_id}\'))">'
+        f'{label}</button>',
         unsafe_allow_html=True,
     )
 
 
-def char_chips(n: int, suno_custom: int = 700) -> str:
-    sc = char_status(n, int(suno_custom * 0.85), suno_custom)
+def char_chips(n: int) -> str:
+    sc = char_status(n, 850, 1000)
     uc = "ok"
     return (
         f'<div class="char-bar">'
-        f'<span class="char-chip {sc}">Suno Custom&nbsp;{n}/{suno_custom}</span>'
+        f'<span class="char-chip {sc}">{n}/1000 chars</span>'
+        f'<span class="char-chip {uc}">Suno&nbsp;&#10003;</span>'
         f'<span class="char-chip {uc}">Udio&nbsp;&#10003;</span>'
         f'<span class="char-chip {uc}">Sampla.ai&nbsp;&#10003;</span>'
         f'</div>'
@@ -751,7 +784,7 @@ if uploaded_file:
 
 # ── ANALYZE BUTTON ────────────────────────────────────────────────────────────
 run_btn = st.button(
-    "Analyze Sample → Generate Prompt",
+    "Analyze Sample → Generate Prompts",
     disabled=bool(_key_error),
 )
 
@@ -793,16 +826,15 @@ if uploaded_file and run_btn and not _key_error:
             st.session_state.app_state = "pass2"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot active"></div>'
-                '<span>Pass 2 of 2 — Crafting prompt from analysis...</span></div>',
+                '<span>Pass 2 of 2 — Building prompt from analysis...</span></div>',
                 unsafe_allow_html=True,
             )
             with st.spinner(""):
-                r2 = model.generate_content(
+                r2   = model.generate_content(
                     build_prompt_generation(st.session_state.analysis)
                 )
-                st.session_state.sampler_prompt = cap_prompt(
-                    extract_section(r2.text, "SAMPLER PROMPT"), 700
-                )
+                raw2 = r2.text.strip()
+                st.session_state.sampler_prompt = cap_prompt(raw2, 1000)
 
             st.session_state.app_state = "done"
             status_slot.markdown(
@@ -838,7 +870,7 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
 
-    # ── SAMPLER PROMPT ──
+    # ── PROMPT ──
     st.markdown(
         '<div class="sec-label">Generated Prompt<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
@@ -847,9 +879,9 @@ if st.session_state.analysis:
     if st.session_state.sampler_prompt:
         n = len(st.session_state.sampler_prompt)
         st.markdown(
-            '<div class="prompt-card-title">Sampler Prompt</div>'
+            '<div class="prompt-card-title">AI Music Prompt</div>'
             '<div class="prompt-card-sub">'
-            'Crafted from the sonic DNA of the record · 90 BPM hardcoded'
+            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded · Ready for Suno, Udio &amp; Sampla.ai'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -861,7 +893,7 @@ if st.session_state.analysis:
         copy_button(st.session_state.sampler_prompt, "cb_sampler")
     elif st.session_state.app_state == "done":
         st.markdown(
-            '<div class="alert">Sampler prompt not generated — try again.</div>',
+            '<div class="alert">Prompt not generated — try again.</div>',
             unsafe_allow_html=True,
         )
 
