@@ -550,7 +550,7 @@ C. [Third direction]
 #        the model to generate music that FEELS like it was made to be flipped.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
-    return f"""You are writing AI music generation prompts for the greatest sample-based hip-hop producers who ever lived.
+    return f"""You are writing an AI music generation prompt for the greatest sample-based hip-hop producers who ever lived.
 
 Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD that legends would excavate from a dusty crate and immediately flip. You know their aesthetic DNA cold:
 
@@ -562,13 +562,19 @@ Pete Rock: jazz/soul/R&B/Brazilian/Bollywood (90,000-record collection), horn-he
 Q-Tip: sophisticated jazz (Blue Note, Prestige, CTI), upright bass-forward, warm Rhodes, positive and swinging, 60s–70s jazz with emotional sophistication.
 Havoc (Mobb Deep): sparse piano loops over minor-key soul, Al Green/Quincy Jones flipped dark, Queensbridge bleakness, menacing and cold, buried in shadow and low-pass filter.
 Buckwild (D.I.T.C.): 60s–70s jazz/soul/funk/blaxploitation, fat staccato chops, Bronx rawness, the crispest New York golden-era boom bap aesthetic.
-Da Beatminerz: raw NYC soul/jazz, unpolished severity, dark and claustrophobic, no-nonsense grit, the underground's most menacing basement sound.
 Large Professor: 70s jazz-funk, smooth-hard East Coast, sophisticated loops that still knock hard, bridge between jazz sophistication and street impact.
+Lord Finesse (D.I.T.C.): jazz-funk with attitude, Bronx swing and soul, hard-grooving records that feel competitive and alive.
+Diamond D (D.I.T.C.): Bronx jazz-funk, dusty and hard, warm horns and dark basslines, golden-era New York grit with deep musicianship.
+Marley Marl: Queensbridge pioneer, classic soul and R&B sources, the father of the boom bap aesthetic, warm and hard simultaneously.
+Easy Mo Bee: jazz-soul with a Brooklyn edge, warm analog textures, sophisticated but street, BIG-era production authority.
+DJ Muggs (Cypress Hill): dark psychedelic soul, heavy low-end, cinematic doom, Latin-tinged darkness, hazy and menacing.
 No I.D.: Chicago soul and gospel-adjacent, emotionally devastating in simplicity, records that feel destined to be flipped.
 Madlib: eclectic and lo-fi — Brazilian tropicália, African records, psych-soul, the most unpredictable crate-digger, anything with soul qualifies.
-Knxwledge: chopped R&B/soul/jazz, cassette saturation, spiritual and intimate, lo-fi beat-tape culture.
+9th Wonder: Southern soul, gospel, classic R&B, warm and organic, sample-driven emotion over everything.
+Nottz: deep soul and funk, warm analog character, Virginia underground heat, rich harmonic textures.
+Evidence: West Coast soul-jazz, introspective and cinematic, muted and weathered, records that feel lived-in.
 Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
-Conductor Williams: orchestral soul chops (SP-606), Griselda/Shaolin-style grit meets symphony, loop-heavy vinyl-esque textures, the modern RZA lineage.
+Kanye West (early): sped-up soul samples, chipmunk soul era, warm gospel-adjacent flip energy, emotionally direct and undeniable.
 
 BASE EVERYTHING on the analysis below. Use EXACT era, aesthetic, and instruments found. No generic language. Write like a producer with 30 years in the crates.
 
@@ -577,32 +583,19 @@ ANALYSIS:
 
 ---
 
-CRITICAL FORMAT RULES — FOLLOW EXACTLY:
-- Use ONLY "## SECTION NAME" (two hashes) for section headers — never ###, never bold
-- Write exactly TWO sections in this exact order: ## SAMPLER PROMPT, then ## SUNO QUICK
-- Do not add any other sections, headers, or labels
-
-CRITICAL CONTENT RULES — ALL PROMPTS:
+OUTPUT RULES — FOLLOW EXACTLY:
+- Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
+- HARD MAX 1000 characters. Count carefully before outputting.
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
-- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — this beats "no drums" every time
-- ALWAYS state "90 BPM" explicitly — this is the classic boom bap standard, non-negotiable
-- ERA + RECORDING AESTHETIC leads every prompt — the strongest signal for Suno and Udio
+- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — never say "no drums"
+- ALWAYS include "90 BPM" — the classic boom bap standard, non-negotiable
+- ERA + RECORDING AESTHETIC leads first — strongest signal for Suno, Udio, and Sampla.ai
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
-- Production texture IS emotional depth: vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection — make it feel real and sampleable
+- Production texture creates emotional soul: choose 2 from vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection
+- End exactly with: "the kind of record [pick 2–3 producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
 
-## SAMPLER PROMPT
-One single flowing paragraph. TARGET 460–580 characters, HARD MAX 700 characters.
-This is the definitive prompt — the producer DNA from the analysis shapes the entire emotional register.
-
-Follow this exact structure, in this order:
-[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [production texture: choose 2 from: vinyl surface noise / tape saturation / room bleed / analog warmth / human timing imperfection] — [2–3 emotional character words matching the producer DNA] — end with: "the kind of record [pick 2–3 specific producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
-
-## SUNO QUICK
-One dense sentence only. ABSOLUTE MAXIMUM 130 characters. Shorter is always better. Target under 110.
-Suno's highest-quality format: fewer words = sharper output. Never use more than needed.
-Structure: [Mood adjective] [era] [genre/aesthetic], [instrument 1], [instrument 2], [vocal or "purely instrumental"], 90 BPM
-The phrase "90 BPM" must always appear. No texture language. No "loopable". Pure sonic snapshot.
-Example at target length: "Brooding mid-70s Blue Note jazz trio, Rhodes electric piano, upright bass, purely instrumental, 90 BPM" = 102 chars""".strip()
+Follow this structure:
+[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [2 production texture descriptors] — [2–3 emotional character words] — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -750,37 +743,6 @@ def render_analysis(raw: str) -> None:
     )
     st.markdown(f'<div class="analysis-card">{rows}</div>', unsafe_allow_html=True)
 
-    if producer_dna:
-        st.markdown(
-            f'<div class="dna-card">'
-            f'<div class="dna-label">Producer DNA</div>'
-            f'<div class="dna-text">{html_module.escape(producer_dna)}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-
-    if flip_block:
-        items_html = ""
-        for line in flip_block.split('\n'):
-            line = line.strip()
-            if not line:
-                continue
-            fm = re.match(r'^([A-C])[\.\)]\s*(.+)', line)
-            if fm:
-                items_html += (
-                    f'<div class="flip-item">'
-                    f'<span class="flip-ltr">{html_module.escape(fm.group(1))}.</span>'
-                    f'{html_module.escape(fm.group(2))}</div>'
-                )
-            else:
-                items_html += f'<div class="flip-item">{html_module.escape(line)}</div>'
-        if items_html:
-            st.markdown(
-                f'<div class="flip-card">'
-                f'<div class="flip-hdr">Flip Directions</div>'
-                f'{items_html}</div>',
-                unsafe_allow_html=True,
-            )
 
 
 def copy_button(text: str, btn_id: str, style: str = "default") -> None:
@@ -803,24 +765,15 @@ def copy_button(text: str, btn_id: str, style: str = "default") -> None:
     )
 
 
-def char_chips(n: int, suno_custom: int = 700) -> str:
-    sc = char_status(n, int(suno_custom * 0.85), suno_custom)
+def char_chips(n: int) -> str:
+    sc = char_status(n, 850, 1000)
     uc = "ok"
     return (
         f'<div class="char-bar">'
-        f'<span class="char-chip {sc}">Suno Custom&nbsp;{n}/{suno_custom}</span>'
+        f'<span class="char-chip {sc}">{n}/1000 chars</span>'
+        f'<span class="char-chip {uc}">Suno&nbsp;&#10003;</span>'
         f'<span class="char-chip {uc}">Udio&nbsp;&#10003;</span>'
         f'<span class="char-chip {uc}">Sampla.ai&nbsp;&#10003;</span>'
-        f'</div>'
-    )
-
-
-def quick_char_chips(n: int) -> str:
-    sc = char_status(n, 100, 130)
-    return (
-        f'<div class="char-bar">'
-        f'<span class="char-chip {sc}">Suno&nbsp;{n}/130 chars</span>'
-        f'<span class="char-chip ok">Optimal&nbsp;quality&nbsp;range</span>'
         f'</div>'
     )
 
@@ -832,7 +785,6 @@ for _k, _v in [
     ("app_state",      "idle"),
     ("analysis",       ""),
     ("sampler_prompt", ""),
-    ("suno_quick",     ""),
     ("upload_key",     0),
 ]:
     if _k not in st.session_state:
@@ -895,8 +847,8 @@ if _key_error:
 _status_map = {
     "idle":  ("idle",   "Ready — drop a sample to begin"),
     "pass1": ("active", "Pass 1 of 2 — Reading and analyzing audio..."),
-    "pass2": ("active", "Pass 2 of 2 — Building prompts from analysis..."),
-    "done":  ("done",   "Analysis complete — prompts ready to copy"),
+    "pass2": ("active", "Pass 2 of 2 — Building prompt from analysis..."),
+    "done":  ("done",   "Analysis complete — prompt ready to copy"),
     "error": ("error",  "Error — see details below"),
 }
 _dot, _stxt = _status_map.get(st.session_state.app_state, ("idle", "Ready"))
@@ -980,18 +932,13 @@ if uploaded_file and run_btn and not _key_error:
                 r2   = model.generate_content(
                     build_prompt_generation(st.session_state.analysis)
                 )
-                raw2 = r2.text
-                st.session_state.sampler_prompt = cap_prompt(
-                    extract_section(raw2, "SAMPLER PROMPT"), 700
-                )
-                st.session_state.suno_quick = cap_prompt(
-                    extract_section(raw2, "SUNO QUICK"), 130
-                )
+                raw2 = r2.text.strip()
+                st.session_state.sampler_prompt = cap_prompt(raw2, 1000)
 
             st.session_state.app_state = "done"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot done"></div>'
-                '<span>Analysis complete — prompts ready to copy</span></div>',
+                '<span>Analysis complete — prompt ready to copy</span></div>',
                 unsafe_allow_html=True,
             )
 
@@ -1022,18 +969,18 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
 
-    # ── SAMPLER PROMPT ──
+    # ── PROMPT ──
     st.markdown(
-        '<div class="sec-label">Generated Prompts<div class="sec-rule"></div></div>',
+        '<div class="sec-label">Generated Prompt<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
     )
 
     if st.session_state.sampler_prompt:
         n = len(st.session_state.sampler_prompt)
         st.markdown(
-            '<div class="prompt-card-title">Sampler Prompt</div>'
+            '<div class="prompt-card-title">AI Music Prompt</div>'
             '<div class="prompt-card-sub">'
-            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded'
+            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded · Ready for Suno, Udio &amp; Sampla.ai'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -1045,31 +992,7 @@ if st.session_state.analysis:
         copy_button(st.session_state.sampler_prompt, "cb_sampler")
     elif st.session_state.app_state == "done":
         st.markdown(
-            '<div class="alert">Sampler prompt not generated — try again.</div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
-
-    # ── SUNO QUICK ──
-    if st.session_state.suno_quick:
-        n = len(st.session_state.suno_quick)
-        st.markdown(
-            '<div class="quick-card-title">&#9632; Suno Quick Prompt</div>'
-            '<div class="quick-card-sub">'
-            'Under-110-char optimized format · 90 BPM hardcoded · Suno generates highest quality at this length'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        st.text_area(
-            "quick", value=st.session_state.suno_quick,
-            height=80, key="ta_quick", label_visibility="collapsed",
-        )
-        st.markdown(quick_char_chips(n), unsafe_allow_html=True)
-        copy_button(st.session_state.suno_quick, "cb_quick", style="quick")
-    elif st.session_state.app_state == "done":
-        st.markdown(
-            '<div class="alert">Suno Quick prompt not generated — try again.</div>',
+            '<div class="alert">Prompt not generated — try again.</div>',
             unsafe_allow_html=True,
         )
 
@@ -1079,7 +1002,6 @@ if st.session_state.analysis:
         st.session_state.app_state      = "idle"
         st.session_state.analysis       = ""
         st.session_state.sampler_prompt = ""
-        st.session_state.suno_quick     = ""
         st.session_state.upload_key    += 1
         st.rerun()
 
