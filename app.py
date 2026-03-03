@@ -53,8 +53,17 @@ html, body, .stApp {
     -webkit-font-smoothing: antialiased;
 }
 
+/* ── HIDE ALL STREAMLIT CHROME ───────────────────────────────────────────── */
 header, footer, #MainMenu, .stDeployButton,
-[data-testid="stToolbar"], [data-testid="stDecoration"] {
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+[data-testid="stBottom"],
+[data-testid="stSidebar"],
+[data-testid="collapsedControl"],
+[data-testid="manage-app-button"],
+.stAppToolbar,
+.stAppDeployButton {
     visibility: hidden !important; display: none !important;
 }
 
@@ -179,6 +188,28 @@ header, footer, #MainMenu, .stDeployButton,
 [data-testid="stFileUploaderDropzoneInstructions"] {
     color: var(--text2) !important; font-size: 12px !important;
 }
+
+/* ── BROWSE BUTTON ───────────────────────────────────────────────────────── */
+[data-testid="stFileUploaderDropzone"] button,
+.stFileUploader button {
+    background: var(--gold) !important;
+    color: #0a0c0e !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.8px !important;
+    padding: 6px 18px !important;
+    cursor: pointer !important;
+    transition: background 0.15s, box-shadow 0.15s !important;
+}
+[data-testid="stFileUploaderDropzone"] button:hover,
+.stFileUploader button:hover {
+    background: var(--gold-lt) !important;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.25) !important;
+}
+
 .file-chip {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 8px 14px;
@@ -578,7 +609,6 @@ Example at target length: "Brooding mid-70s Blue Note jazz trio, Rhodes electric
 # HELPERS
 # ══════════════════════════════════════════════════════════════════════════════
 def extract_section(text: str, header: str) -> str:
-    # Match any markdown header level (## or ###) as a section boundary
     pattern = rf"##\s*{re.escape(header)}\s*\n(.*?)(?=\n#{{1,6}}\s|\Z)"
     m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
     return m.group(1).strip() if m else ""
@@ -625,14 +655,14 @@ def parse_analysis(raw: str):
     flip_re  = re.compile(r'^FLIP\s+DIRECTIONS\s*:', re.IGNORECASE)
     dna_re   = re.compile(r'^PRODUCER\s+DNA\s*:', re.IGNORECASE)
 
-    fields     = []
-    flip_lines = []
+    fields       = []
+    flip_lines   = []
     producer_dna = ""
-    in_flip    = False
-    in_dna     = False
-    cur_key    = None
-    cur_val    = []
-    dna_parts  = []
+    in_flip      = False
+    in_dna       = False
+    cur_key      = None
+    cur_val      = []
+    dna_parts    = []
 
     for raw_line in raw.split('\n'):
         line = raw_line.strip()
@@ -664,15 +694,14 @@ def parse_analysis(raw: str):
             continue
 
         if in_dna:
-            # Check if this is a new field (ends the DNA block)
             m = key_pat.match(line)
             if m and len(m.group(1).strip()) >= 2 and re.match(r'^[A-Z][A-Z\s+]*$', m.group(1).strip()):
                 producer_dna = ' '.join(dna_parts)
                 in_dna = False
                 dna_parts = []
-                cur_key  = m.group(1).strip()
+                cur_key   = m.group(1).strip()
                 val_start = m.group(2).strip()
-                cur_val  = [val_start] if val_start else []
+                cur_val   = [val_start] if val_start else []
             else:
                 dna_parts.append(line)
             continue
@@ -721,7 +750,6 @@ def render_analysis(raw: str) -> None:
     )
     st.markdown(f'<div class="analysis-card">{rows}</div>', unsafe_allow_html=True)
 
-    # Producer DNA — special highlighted card
     if producer_dna:
         st.markdown(
             f'<div class="dna-card">'
@@ -731,7 +759,6 @@ def render_analysis(raw: str) -> None:
             unsafe_allow_html=True,
         )
 
-    # Flip directions
     if flip_block:
         items_html = ""
         for line in flip_block.split('\n'):
@@ -758,7 +785,6 @@ def render_analysis(raw: str) -> None:
 
 def copy_button(text: str, btn_id: str, style: str = "default") -> None:
     """Embeds text in onclick — double quotes HTML-escaped so the attribute stays valid."""
-    # json.dumps wraps in double quotes; those must become &quot; inside onclick="..."
     safe       = json.dumps(text).replace('"', '&quot;')
     cls        = "cp-btn-quick" if style == "quick" else "cp-btn"
     label      = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
@@ -777,15 +803,14 @@ def copy_button(text: str, btn_id: str, style: str = "default") -> None:
     )
 
 
-def char_chips(n: int, suno_custom: int = 700, suno_quick_max: int = 130) -> str:
-    """Return HTML for per-platform character limit chips."""
+def char_chips(n: int, suno_custom: int = 700) -> str:
     sc = char_status(n, int(suno_custom * 0.85), suno_custom)
-    uc = "ok"  # Udio has no hard limit
+    uc = "ok"
     return (
         f'<div class="char-bar">'
         f'<span class="char-chip {sc}">Suno Custom&nbsp;{n}/{suno_custom}</span>'
-        f'<span class="char-chip {uc}">Udio&nbsp;✓</span>'
-        f'<span class="char-chip {uc}">Sampla.ai&nbsp;✓</span>'
+        f'<span class="char-chip {uc}">Udio&nbsp;&#10003;</span>'
+        f'<span class="char-chip {uc}">Sampla.ai&nbsp;&#10003;</span>'
         f'</div>'
     )
 
@@ -897,7 +922,7 @@ if uploaded_file:
     raw_bytes = uploaded_file.getvalue()
     st.markdown(
         f'<div class="file-chip">'
-        f'<span class="file-chip-dot">●</span>'
+        f'<span class="file-chip-dot">&#9679;</span>'
         f'<span class="file-chip-name">{html_module.escape(uploaded_file.name)}</span>'
         f'<span class="file-chip-size">{file_size_str(len(raw_bytes))}</span>'
         f'</div>',
@@ -997,7 +1022,7 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
 
-    # ── SAMPLER PROMPT — full width ──
+    # ── SAMPLER PROMPT ──
     st.markdown(
         '<div class="sec-label">Generated Prompts<div class="sec-rule"></div></div>',
         unsafe_allow_html=True,
@@ -1026,7 +1051,7 @@ if st.session_state.analysis:
 
     st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
 
-    # SUNO QUICK — full width, gold treatment
+    # ── SUNO QUICK ──
     if st.session_state.suno_quick:
         n = len(st.session_state.suno_quick)
         st.markdown(
