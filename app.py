@@ -467,6 +467,11 @@ C. [Third direction]
 #   LOOPABLE: The musical idea is built to repeat — a short 2, 4, or 8 bar
 #        harmonic cycle that creates hypnotic motion when played on loop.
 #
+#   NO REAL NAMES: Never output any real artist, producer, musician, or
+#        band name. Suno and Udio flag real names and refuse generation.
+#        Use descriptive aesthetic phrases instead — e.g. "golden era East
+#        Coast boom bap producers", "dark cinematic underground beatmakers".
+#
 #   NO DRUM NEGATION: Genre-locking is dramatically more effective.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
@@ -478,27 +483,11 @@ ERA LOCK — NON-NEGOTIABLE: The output prompt MUST be anchored to the late 1960
 
 You know the aesthetic DNA of the producers who built hip-hop from these records:
 
-RZA: 50s–70s soul and jazz (Thelonious Monk, Stax Records), blaxploitation/kung-fu cinema scores, heavy low-pass filtering, eerie minor keys, ancient-feeling cinematic menace.
-Alchemist: obscure dark jazz, film scores, world music, psychedelic rock, melancholic melodies, cold hypnotic tension — the underground's cinematic architect.
-J Dilla: intimate Detroit soul, deep obscure cuts (Eastern European psych-rock, Japanese jazz fusion), woozy cassette-worn warmth, humanly imperfect feel — music with soul in every wrong note.
-DJ Premier: surgically chopped jazz/soul (Blue Note, Verve), 2–3 second loops with strong melodic hooks, organic New York grit, records that hit hard with minimal transformation.
-Pete Rock: jazz/soul/R&B/Brazilian/Bollywood (90,000-record collection), horn-heavy soul jazz, CTI/Stax aesthetic, warm and dusty, sophisticated and grooving, SP-1200 character.
-Q-Tip: sophisticated jazz (Blue Note, Prestige, CTI), upright bass-forward, warm Rhodes, positive and swinging, 60s–70s jazz with emotional sophistication.
-Havoc (Mobb Deep): sparse piano loops over minor-key soul, Al Green/Quincy Jones flipped dark, Queensbridge bleakness, menacing and cold, buried in shadow and low-pass filter.
-Buckwild (D.I.T.C.): 60s–70s jazz/soul/funk/blaxploitation, fat staccato chops, Bronx rawness, the crispest New York golden-era boom bap aesthetic.
-Large Professor: 70s jazz-funk, smooth-hard East Coast, sophisticated loops that still knock hard, bridge between jazz sophistication and street impact.
-Lord Finesse (D.I.T.C.): jazz-funk with attitude, Bronx swing and soul, hard-grooving records that feel competitive and alive.
-Diamond D (D.I.T.C.): Bronx jazz-funk, dusty and hard, warm horns and dark basslines, golden-era New York grit with deep musicianship.
-Marley Marl: Queensbridge pioneer, classic soul and R&B sources, the father of the boom bap aesthetic, warm and hard simultaneously.
-Easy Mo Bee: jazz-soul with a Brooklyn edge, warm analog textures, sophisticated but street, BIG-era production authority.
-DJ Muggs (Cypress Hill): dark psychedelic soul, heavy low-end, cinematic doom, Latin-tinged darkness, hazy and menacing.
-No I.D.: Chicago soul and gospel-adjacent, emotionally devastating in simplicity, records that feel destined to be flipped.
-Madlib: eclectic and lo-fi — Brazilian tropicália, African records, psych-soul, the most unpredictable crate-digger, anything with soul qualifies.
-9th Wonder: Southern soul, gospel, classic R&B, warm and organic, sample-driven emotion over everything.
-Nottz: deep soul and funk, warm analog character, Virginia underground heat, rich harmonic textures.
-Evidence: West Coast soul-jazz, introspective and cinematic, muted and weathered, records that feel lived-in.
-Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
-Kanye West (early): sped-up soul samples, chipmunk soul era, warm gospel-adjacent flip energy, emotionally direct and undeniable.
+East Coast boom bap architects (New York, early 90s): hard bop and soul-jazz sources, surgically chopped 2–3 second loops, Blue Note and Verve catalog, horn-heavy CTI/Stax aesthetic, warm SP-1200 character, upright bass-forward, organic New York grit.
+Dark cinematic underground school: obscure dark jazz, blaxploitation film scores, world music, psychedelic rock, eerie minor keys, heavy low-pass filtering, cold hypnotic tension, ancient-feeling cinematic menace, Latin-tinged darkness.
+Lo-fi spiritual beatmaker school: intimate Detroit soul, deep obscure cuts, Eastern European psych-rock, Japanese jazz fusion, woozy cassette-worn warmth, humanly imperfect feel, Brazilian tropicália, African records, the most eclectic and unpredictable crate-digging aesthetic.
+Golden era soul-flip generation (mid-2000s): sped-up soul samples, gospel-adjacent energy, dramatic orchestral records, Southern soul and gospel, warm and organic, emotionally direct and undeniable, made to be flipped into anthems.
+Queensbridge and Bronx rawness school: sparse piano loops over minor-key soul, menacing and cold, buried in shadow, Bronx jazz-funk attitude, fat staccato chops, dusty and hard, warm horns over dark basslines, deep musicianship with street impact.
 
 BASE instrumentation, harmonic character, and emotional feel on the analysis below — but ALWAYS reframe it as a late 1960s or 1970s recording. Write like a producer with 30 years in the crates.
 
@@ -510,21 +499,23 @@ ANALYSIS:
 OUTPUT RULES — FOLLOW EXACTLY:
 - Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
 - HARD MAX 1000 characters. Count carefully before outputting.
-- ERA is ALWAYS late 1960s–1970s — no exceptions, no matter what the analysis says
+- ERA is ALWAYS late 1960s–1970s — translate any other era into this world, no exceptions
 - BPM: choose one value between 78–90 BPM based on the feel of the analysis — state it explicitly
 - ALWAYS minor scale or modal tonality — melancholic, searching, or menacing. No major key.
 - MUST include a featured instrument solo — a specific named melodic statement (e.g. "Harmon-muted trumpet solo over the changes", "tenor saxophone running the minor harmony", "Hammond B3 organ break", "Rhodes electric piano statement")
 - Live band feel — real musicians in a room together, human timing imperfection, instruments bleeding into each other's mics
 - Deep and pensive emotional character — weighted with meaning, shadowed, searching
-- MUST include: "recorded on 2-inch tape" and "tape saturation" — these are non-negotiable texture anchors
+- MUST include: "recorded on 2-inch tape" and "tape saturation" — mandatory texture anchors
 - Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) built to repeat hypnotically without fatigue
+- NEVER use any real artist name, producer name, musician name, or band name anywhere in the output — Suno and Udio will block generation if real names appear
+- Instead, end with a descriptive aesthetic phrase that captures the TYPE of producer who would flip this record. Choose the phrase that best matches the producer DNA from the analysis. Examples: "golden era East Coast boom bap producers", "dark cinematic underground beatmakers", "lo-fi spiritual crate-diggers", "Bronx and Queens golden era architects", "soul-flip generation beatmakers", "underground West Coast soul diggers", "hard bop sample hunters from New York"
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
 - Genre-lock naturally ("jazz trio", "soul quartet", "string ensemble") — never say "no drums"
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
-- End exactly with: "the kind of record [pick 2–3 producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
+- End exactly with: "the kind of record [descriptive aesthetic phrase — NO real names] would pull from a dusty crate and flip into something timeless."
 
 Follow this structure:
-[Late 1960s or 1970s ERA] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [78–90] BPM — [minor key/modal description] — [featured instrument solo] — live band feel, recorded on 2-inch tape, tape saturation — deep and pensive, [1–2 additional emotional words] — designed to feel loopable — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
+[Late 1960s or 1970s ERA] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [78–90] BPM — [minor key/modal description] — [featured instrument solo] — live band feel, recorded on 2-inch tape, tape saturation — deep and pensive, [1–2 additional emotional words] — designed to feel loopable — the kind of record [descriptive aesthetic phrase, NO real names] would pull from a dusty crate and flip into something timeless.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
