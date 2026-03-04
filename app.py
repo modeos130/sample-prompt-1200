@@ -434,28 +434,49 @@ C. [Third direction]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 2 — Single prompt generation
+# PASS 2 — Prompt generation
 #
-# Research-informed design principles:
+# Design principles:
 #
-#   BPM: Classic boom bap / underground hip-hop sweet spot is 88–92 BPM.
-#        Hardcoded to 90 BPM — the canonical walking-pace standard.
+#   ERA LOCK: Output prompts are ALWAYS anchored to late 1960s–1970s —
+#        the golden age of sample source material. No matter what era the
+#        source audio is from, the generated prompt is translated into that
+#        world: Blue Note, CTI, Stax, Motown, soul-jazz, hard bop, film scores.
+#        This is the only era that produces the raw material legends flip.
 #
-#   SINGLE PROMPT: Under 1000 chars. Era leads. Instrument specificity is the
-#        single highest quality lever. Texture language creates emotional soul.
-#        Producer names as callout = focuses the model on the right aesthetic.
+#   BPM: 78–90 BPM range — the full boom bap tempo band.
+#        78 = slow, heavy, Dilla-dragged. 90 = crisp, walking-pace.
+#        The model selects within this range based on the feel of the analysis.
 #
-#   NO DRUM NEGATION: Genre-locking (jazz trio, solo piano, string quartet)
-#        is dramatically more effective than saying "no drums".
+#   TAPE: Recorded on 2-inch tape with tape saturation — mandatory texture.
+#        Not "analog warmth" in the abstract — specifically the compression,
+#        harmonic distortion, and physical character of a real tape machine.
 #
-#   PRODUCER DNA: The greatest sample-based producers each had a distinct
-#        sonic fingerprint — encoding their aesthetic into the prompt forces
-#        the model to generate music that FEELS like it was made to be flipped.
+#   MINOR / MODAL: Always minor scale or modal tonality — melancholic,
+#        searching, or menacing. The greatest crate-finds are emotionally
+#        weighted. This is locked in regardless of the source key.
+#
+#   SOLOS: A featured instrument solo is mandatory — the melodic statement
+#        a producer can isolate, chop, and flip. Trumpet over the changes,
+#        organ break, tenor sax running the harmony, Rhodes statement.
+#
+#   HUMAN / LIVE BAND: No programmed, no sequenced. Real musicians in a
+#        room, bleeding into each other's mics, rushing and dragging against
+#        the pocket. That imperfection is the soul.
+#
+#   LOOPABLE: The musical idea is built to repeat — a short 2, 4, or 8 bar
+#        harmonic cycle that creates hypnotic motion when played on loop.
+#
+#   NO DRUM NEGATION: Genre-locking is dramatically more effective.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
     return f"""You are writing an AI music generation prompt for the greatest sample-based hip-hop producers who ever lived.
 
-Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD that legends would excavate from a dusty crate and immediately flip. You know their aesthetic DNA cold:
+Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD from the late 1960s or 1970s that legends would excavate from a dusty crate and immediately flip.
+
+ERA LOCK — NON-NEGOTIABLE: The output prompt MUST be anchored to the late 1960s–1970s regardless of what era the source analysis describes. Translate everything into the sonic world of that golden period: Blue Note hard bop sessions, CTI soul-jazz, Stax Records soul, Motown studio productions, blaxploitation film scores, spiritual jazz, psychedelic soul. No other era produces this quality of sample material. This rule cannot be overridden.
+
+You know the aesthetic DNA of the producers who built hip-hop from these records:
 
 RZA: 50s–70s soul and jazz (Thelonious Monk, Stax Records), blaxploitation/kung-fu cinema scores, heavy low-pass filtering, eerie minor keys, ancient-feeling cinematic menace.
 Alchemist: obscure dark jazz, film scores, world music, psychedelic rock, melancholic melodies, cold hypnotic tension — the underground's cinematic architect.
@@ -479,7 +500,7 @@ Evidence: West Coast soul-jazz, introspective and cinematic, muted and weathered
 Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
 Kanye West (early): sped-up soul samples, chipmunk soul era, warm gospel-adjacent flip energy, emotionally direct and undeniable.
 
-BASE EVERYTHING on the analysis below. Use EXACT era, aesthetic, and instruments found. No generic language. Write like a producer with 30 years in the crates.
+BASE instrumentation, harmonic character, and emotional feel on the analysis below — but ALWAYS reframe it as a late 1960s or 1970s recording. Write like a producer with 30 years in the crates.
 
 ANALYSIS:
 {analysis_text}
@@ -489,16 +510,21 @@ ANALYSIS:
 OUTPUT RULES — FOLLOW EXACTLY:
 - Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
 - HARD MAX 1000 characters. Count carefully before outputting.
+- ERA is ALWAYS late 1960s–1970s — no exceptions, no matter what the analysis says
+- BPM: choose one value between 78–90 BPM based on the feel of the analysis — state it explicitly
+- ALWAYS minor scale or modal tonality — melancholic, searching, or menacing. No major key.
+- MUST include a featured instrument solo — a specific named melodic statement (e.g. "Harmon-muted trumpet solo over the changes", "tenor saxophone running the minor harmony", "Hammond B3 organ break", "Rhodes electric piano statement")
+- Live band feel — real musicians in a room together, human timing imperfection, instruments bleeding into each other's mics
+- Deep and pensive emotional character — weighted with meaning, shadowed, searching
+- MUST include: "recorded on 2-inch tape" and "tape saturation" — these are non-negotiable texture anchors
+- Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) built to repeat hypnotically without fatigue
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
-- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — never say "no drums"
-- ALWAYS include "90 BPM" — the classic boom bap standard, non-negotiable
-- ERA + RECORDING AESTHETIC leads first — strongest signal for Suno, Udio, and Sampla.ai
+- Genre-lock naturally ("jazz trio", "soul quartet", "string ensemble") — never say "no drums"
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
-- Production texture creates emotional soul: choose 2 from vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection
 - End exactly with: "the kind of record [pick 2–3 producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
 
 Follow this structure:
-[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [2 production texture descriptors] — [2–3 emotional character words] — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
+[Late 1960s or 1970s ERA] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [78–90] BPM — [minor key/modal description] — [featured instrument solo] — live band feel, recorded on 2-inch tape, tape saturation — deep and pensive, [1–2 additional emotional words] — designed to feel loopable — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -881,7 +907,7 @@ if st.session_state.analysis:
         st.markdown(
             '<div class="prompt-card-title">AI Music Prompt</div>'
             '<div class="prompt-card-sub">'
-            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded · Ready for Suno, Udio &amp; Sampla.ai'
+            'Late 60s/70s era-locked · 78–90 BPM · Minor/modal · 2-inch tape · Live band feel · Loopable · Ready for Suno, Udio &amp; Sampla.ai'
             '</div>',
             unsafe_allow_html=True,
         )
