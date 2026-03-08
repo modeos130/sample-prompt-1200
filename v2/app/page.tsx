@@ -19,6 +19,14 @@ const STATUS_MAP: Record<AppState, { dot: string; text: string }> = {
   error: { dot: "bg-[#e05656]",                    text: "Error — see details below"       },
 };
 
+const STATUS_TEXT_COLOR: Record<AppState, string> = {
+  idle:  "text-[#6a7a8a]",
+  pass1: "text-[#8a9aaa]",
+  pass2: "text-[#8a9aaa]",
+  done:  "text-[#34c97a]",
+  error: "text-[#e05656]",
+};
+
 const TAB_LABELS: Record<ResultTab, string> = {
   prompt:   "Generated Prompt",
   analysis: "Sample Analysis",
@@ -89,21 +97,23 @@ export default function Home() {
               <span className="font-['Syne',sans-serif] font-extrabold text-[18px] leading-none text-[#eef2f7] tracking-tight">
                 Sample Prompt <span className="text-[#c9a84c]">1200</span>
               </span>
-              <span className="text-[9px] font-mono text-[#2a3545] tracking-[2px] hidden sm:inline">V2</span>
+              <span className="text-[9px] font-mono text-[#4a5a70] tracking-[2px] hidden sm:inline">V2</span>
             </div>
           </div>
 
           {/* Status pill */}
           <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0d1118] border border-[#1a2030]">
             <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
-            <span className="text-[9.5px] font-mono text-[#4a5a70] max-w-[200px] lg:max-w-[280px] truncate">{displayText}</span>
+            <span className={`text-[11px] font-mono max-w-[200px] lg:max-w-[300px] truncate ${STATUS_TEXT_COLOR[appState]}`}>
+              {displayText}
+            </span>
           </div>
 
           {/* Platform pills */}
           <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-[8px] font-mono tracking-[1.5px] uppercase text-[#2a3545] mr-1">Works with</span>
+            <span className="text-[9px] font-mono tracking-[1.5px] uppercase text-[#4a5a70] mr-1">Works with</span>
             {["Suno", "Udio", "Sampla"].map((p) => (
-              <span key={p} className="px-2.5 py-1 rounded-full bg-[#0d1118] border border-[#1a2030] text-[8.5px] font-mono text-[#4a5a70]">
+              <span key={p} className="px-2.5 py-1 rounded-full bg-[#0d1118] border border-[#1e2838] text-[10px] font-mono text-[#7e8fa0]">
                 {p}
               </span>
             ))}
@@ -125,7 +135,7 @@ export default function Home() {
                 Drop a sample.<br />
                 <span className="text-[#c9a84c]">Get the prompt.</span>
               </h1>
-              <p className="text-[13px] font-mono text-[#4a5a70] max-w-[540px] leading-[1.8]">
+              <p className="text-[13px] font-mono text-[#6a7a8a] max-w-[540px] leading-[1.8]">
                 Era-locked genre analysis via Gemini. Outputs a ready-to-paste prompt for Suno,
                 Udio, and Sampla.ai — no artist names, no drums, pure sonic DNA.
               </p>
@@ -139,7 +149,7 @@ export default function Home() {
                 <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
                   <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">1</span>
                 </span>
-                <span className="text-[9px] font-mono tracking-[4px] uppercase text-[#3d4d5c]">Select Mode</span>
+                <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Select Mode</span>
               </div>
               <GenreSelector selected={null} onSelect={handleGenreSelect} compact={false} />
             </section>
@@ -158,7 +168,7 @@ export default function Home() {
                     <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
                       <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">1</span>
                     </span>
-                    <span className="text-[9px] font-mono tracking-[4px] uppercase text-[#3d4d5c]">Select Mode</span>
+                    <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Select Mode</span>
                   </div>
                   <GenreSelector selected={genre} onSelect={handleGenreSelect} compact />
                 </section>
@@ -171,7 +181,7 @@ export default function Home() {
                     <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
                       <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">2</span>
                     </span>
-                    <span className="text-[9px] font-mono tracking-[4px] uppercase text-[#3d4d5c]">Upload Sample</span>
+                    <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Upload Sample</span>
                   </div>
                   <AudioUploader
                     genre={genre}
@@ -184,18 +194,18 @@ export default function Home() {
                 {/* Error block */}
                 {appState === "error" && statusMsg && (
                   <div className="animate-slide-down rounded-2xl bg-[rgba(224,86,86,0.10)] border border-[#e05656]/30 border-l-4 border-l-[#e05656] px-5 py-4">
-                    <p className="text-[8.5px] font-mono tracking-[3px] uppercase text-[#e05656] mb-2">Error Details</p>
-                    <p className="text-[12px] font-mono text-[rgba(224,86,86,0.8)] leading-relaxed mb-4">{statusMsg}</p>
+                    <p className="text-[9px] font-mono tracking-[3px] uppercase text-[#e05656] mb-2">Error Details</p>
+                    <p className="text-[12px] font-mono text-[rgba(224,86,86,0.85)] leading-relaxed mb-4">{statusMsg}</p>
                     <div className="flex gap-3">
                       <button
                         onClick={handleRetry}
-                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[9px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl bg-[rgba(224,86,86,0.12)] border border-[#e05656]/40 text-[#e05656] hover:bg-[rgba(224,86,86,0.2)] transition-colors duration-150"
+                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[10px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl bg-[rgba(224,86,86,0.12)] border border-[#e05656]/40 text-[#e05656] hover:bg-[rgba(224,86,86,0.2)] transition-colors duration-150"
                       >
                         ↺ Try Again
                       </button>
                       <button
                         onClick={handleReset}
-                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[9px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl text-[#3d4d5c] hover:text-[#4a5a70] transition-colors duration-150"
+                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[10px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl text-[#6a7a8a] hover:text-[#8a9aaa] transition-colors duration-150"
                       >
                         Clear & Start Over
                       </button>
@@ -209,7 +219,7 @@ export default function Home() {
                     <div className="h-px bg-gradient-to-r from-transparent via-[#1a2030] to-transparent mb-4" />
                     <button
                       onClick={handleReset}
-                      className="inline-flex items-center gap-2.5 font-['Syne',sans-serif] font-bold text-[10px] tracking-[3px] uppercase text-[#2a3545] hover:text-[#c9a84c] transition-colors duration-200"
+                      className="inline-flex items-center gap-2.5 font-['Syne',sans-serif] font-bold text-[11px] tracking-[3px] uppercase text-[#5a6a7a] hover:text-[#c9a84c] transition-colors duration-200"
                     >
                       <span className="text-[16px] leading-none">↺</span>
                       New Analysis
@@ -224,16 +234,16 @@ export default function Home() {
                   <div className="animate-slide-down">
 
                     {/* Tab bar */}
-                    <div className="flex items-center border-b border-[#111820] mb-5">
+                    <div className="flex items-center border-b border-[#1a2030] mb-5">
                       {(["prompt", "analysis", "suno"] as ResultTab[]).map((tab) => (
                         <button
                           key={tab}
                           onClick={() => setActiveTab(tab)}
                           className={[
-                            "px-4 py-2.5 text-[9px] font-mono tracking-[2px] uppercase transition-all duration-150 border-b-2 -mb-px",
+                            "px-4 py-2.5 text-[11px] font-mono tracking-[2px] uppercase transition-all duration-150 border-b-2 -mb-px",
                             activeTab === tab
                               ? "border-[#c9a84c] text-[#c9a84c]"
-                              : "border-transparent text-[#3d4d5c] hover:text-[#4a5a70]",
+                              : "border-transparent text-[#5a6a7a] hover:text-[#8a9aaa]",
                           ].join(" ")}
                         >
                           {TAB_LABELS[tab]}
@@ -269,15 +279,15 @@ export default function Home() {
                 ) : (
                   /* Waiting placeholder — desktop only */
                   <div className="hidden lg:flex flex-col items-center justify-center min-h-[340px] rounded-2xl border border-dashed border-[#141c28] text-center px-8">
-                    <div className="w-12 h-12 rounded-2xl border border-[#1a2030] flex items-center justify-center mb-4">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a3545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="w-12 h-12 rounded-2xl border border-[#1e2838] flex items-center justify-center mb-4">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3d4d5c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 18V5l12-2v13" />
                         <circle cx="6" cy="18" r="3" />
                         <circle cx="18" cy="16" r="3" />
                       </svg>
                     </div>
-                    <p className="font-['Syne',sans-serif] font-bold text-[11px] tracking-[2px] uppercase text-[#1e2838] mb-1.5">Results</p>
-                    <p className="text-[10px] font-mono text-[#1a2535]">Upload and analyze a sample<br />to see output here</p>
+                    <p className="font-['Syne',sans-serif] font-bold text-[12px] tracking-[2px] uppercase text-[#3d4d5c] mb-1.5">Results</p>
+                    <p className="text-[11px] font-mono text-[#2a3545]">Upload and analyze a sample<br />to see output here</p>
                   </div>
                 )}
               </div>
@@ -290,7 +300,7 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-[#0d1118] bg-[#080a0c]">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between text-[8.5px] font-mono text-[#2a3545] tracking-[1px]">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between text-[9px] font-mono text-[#3d4d5c] tracking-[1px]">
           <span className="font-['Syne',sans-serif] font-bold">Sample Prompt 1200 V2</span>
           <span>130 MODE · Booman Systems · 2026</span>
         </div>

@@ -9,6 +9,23 @@ import { BALTIMORE_CLUB_ANALYSIS_PROMPT, buildBaltimoreClubPrompt } from "@/lib/
 
 const MAX_FILE_MB = 4;
 
+// Gemini supported audio MIME types
+const MIME_MAP: Record<string, string> = {
+  mp3:  "audio/mpeg",
+  wav:  "audio/wav",
+  ogg:  "audio/ogg",
+  flac: "audio/flac",
+  aac:  "audio/aac",
+  m4a:  "audio/mp4",
+  aiff: "audio/aiff",
+  aif:  "audio/aiff",
+};
+
+function getMimeType(filename: string): string {
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+  return MIME_MAP[ext] ?? "audio/mpeg";
+}
+
 type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
 
 function getGenrePrompts(genre: Genre) {
@@ -64,10 +81,10 @@ export async function POST(req: NextRequest) {
     }
 
     const genai = new GoogleGenerativeAI(apiKey);
-    const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
+    // Use gemini-2.0-flash as stable multimodal model; 2.5-flash may be preview-only
+    const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const ext = file.name.split(".").pop()?.toLowerCase();
-    const mimeType = ext === "wav" ? "audio/wav" : "audio/mpeg";
+    const mimeType = getMimeType(file.name);
     const b64 = buffer.toString("base64");
     const audioPart = { inlineData: { mimeType, data: b64 } };
 
@@ -89,12 +106,16 @@ export async function POST(req: NextRequest) {
 
     if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
       userMessage = "API quota exceeded. Enable billing at aistudio.google.com or wait for the rate-limit window.";
-    } else if (msg.includes("403") || msg.toLowerCase().includes("api_key")) {
+    } else if (msg.includes("403") || msg.toLowerCase().includes("api_key") || msg.toLowerCase().includes("invalid")) {
       userMessage = "Invalid API key. Check GEMINI_KEY in your environment variables.";
-    } else if (msg.toLowerCase().includes("timeout")) {
-      userMessage = "Request timed out. Try a shorter audio clip (under 5 minutes works best).";
-    } else if (msg.toLowerCase().includes("too large")) {
+    } else if (msg.toLowerCase().includes("timeout") || msg.toLowerCase().includes("deadline")) {
+      userMessage = "Request timed out. Try a shorter audio clip (under 60 seconds works best).";
+    } else if (msg.toLowerCase().includes("too large") || msg.includes("413")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
+    } else if (msg.toLowerCase().includes("not found") || msg.includes("404")) {
+      userMessage = "Gemini model unavailable. Check that your API key has access to the model.";
+    } else if (msg.toLowerCase().includes("audio") || msg.toLowerCase().includes("mime") || msg.toLowerCase().includes("unsupported")) {
+      userMessage = "Unsupported audio format. Use MP3 or WAV for best results.";
     }
 
     return NextResponse.json({ error: userMessage }, { status: 500 });

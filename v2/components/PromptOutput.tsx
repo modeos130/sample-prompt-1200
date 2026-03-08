@@ -52,14 +52,14 @@ export default function PromptOutput({ prompt }: { prompt: string }) {
         {BADGES.map(({ icon, label }) => (
           <span
             key={label}
-            className="inline-flex items-center gap-1.5 text-[9px] font-mono px-2.5 py-1 rounded-full border border-[#1a2030] bg-[#0d1118] text-[#3d4d5c]"
+            className="inline-flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-[#1e2838] bg-[#0d1118] text-[#6a7a8a]"
           >
-            <span className="text-[#c9a84c] text-[10px] leading-none">{icon}</span>
+            <span className="text-[#c9a84c] text-[11px] leading-none">{icon}</span>
             {label}
           </span>
         ))}
-        <span className="inline-flex items-center gap-1.5 text-[9px] font-mono px-2.5 py-1 rounded-full border border-[#1a2030] bg-[#0d1118] text-[#3d4d5c]">
-          <span className="text-[#2ecc71] text-[10px] leading-none">✓</span>
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-[#1e2838] bg-[#0d1118] text-[#6a7a8a]">
+          <span className="text-[#34c97a] text-[11px] leading-none">✓</span>
           Suno · Udio · Sampla
         </span>
       </div>

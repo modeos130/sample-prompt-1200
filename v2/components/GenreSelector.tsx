@@ -71,12 +71,12 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
                 "flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all duration-150 focus:outline-none",
                 isSelected
                   ? "border-[#c9a84c] bg-[rgba(201,168,76,0.08)] text-[#c9a84c]"
-                  : "border-[#141c28] bg-[#0a0d14] text-[#3d4d5c] hover:border-[#1e2838] hover:text-[#4a5a70]",
+                  : "border-[#1a2030] bg-[#0d1118] text-[#7e8fa0] hover:border-[#2a3a50] hover:text-[#a0b0c0]",
               ].join(" ")}
             >
               {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] flex-shrink-0" />}
-              <span className="font-['Syne',sans-serif] font-bold text-[11px] tracking-[1px]">{g.label}</span>
-              <span className="text-[8px] font-mono opacity-60">{g.bpm}</span>
+              <span className="font-['Syne',sans-serif] font-bold text-[12px] tracking-[0.5px]">{g.label}</span>
+              <span className="text-[9px] font-mono opacity-70">{g.bpm}</span>
             </button>
           );
         })}

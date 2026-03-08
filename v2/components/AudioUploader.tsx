@@ -49,7 +49,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
     setDragging(false);
     if (disabled) return;
     const f = e.dataTransfer.files[0];
-    if (f && (f.type === "audio/mpeg" || f.type === "audio/wav")) handleFile(f);
+    if (f && f.type.startsWith("audio/")) handleFile(f);
   }
 
   async function handleAnalyze() {
@@ -118,7 +118,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
         <input
           ref={inputRef}
           type="file"
-          accept=".mp3,.wav"
+          accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.aiff"
           className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
         />
@@ -197,7 +197,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
                 Drop your sample here
               </p>
               <p className="text-[11px] font-mono text-[#3d4d5c]">
-                or <span className="text-[#c9a84c]">browse files</span> &nbsp;·&nbsp; MP3 or WAV &nbsp;·&nbsp; Max 4 MB
+                or <span className="text-[#c9a84c]">browse files</span> &nbsp;·&nbsp; MP3, WAV, FLAC, AAC &nbsp;·&nbsp; Max 4 MB
               </p>
             </div>
           )
