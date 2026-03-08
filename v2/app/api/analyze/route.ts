@@ -102,20 +102,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ analysis, generatedPrompt });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    let userMessage = `Analysis failed — ${msg.slice(0, 140)}`;
 
-    if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
+    // Show raw Gemini error by default — specific overrides only for well-known codes
+    let userMessage = `Gemini error: ${msg.slice(0, 300)}`;
+
+    if (msg.includes("[429]") || msg.includes("RESOURCE_EXHAUSTED")) {
       userMessage = "API quota exceeded. Enable billing at aistudio.google.com or wait for the rate-limit window.";
-    } else if (msg.includes("403") || msg.toLowerCase().includes("api_key") || msg.toLowerCase().includes("invalid")) {
+    } else if (msg.includes("[403]") || msg.includes("API_KEY_INVALID")) {
       userMessage = "Invalid API key. Check GEMINI_KEY in your environment variables.";
-    } else if (msg.toLowerCase().includes("timeout") || msg.toLowerCase().includes("deadline")) {
-      userMessage = "Request timed out. Try a shorter audio clip (under 60 seconds works best).";
-    } else if (msg.toLowerCase().includes("too large") || msg.includes("413")) {
+    } else if (msg.includes("[413]") || msg.includes("Request payload size")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
-    } else if (msg.toLowerCase().includes("not found") || msg.includes("404")) {
-      userMessage = "Gemini model unavailable. Check that your API key has access to the model.";
-    } else if (msg.toLowerCase().includes("audio") || msg.toLowerCase().includes("mime") || msg.toLowerCase().includes("unsupported")) {
-      userMessage = "Unsupported audio format. Use MP3 or WAV for best results.";
     }
 
     return NextResponse.json({ error: userMessage }, { status: 500 });
