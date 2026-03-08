@@ -54,9 +54,36 @@ const GENRES: GenreConfig[] = [
 interface Props {
   selected: Genre | null;
   onSelect: (genre: Genre) => void;
+  compact?: boolean;
 }
 
-export default function GenreSelector({ selected, onSelect }: Props) {
+export default function GenreSelector({ selected, onSelect, compact = false }: Props) {
+  if (compact) {
+    return (
+      <div className="flex flex-wrap gap-2">
+        {GENRES.map((g) => {
+          const isSelected = selected === g.id;
+          return (
+            <button
+              key={g.id}
+              onClick={() => onSelect(g.id)}
+              className={[
+                "flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all duration-150 focus:outline-none",
+                isSelected
+                  ? "border-[#c9a84c] bg-[rgba(201,168,76,0.08)] text-[#c9a84c]"
+                  : "border-[#141c28] bg-[#0a0d14] text-[#3d4d5c] hover:border-[#1e2838] hover:text-[#4a5a70]",
+              ].join(" ")}
+            >
+              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] flex-shrink-0" />}
+              <span className="font-['Syne',sans-serif] font-bold text-[11px] tracking-[1px]">{g.label}</span>
+              <span className="text-[8px] font-mono opacity-60">{g.bpm}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
       {GENRES.map((g, i) => {
