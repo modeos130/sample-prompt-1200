@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
     }
 
     const genai = new GoogleGenerativeAI(apiKey);
-    // Use gemini-2.0-flash as stable multimodal model; 2.5-flash may be preview-only
-    const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // gemini-1.5-flash: stable, widely available, full audio support
+    const model = genai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const mimeType = getMimeType(file.name);
     const b64 = buffer.toString("base64");
