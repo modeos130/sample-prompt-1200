@@ -77,7 +77,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
 
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
-      onResult(data.analysis, data.generatedPrompt);
+      onResult(data.analysis ?? "", data.generatedPrompt ?? "");
       onStatusChange("done");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
