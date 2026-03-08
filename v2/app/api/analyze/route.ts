@@ -9,7 +9,7 @@ export const maxDuration = 60;
 const MAX_FILE_MB = 4;
 
 // Override via GEMINI_MODEL env var in Vercel if needed.
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-1.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
 
 // Tries v1beta first (newer/preview models), then v1 (stable models).
 // This covers all possible model placements without manual configuration.
