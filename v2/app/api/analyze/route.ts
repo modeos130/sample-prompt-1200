@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 60;
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { BOOM_BAP_ANALYSIS_PROMPT, buildBoomBapPrompt } from "@/lib/genres/boom-bap";
 import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
