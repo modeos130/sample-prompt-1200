@@ -1,6 +1,6 @@
 "use client";
 
-export type Genre = "boom-bap" | "house" | "trap";
+export type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
 
 interface GenreConfig {
   id: Genre;
@@ -10,7 +10,6 @@ interface GenreConfig {
   era: string;
   tags: string[];
   num: string;
-  accent: string;
 }
 
 const GENRES: GenreConfig[] = [
@@ -22,7 +21,6 @@ const GENRES: GenreConfig[] = [
     era: "Late 60s / 70s",
     tags: ["Soul-Jazz", "Hard Bop", "Crate Dig"],
     num: "01",
-    accent: "#c9a84c",
   },
   {
     id: "house",
@@ -32,7 +30,6 @@ const GENRES: GenreConfig[] = [
     era: "Late 70s / 80s",
     tags: ["Deep House", "Gospel Soul", "Dance Floor"],
     num: "02",
-    accent: "#c9a84c",
   },
   {
     id: "trap",
@@ -42,7 +39,15 @@ const GENRES: GenreConfig[] = [
     era: "70s–90s Dark Cinematic",
     tags: ["Gothic Orchestral", "Dark Ambient", "Cinematic"],
     num: "03",
-    accent: "#c9a84c",
+  },
+  {
+    id: "baltimore-club",
+    label: "Baltimore",
+    sub: "Club Music",
+    bpm: "130–145 BPM",
+    era: "Late 70s / Early 80s",
+    tags: ["Up-Tempo Funk", "Staccato Soul", "Party Floor"],
+    num: "04",
   },
 ];
 
@@ -53,10 +58,14 @@ interface Props {
 
 export default function GenreSelector({ selected, onSelect }: Props) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
       {GENRES.map((g, i) => {
         const isSelected = selected === g.id;
-        const staggerClass = i === 0 ? "animate-stagger-1" : i === 1 ? "animate-stagger-2" : "animate-stagger-3";
+        const staggerClass =
+          i === 0 ? "animate-stagger-1" :
+          i === 1 ? "animate-stagger-2" :
+          i === 2 ? "animate-stagger-3" :
+          "animate-stagger-3";
         return (
           <button
             key={g.id}

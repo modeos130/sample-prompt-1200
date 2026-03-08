@@ -5,10 +5,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { BOOM_BAP_ANALYSIS_PROMPT, buildBoomBapPrompt } from "@/lib/genres/boom-bap";
 import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
 import { TRAP_ANALYSIS_PROMPT, buildTrapPrompt } from "@/lib/genres/trap";
+import { BALTIMORE_CLUB_ANALYSIS_PROMPT, buildBaltimoreClubPrompt } from "@/lib/genres/baltimore-club";
 
 const MAX_FILE_MB = 15;
 
-type Genre = "boom-bap" | "house" | "trap";
+type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
 
 function getGenrePrompts(genre: Genre) {
   switch (genre) {
@@ -18,6 +19,8 @@ function getGenrePrompts(genre: Genre) {
       return { analysisPrompt: HOUSE_ANALYSIS_PROMPT, buildPrompt: buildHousePrompt };
     case "trap":
       return { analysisPrompt: TRAP_ANALYSIS_PROMPT, buildPrompt: buildTrapPrompt };
+    case "baltimore-club":
+      return { analysisPrompt: BALTIMORE_CLUB_ANALYSIS_PROMPT, buildPrompt: buildBaltimoreClubPrompt };
   }
 }
 
@@ -41,7 +44,7 @@ export async function POST(req: NextRequest) {
     const genre = formData.get("genre") as Genre | null;
 
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
-    if (!genre || !["boom-bap", "house", "trap"].includes(genre)) {
+    if (!genre || !["boom-bap", "house", "trap", "baltimore-club"].includes(genre)) {
       return NextResponse.json({ error: "Invalid genre" }, { status: 400 });
     }
 

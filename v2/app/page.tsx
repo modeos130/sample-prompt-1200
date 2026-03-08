@@ -6,6 +6,7 @@ import GenreSelector, { type Genre } from "@/components/GenreSelector";
 import AudioUploader from "@/components/AudioUploader";
 import AnalysisOutput from "@/components/AnalysisOutput";
 import PromptOutput from "@/components/PromptOutput";
+import SunoSettings from "@/components/SunoSettings";
 
 type AppState = "idle" | "pass1" | "pass2" | "done" | "error";
 
@@ -216,7 +217,13 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="h-px bg-gradient-to-r from-transparent via-[#1a2030] to-transparent mt-16 mb-7" />
+              {/* Suno Settings — full-width below results grid */}
+            <div className="mt-8">
+              <p className="text-[8px] font-mono tracking-[3.5px] uppercase text-[#2a3545] mb-3">Suno Parameters</p>
+              <SunoSettings analysis={analysis} genre={genre!} />
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-[#1a2030] to-transparent mt-16 mb-7" />
               <button
                 onClick={handleReset}
                 className="inline-flex items-center gap-2.5 font-['Syne',sans-serif] font-bold text-[10px] tracking-[3px] uppercase text-[#2a3545] hover:text-[#c9a84c] transition-colors duration-200"
