@@ -7,8 +7,15 @@ import { BALTIMORE_CLUB_ANALYSIS_PROMPT, buildBaltimoreClubPrompt } from "@/lib/
 export const maxDuration = 60;
 
 const MAX_FILE_MB = 4;
-const GEMINI_MODEL = "gemini-1.5-flash";
-const GEMINI_API = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent`;
+
+// Override via GEMINI_MODEL env var in Vercel — no code change needed.
+// Default: gemini-2.5-flash (original design). If your key returns 404,
+// set GEMINI_MODEL to whatever `ListModels` shows as available.
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+
+// Tries v1beta first (newer/preview models), then v1 (stable models).
+// This covers all possible model placements without manual configuration.
+const API_VERSIONS = ["v1beta", "v1"];
 
 const MIME_MAP: Record<string, string> = {
   mp3:  "audio/mpeg",
@@ -30,27 +37,50 @@ type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
 
 function getGenrePrompts(genre: Genre) {
   switch (genre) {
-    case "boom-bap":      return { analysisPrompt: BOOM_BAP_ANALYSIS_PROMPT, buildPrompt: buildBoomBapPrompt };
-    case "house":         return { analysisPrompt: HOUSE_ANALYSIS_PROMPT,     buildPrompt: buildHousePrompt };
-    case "trap":          return { analysisPrompt: TRAP_ANALYSIS_PROMPT,       buildPrompt: buildTrapPrompt };
-    case "baltimore-club":return { analysisPrompt: BALTIMORE_CLUB_ANALYSIS_PROMPT, buildPrompt: buildBaltimoreClubPrompt };
+    case "boom-bap":       return { analysisPrompt: BOOM_BAP_ANALYSIS_PROMPT,       buildPrompt: buildBoomBapPrompt       };
+    case "house":          return { analysisPrompt: HOUSE_ANALYSIS_PROMPT,           buildPrompt: buildHousePrompt         };
+    case "trap":           return { analysisPrompt: TRAP_ANALYSIS_PROMPT,             buildPrompt: buildTrapPrompt          };
+    case "baltimore-club": return { analysisPrompt: BALTIMORE_CLUB_ANALYSIS_PROMPT,  buildPrompt: buildBaltimoreClubPrompt };
   }
 }
 
 async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string> {
-  const res = await fetch(`${GEMINI_API}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ role: "user", parts }] }),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    const msg = data?.error?.message ?? `HTTP ${res.status}`;
-    throw new Error(`[${res.status}] ${msg}`);
+  let lastStatus = 0;
+  let lastMsg    = "";
+
+  for (const version of API_VERSIONS) {
+    const url = `https://generativelanguage.googleapis.com/${version}/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const res  = await fetch(url, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ contents: [{ role: "user", parts }] }),
+    });
+
+    const data = await res.json() as Record<string, unknown>;
+    const errMsg = (data?.error as Record<string, string>)?.message ?? `HTTP ${res.status}`;
+
+    if (res.status === 404) {
+      // Model not on this API version — try the next one
+      lastStatus = 404;
+      lastMsg    = errMsg;
+      continue;
+    }
+
+    if (!res.ok) throw new Error(`[${res.status}] ${errMsg}`);
+
+    const text = (data?.candidates as Array<{content:{parts:Array<{text:string}>}}>)
+      ?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Empty response from Gemini — response may have been blocked by safety filters");
+    return text;
   }
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Empty response from Gemini — response may have been blocked");
-  return text;
+
+  // All versions 404 — guide the user clearly
+  throw new Error(
+    `Model "${GEMINI_MODEL}" not found on v1beta or v1. ` +
+    `Set the GEMINI_MODEL environment variable in Vercel to a model your API key can access. ` +
+    `Visit aistudio.google.com, open your project, and check which models are listed. ` +
+    `(Last error: ${lastMsg.slice(0, 120)})`
+  );
 }
 
 function extractSection(text: string, header: string): string {
@@ -69,8 +99,8 @@ function capPrompt(text: string, limit: number): string {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const file  = formData.get("file")  as File   | null;
-    const genre = formData.get("genre") as Genre  | null;
+    const file  = formData.get("file")  as File  | null;
+    const genre = formData.get("genre") as Genre | null;
 
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
     if (!genre || !["boom-bap", "house", "trap", "baltimore-club"].includes(genre)) {
@@ -92,7 +122,7 @@ export async function POST(req: NextRequest) {
 
     const { analysisPrompt, buildPrompt } = getGenrePrompts(genre);
 
-    // Pass 1 — audio analysis (text + audio inline)
+    // Pass 1 — audio analysis
     const rawAnalysis = await geminiGenerate(apiKey, [
       { text: analysisPrompt },
       { inline_data: { mime_type: mimeType, data: b64 } },
@@ -100,19 +130,19 @@ export async function POST(req: NextRequest) {
     const analysis = extractSection(rawAnalysis, "ANALYSIS") || rawAnalysis;
 
     // Pass 2 — prompt generation (text only)
-    const rawPrompt      = await geminiGenerate(apiKey, [{ text: buildPrompt(analysis) }]);
+    const rawPrompt       = await geminiGenerate(apiKey, [{ text: buildPrompt(analysis) }]);
     const generatedPrompt = capPrompt(rawPrompt.trim(), 1000);
 
     return NextResponse.json({ analysis, generatedPrompt });
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    let userMessage = `Gemini error: ${msg.slice(0, 300)}`;
+    let userMessage = `${msg.slice(0, 400)}`;
 
     if (msg.includes("[429]") || msg.includes("RESOURCE_EXHAUSTED")) {
       userMessage = "API quota exceeded. Enable billing at aistudio.google.com or wait for the rate-limit window.";
     } else if (msg.includes("[403]") || msg.includes("API_KEY_INVALID")) {
-      userMessage = "Invalid API key. Check GEMINI_KEY in your environment variables.";
+      userMessage = "Invalid API key. Check GEMINI_KEY in your Vercel environment variables.";
     } else if (msg.includes("[413]") || msg.includes("Request payload size")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
     }
