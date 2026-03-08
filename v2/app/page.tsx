@@ -50,11 +50,14 @@ export default function Home() {
   }
 
   const { dot, text } = STATUS_MAP[appState];
-  const displayText = (appState === "pass1" || appState === "pass2") && statusMsg ? statusMsg : text;
+  const displayText =
+    statusMsg && (appState === "pass1" || appState === "pass2" || appState === "error")
+      ? statusMsg
+      : text;
 
   return (
-    <main className="min-h-screen bg-[#0d0f11]">
-      <div className="max-w-[760px] mx-auto px-7 py-10 pb-24">
+    <main className="min-h-screen bg-[#0d0f11] flex flex-col items-center">
+      <div className="w-full max-w-[760px] px-4 sm:px-7 py-10 pb-24">
 
         {/* ── HEADER ── */}
         <header className="mb-9 pb-7 border-b border-[#1e2530]">
@@ -110,6 +113,14 @@ export default function Home() {
               onStatusChange={handleStatusChange}
             />
           </section>
+        )}
+
+        {/* ── ERROR DETAIL ── */}
+        {appState === "error" && statusMsg && (
+          <div className="animate-slide-down mb-6 bg-[rgba(224,86,86,0.08)] border border-[#e05656] rounded-[10px] px-4 py-3.5">
+            <p className="text-[9px] font-mono font-medium tracking-[2px] uppercase text-[#e05656] mb-1.5">Error Details</p>
+            <p className="text-[11px] font-mono text-[#e05656] leading-relaxed">{statusMsg}</p>
+          </div>
         )}
 
         {/* ── RESULTS ── */}
