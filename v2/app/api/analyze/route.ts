@@ -7,7 +7,7 @@ import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
 import { TRAP_ANALYSIS_PROMPT, buildTrapPrompt } from "@/lib/genres/trap";
 import { BALTIMORE_CLUB_ANALYSIS_PROMPT, buildBaltimoreClubPrompt } from "@/lib/genres/baltimore-club";
 
-const MAX_FILE_MB = 15;
+const MAX_FILE_MB = 4;
 
 type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
 

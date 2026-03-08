@@ -17,7 +17,7 @@ const GENRE_LABELS: Record<Genre, string> = {
   "baltimore-club": "Baltimore Club",
 };
 
-const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15 MB
+const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB — Vercel's multipart body limit is 4.5 MB
 
 function fileSizeStr(n: number): string {
   return n >= 1_048_576 ? `${(n / 1_048_576).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`;
@@ -197,7 +197,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
                 Drop your sample here
               </p>
               <p className="text-[11px] font-mono text-[#3d4d5c]">
-                or <span className="text-[#c9a84c]">browse files</span> &nbsp;·&nbsp; MP3 or WAV &nbsp;·&nbsp; Max 15 MB
+                or <span className="text-[#c9a84c]">browse files</span> &nbsp;·&nbsp; MP3 or WAV &nbsp;·&nbsp; Max 4 MB
               </p>
             </div>
           )
@@ -206,7 +206,7 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
         {/* Size error */}
         {sizeError && (
           <p className="text-[11px] font-mono text-[#e05656] animate-fade-in">
-            File too large — max 15 MB
+            File too large — max 4 MB
           </p>
         )}
 
