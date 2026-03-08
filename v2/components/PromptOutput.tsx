@@ -8,79 +8,111 @@ function charStatus(n: number): "ok" | "warn" | "over" {
   return "ok";
 }
 
-const STATUS_COLORS = {
-  ok: "text-[#34c97a] border-[rgba(52,201,122,0.3)] bg-[rgba(52,201,122,0.15)]",
-  warn: "text-[#e8944a] border-[#28333f] bg-[#141820]",
-  over: "text-[#e05656] border-[#28333f] bg-[#141820]",
+const BAR_COLORS = {
+  ok:   "bg-[#2ecc71]",
+  warn: "bg-[#e8944a]",
+  over: "bg-[#e05656]",
+};
+
+const TEXT_COLORS = {
+  ok:   "text-[#2ecc71]",
+  warn: "text-[#e8944a]",
+  over: "text-[#e05656]",
 };
 
 export default function PromptOutput({ prompt }: { prompt: string }) {
   const [copied, setCopied] = useState(false);
-  const n = prompt.length;
-  const sc = charStatus(n);
+  const n   = prompt.length;
+  const sc  = charStatus(n);
+  const pct = Math.min(100, (n / 1000) * 100);
 
   function handleCopy() {
     navigator.clipboard.writeText(prompt).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2200);
     });
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-3">
-        <p className="font-['Syne',sans-serif] font-bold text-[9px] tracking-[2.5px] uppercase text-[#7e8fa0] mb-1">
-          AI Music Prompt
-        </p>
-        <p className="text-[9.5px] font-mono text-[#3d4d5c]">
-          Era-locked · Minor/modal · 2-inch tape · Live band · Loopable · Ready for Suno, Udio &amp; Sampla.ai
-        </p>
-      </div>
+    <div className="w-full flex flex-col gap-4">
 
+      {/* Sub-header */}
+      <p className="text-[9px] font-mono text-[#2a3545] leading-relaxed">
+        Era-locked · Minor/modal · No drums · Loopable · Ready for Suno, Udio &amp; Sampla
+      </p>
+
+      {/* Prompt textarea */}
       <textarea
         readOnly
         value={prompt}
-        rows={7}
+        rows={9}
         className={[
-          "w-full rounded-[6px] border border-[#28333f] bg-[#1a1f28]",
-          "font-mono text-[12px] text-[#d8e2ec] leading-[1.75]",
-          "px-3.5 py-3 resize-none focus:outline-none focus:border-[#7a6230]",
-          "focus:shadow-[0_0_0_2px_rgba(201,168,76,0.06)]",
+          "w-full rounded-2xl border border-[#141c28] bg-[#0d1118]",
+          "font-mono text-[12.5px] text-[#eef2f7] leading-[1.85]",
+          "px-5 py-4 resize-none focus:outline-none",
+          "transition-colors duration-200 focus:border-[#7a6230]",
         ].join(" ")}
       />
 
-      {/* char bar */}
-      <div className="flex items-center gap-2 flex-wrap mt-2">
-        <span
-          className={[
-            "text-[9px] font-mono px-2 py-0.5 rounded border",
-            STATUS_COLORS[sc],
-          ].join(" ")}
-        >
-          {n}/1000 chars
-        </span>
-        {(["Suno", "Udio", "Sampla.ai"] as const).map((p) => (
-          <span
-            key={p}
-            className="text-[9px] font-mono px-2 py-0.5 rounded border text-[#34c97a] border-[rgba(52,201,122,0.3)] bg-[rgba(52,201,122,0.15)]"
-          >
-            {p}&nbsp;✓
+      {/* Character meter */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className={`text-[9px] font-mono ${TEXT_COLORS[sc]}`}>
+            {n} / 1000 chars
           </span>
-        ))}
+          <div className="flex items-center gap-1.5">
+            {(["Suno", "Udio", "Sampla"] as const).map((p) => (
+              <span
+                key={p}
+                className="text-[8px] font-mono px-2.5 py-1 rounded-full bg-[rgba(46,204,113,0.08)] border border-[rgba(46,204,113,0.2)] text-[#2ecc71]"
+              >
+                {p} ✓
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="h-[3px] rounded-full bg-[#111820] overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${BAR_COLORS[sc]}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
       </div>
 
-      {/* copy button */}
+      {/* Copy button */}
       <button
         onClick={handleCopy}
         className={[
-          "mt-3 inline-flex items-center gap-2 px-5 py-2 rounded-[6px] border font-mono text-[10.5px] transition-all duration-150",
+          "w-full h-[56px] rounded-2xl font-['Syne',sans-serif] font-extrabold text-[12px]",
+          "tracking-[3px] uppercase transition-all duration-200 flex items-center justify-center gap-3 border-2",
           copied
-            ? "border-[#34c97a] text-[#34c97a] bg-[rgba(52,201,122,0.15)]"
-            : "border-[#28333f] bg-[#222a34] text-[#7e8fa0] hover:border-[#7a6230] hover:text-[#e8c97a] hover:bg-[rgba(201,168,76,0.06)]",
+            ? "bg-[rgba(46,204,113,0.1)] border-[#2ecc71] text-[#2ecc71]"
+            : [
+                "bg-[#0d1118] border-[#1a2030] text-[#4a5a70]",
+                "hover:border-[#c9a84c] hover:text-[#c9a84c] hover:bg-[rgba(201,168,76,0.05)]",
+                "hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(201,168,76,0.15)]",
+                "active:translate-y-0 active:shadow-none",
+              ].join(" "),
         ].join(" ")}
       >
-        {copied ? "✓ Copied!" : "■ Copy Prompt"}
+        {copied ? (
+          <>
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Copied to Clipboard
+          </>
+        ) : (
+          <>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+            Copy Prompt
+          </>
+        )}
       </button>
+
     </div>
   );
 }
