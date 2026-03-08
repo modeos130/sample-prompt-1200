@@ -312,50 +312,6 @@ header, footer, #MainMenu, .stDeployButton,
     flex: 1; word-break: break-word; line-height: 1.6;
 }
 
-/* ── PRODUCER DNA — special treatment ──────────────────────────────────── */
-.dna-card {
-    background: linear-gradient(135deg, var(--gold-tint), transparent);
-    border: 1px solid var(--gold-dim);
-    border-left: 3px solid var(--gold);
-    border-radius: var(--radius);
-    padding: 14px 16px; margin-bottom: 6px;
-}
-.dna-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 8px; font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 7px;
-}
-.dna-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 11.5px; color: var(--text);
-    line-height: 1.65;
-}
-
-/* ── FLIP CARD ──────────────────────────────────────────────────────────── */
-.flip-card {
-    background: var(--s1);
-    border: 1px solid var(--bd);
-    border-left: 3px solid var(--bd3);
-    border-radius: var(--radius);
-    padding: 14px 16px; margin-top: 4px; margin-bottom: 6px;
-}
-.flip-hdr {
-    font-family: 'Syne', sans-serif;
-    font-size: 8px; font-weight: 700;
-    color: var(--text3);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 10px;
-}
-.flip-item {
-    font-size: 11px; color: var(--text2);
-    padding: 3px 0; line-height: 1.6;
-}
-.flip-ltr {
-    color: var(--gold-lt); margin-right: 8px; font-weight: 500;
-}
-
 /* ── PROMPT CARD ─────────────────────────────────────────────────────────── */
 .prompt-card {
     background: var(--s1);
@@ -377,42 +333,6 @@ header, footer, #MainMenu, .stDeployButton,
     letter-spacing: 0.5px;
     margin-bottom: 12px;
     line-height: 1.5;
-}
-.platform-tags {
-    display: flex; gap: 5px; flex-wrap: wrap;
-    margin-bottom: 12px;
-}
-.ptag {
-    font-size: 8.5px; font-weight: 500;
-    color: var(--text3);
-    background: var(--s2);
-    border: 1px solid var(--bd2);
-    border-radius: 4px;
-    padding: 2px 7px;
-    letter-spacing: 0.5px;
-}
-.ptag.ok { color: var(--green); border-color: rgba(52,201,122,0.3); background: var(--green-dim); }
-
-/* ── QUICK PROMPT CARD — highlighted treatment ─────────────────────────── */
-.quick-card {
-    background: linear-gradient(135deg, rgba(201,168,76,0.07), var(--s1));
-    border: 1px solid var(--gold-dim);
-    border-radius: var(--radius-lg);
-    padding: 16px 18px;
-    margin-bottom: 16px;
-}
-.quick-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 9px; font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 2.5px; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 4px;
-}
-.quick-card-sub {
-    font-size: 9.5px; color: var(--gold-dim);
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
 }
 
 /* ── TEXTAREA ───────────────────────────────────────────────────────────── */
@@ -447,19 +367,6 @@ header, footer, #MainMenu, .stDeployButton,
 }
 .cp-btn:hover { border-color: var(--gold-dim); color: var(--gold-lt); background: var(--gold-tint); }
 .cp-btn.copied { border-color: var(--green) !important; color: var(--green) !important; background: var(--green-dim) !important; }
-.cp-btn-quick {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: var(--gold);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 9px 20px;
-    font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 500;
-    color: #0a0c0e;
-    cursor: pointer; transition: all 0.15s;
-    margin-top: 10px; letter-spacing: 0.5px;
-}
-.cp-btn-quick:hover { background: var(--gold-lt); box-shadow: 0 4px 16px rgba(201,168,76,0.25); }
-.cp-btn-quick.copied { background: var(--green) !important; }
 
 /* ── CHAR LIMIT BAR ─────────────────────────────────────────────────────── */
 .char-bar {
@@ -527,56 +434,62 @@ C. [Third direction]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PASS 2 — Two-output prompt generation
+# PASS 2 — Prompt generation
 #
-# Research-informed design principles:
+# Design principles:
 #
-#   BPM: Classic boom bap / underground hip-hop sweet spot is 88–92 BPM.
-#        Hardcoded to 90 BPM — the canonical walking-pace standard.
-#        Wu-Tang C.R.E.A.M. = 92 BPM. Dilla groove = ~85 BPM. 90 splits it.
+#   ERA LOCK: Output prompts are ALWAYS anchored to late 1960s–1970s —
+#        the golden age of sample source material. No matter what era the
+#        source audio is from, the generated prompt is translated into that
+#        world: Blue Note, CTI, Stax, Motown, soul-jazz, hard bop, film scores.
+#        This is the only era that produces the raw material legends flip.
 #
-#   SAMPLER PROMPT: 460–580 chars. Era leads. Instrument specificity is the
-#        single highest quality lever. Texture language creates emotional soul.
-#        Producer names as callout = focuses the model on the right aesthetic.
+#   BPM: 78–90 BPM range — the full boom bap tempo band.
+#        78 = slow, heavy, Dilla-dragged. 90 = crisp, walking-pace.
+#        The model selects within this range based on the feel of the analysis.
 #
-#   SUNO QUICK: Under 110 chars. No texture, no "loopable". Just the sharpest
-#        possible sonic snapshot. 90 BPM always included.
+#   TAPE: Recorded on 2-inch tape with tape saturation — mandatory texture.
+#        Not "analog warmth" in the abstract — specifically the compression,
+#        harmonic distortion, and physical character of a real tape machine.
 #
-#   NO DRUM NEGATION: Genre-locking (jazz trio, solo piano, string quartet)
-#        is dramatically more effective than saying "no drums".
+#   MINOR / MODAL: Always minor scale or modal tonality — melancholic,
+#        searching, or menacing. The greatest crate-finds are emotionally
+#        weighted. This is locked in regardless of the source key.
 #
-#   PRODUCER DNA: The greatest sample-based producers each had a distinct
-#        sonic fingerprint — encoding their aesthetic into the prompt forces
-#        the model to generate music that FEELS like it was made to be flipped.
+#   SOLOS: A featured instrument solo is mandatory — the melodic statement
+#        a producer can isolate, chop, and flip. Trumpet over the changes,
+#        organ break, tenor sax running the harmony, Rhodes statement.
+#
+#   HUMAN / LIVE BAND: No programmed, no sequenced. Real musicians in a
+#        room, bleeding into each other's mics, rushing and dragging against
+#        the pocket. That imperfection is the soul.
+#
+#   LOOPABLE: The musical idea is built to repeat — a short 2, 4, or 8 bar
+#        harmonic cycle that creates hypnotic motion when played on loop.
+#
+#   NO REAL NAMES: Never output any real artist, producer, musician, or
+#        band name. Suno and Udio flag real names and refuse generation.
+#        Use descriptive aesthetic phrases instead — e.g. "golden era East
+#        Coast boom bap producers", "dark cinematic underground beatmakers".
+#
+#   NO DRUM NEGATION: Genre-locking is dramatically more effective.
 # ══════════════════════════════════════════════════════════════════════════════
 def build_prompt_generation(analysis_text: str) -> str:
     return f"""You are writing an AI music generation prompt for the greatest sample-based hip-hop producers who ever lived.
 
-Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD that legends would excavate from a dusty crate and immediately flip. You know their aesthetic DNA cold:
+Your task: generate source material — NOT a hip-hop beat, but the raw, soulful, cinematic RECORD from the late 1960s or 1970s that legends would excavate from a dusty crate and immediately flip.
 
-RZA: 50s–70s soul and jazz (Thelonious Monk, Stax Records), blaxploitation/kung-fu cinema scores, heavy low-pass filtering, eerie minor keys, ancient-feeling cinematic menace.
-Alchemist: obscure dark jazz, film scores, world music, psychedelic rock, melancholic melodies, cold hypnotic tension — the underground's cinematic architect.
-J Dilla: intimate Detroit soul, deep obscure cuts (Eastern European psych-rock, Japanese jazz fusion), woozy cassette-worn warmth, humanly imperfect feel — music with soul in every wrong note.
-DJ Premier: surgically chopped jazz/soul (Blue Note, Verve), 2–3 second loops with strong melodic hooks, organic New York grit, records that hit hard with minimal transformation.
-Pete Rock: jazz/soul/R&B/Brazilian/Bollywood (90,000-record collection), horn-heavy soul jazz, CTI/Stax aesthetic, warm and dusty, sophisticated and grooving, SP-1200 character.
-Q-Tip: sophisticated jazz (Blue Note, Prestige, CTI), upright bass-forward, warm Rhodes, positive and swinging, 60s–70s jazz with emotional sophistication.
-Havoc (Mobb Deep): sparse piano loops over minor-key soul, Al Green/Quincy Jones flipped dark, Queensbridge bleakness, menacing and cold, buried in shadow and low-pass filter.
-Buckwild (D.I.T.C.): 60s–70s jazz/soul/funk/blaxploitation, fat staccato chops, Bronx rawness, the crispest New York golden-era boom bap aesthetic.
-Large Professor: 70s jazz-funk, smooth-hard East Coast, sophisticated loops that still knock hard, bridge between jazz sophistication and street impact.
-Lord Finesse (D.I.T.C.): jazz-funk with attitude, Bronx swing and soul, hard-grooving records that feel competitive and alive.
-Diamond D (D.I.T.C.): Bronx jazz-funk, dusty and hard, warm horns and dark basslines, golden-era New York grit with deep musicianship.
-Marley Marl: Queensbridge pioneer, classic soul and R&B sources, the father of the boom bap aesthetic, warm and hard simultaneously.
-Easy Mo Bee: jazz-soul with a Brooklyn edge, warm analog textures, sophisticated but street, BIG-era production authority.
-DJ Muggs (Cypress Hill): dark psychedelic soul, heavy low-end, cinematic doom, Latin-tinged darkness, hazy and menacing.
-No I.D.: Chicago soul and gospel-adjacent, emotionally devastating in simplicity, records that feel destined to be flipped.
-Madlib: eclectic and lo-fi — Brazilian tropicália, African records, psych-soul, the most unpredictable crate-digger, anything with soul qualifies.
-9th Wonder: Southern soul, gospel, classic R&B, warm and organic, sample-driven emotion over everything.
-Nottz: deep soul and funk, warm analog character, Virginia underground heat, rich harmonic textures.
-Evidence: West Coast soul-jazz, introspective and cinematic, muted and weathered, records that feel lived-in.
-Just Blaze: dramatic gospel-influenced soul, big orchestral records, cinematic and grand, made to be flipped into anthems.
-Kanye West (early): sped-up soul samples, chipmunk soul era, warm gospel-adjacent flip energy, emotionally direct and undeniable.
+ERA LOCK — NON-NEGOTIABLE: The output prompt MUST be anchored to the late 1960s–1970s regardless of what era the source analysis describes. Translate everything into the sonic world of that golden period: Blue Note hard bop sessions, CTI soul-jazz, Stax Records soul, Motown studio productions, blaxploitation film scores, spiritual jazz, psychedelic soul. No other era produces this quality of sample material. This rule cannot be overridden.
 
-BASE EVERYTHING on the analysis below. Use EXACT era, aesthetic, and instruments found. No generic language. Write like a producer with 30 years in the crates.
+You know the aesthetic DNA of the producers who built hip-hop from these records:
+
+East Coast boom bap architects (New York, early 90s): hard bop and soul-jazz sources, surgically chopped 2–3 second loops, Blue Note and Verve catalog, horn-heavy CTI/Stax aesthetic, warm SP-1200 character, upright bass-forward, organic New York grit.
+Dark cinematic underground school: obscure dark jazz, blaxploitation film scores, world music, psychedelic rock, eerie minor keys, heavy low-pass filtering, cold hypnotic tension, ancient-feeling cinematic menace, Latin-tinged darkness.
+Lo-fi spiritual beatmaker school: intimate Detroit soul, deep obscure cuts, Eastern European psych-rock, Japanese jazz fusion, woozy cassette-worn warmth, humanly imperfect feel, Brazilian tropicália, African records, the most eclectic and unpredictable crate-digging aesthetic.
+Golden era soul-flip generation (mid-2000s): sped-up soul samples, gospel-adjacent energy, dramatic orchestral records, Southern soul and gospel, warm and organic, emotionally direct and undeniable, made to be flipped into anthems.
+Queensbridge and Bronx rawness school: sparse piano loops over minor-key soul, menacing and cold, buried in shadow, Bronx jazz-funk attitude, fat staccato chops, dusty and hard, warm horns over dark basslines, deep musicianship with street impact.
+
+BASE instrumentation, harmonic character, and emotional feel on the analysis below — but ALWAYS reframe it as a late 1960s or 1970s recording. Write like a producer with 30 years in the crates.
 
 ANALYSIS:
 {analysis_text}
@@ -586,16 +499,23 @@ ANALYSIS:
 OUTPUT RULES — FOLLOW EXACTLY:
 - Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
 - HARD MAX 1000 characters. Count carefully before outputting.
+- ERA is ALWAYS late 1960s–1970s — translate any other era into this world, no exceptions
+- BPM: choose one value between 78–90 BPM based on the feel of the analysis — state it explicitly
+- ALWAYS minor scale or modal tonality — melancholic, searching, or menacing. No major key.
+- MUST include a featured instrument solo — a specific named melodic statement (e.g. "Harmon-muted trumpet solo over the changes", "tenor saxophone running the minor harmony", "Hammond B3 organ break", "Rhodes electric piano statement")
+- Live band feel — real musicians in a room together, human timing imperfection, instruments bleeding into each other's mics
+- Deep and pensive emotional character — weighted with meaning, shadowed, searching
+- MUST include: "recorded on 2-inch tape" and "tape saturation" — mandatory texture anchors
+- Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) built to repeat hypnotically without fatigue
+- NEVER use any real artist name, producer name, musician name, or band name anywhere in the output — Suno and Udio will block generation if real names appear
+- Instead, end with a descriptive aesthetic phrase that captures the TYPE of producer who would flip this record. Choose the phrase that best matches the producer DNA from the analysis. Examples: "golden era East Coast boom bap producers", "dark cinematic underground beatmakers", "lo-fi spiritual crate-diggers", "Bronx and Queens golden era architects", "soul-flip generation beatmakers", "underground West Coast soul diggers", "hard bop sample hunters from New York"
 - NEVER mention drums, percussion, kick, snare, hi-hat, cymbals, or any rhythmic element
-- Genre-lock naturally ("jazz trio", "solo piano", "string quartet") — never say "no drums"
-- ALWAYS include "90 BPM" — the classic boom bap standard, non-negotiable
-- ERA + RECORDING AESTHETIC leads first — strongest signal for Suno, Udio, and Sampla.ai
+- Genre-lock naturally ("jazz trio", "soul quartet", "string ensemble") — never say "no drums"
 - Instrument names must be precise: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "nylon-string acoustic guitar" not "guitar"
-- Production texture creates emotional soul: choose 2 from vinyl surface noise, tape saturation, room bleed, analog warmth, human timing imperfection
-- End exactly with: "the kind of record [pick 2–3 producer names most relevant to this analysis] would pull from a dusty crate and flip into something timeless."
+- End exactly with: "the kind of record [descriptive aesthetic phrase — NO real names] would pull from a dusty crate and flip into something timeless."
 
 Follow this structure:
-[ERA] [RECORDING AESTHETIC] — [specific named instruments from analysis, comma-separated] — recorded at 90 BPM — [vocal description OR "purely instrumental"] — [2 production texture descriptors] — [2–3 emotional character words] — the kind of record [2–3 producers] would pull from a dusty crate and flip into something timeless.""".strip()
+[Late 1960s or 1970s ERA] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [78–90] BPM — [minor key/modal description] — [featured instrument solo] — live band feel, recorded on 2-inch tape, tape saturation — deep and pensive, [1–2 additional emotional words] — designed to feel loopable — the kind of record [descriptive aesthetic phrase, NO real names] would pull from a dusty crate and flip into something timeless.""".strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -744,16 +664,14 @@ def render_analysis(raw: str) -> None:
     st.markdown(f'<div class="analysis-card">{rows}</div>', unsafe_allow_html=True)
 
 
-
-def copy_button(text: str, btn_id: str, style: str = "default") -> None:
+def copy_button(text: str, btn_id: str) -> None:
     """Embeds text in onclick — double quotes HTML-escaped so the attribute stays valid."""
     safe       = json.dumps(text).replace('"', '&quot;')
-    cls        = "cp-btn-quick" if style == "quick" else "cp-btn"
-    label      = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
-    reset_str  = "Copy to Suno" if style == "quick" else "&#9632;&nbsp;Copy Prompt"
+    label      = "&#9632;&nbsp;Copy Prompt"
+    reset_str  = "&#9632;&nbsp;Copy Prompt"
     safe_reset = json.dumps(reset_str).replace('"', '&quot;')
     st.markdown(
-        f'<button class="{cls}" id="{btn_id}" '
+        f'<button class="cp-btn" id="{btn_id}" '
         f'onclick="(function(b){{'
         f'navigator.clipboard.writeText({safe}).then(function(){{'
         f'b.classList.add(\'copied\');b.innerHTML=\'&#10003;&nbsp;Copied!\';'
@@ -925,7 +843,7 @@ if uploaded_file and run_btn and not _key_error:
             st.session_state.app_state = "pass2"
             status_slot.markdown(
                 '<div class="statusbar"><div class="sdot active"></div>'
-                '<span>Pass 2 of 2 — Crafting prompts from analysis...</span></div>',
+                '<span>Pass 2 of 2 — Building prompt from analysis...</span></div>',
                 unsafe_allow_html=True,
             )
             with st.spinner(""):
@@ -980,7 +898,7 @@ if st.session_state.analysis:
         st.markdown(
             '<div class="prompt-card-title">AI Music Prompt</div>'
             '<div class="prompt-card-sub">'
-            'Written through the lens of the greatest crate-diggers in hip-hop history · 90 BPM hardcoded · Ready for Suno, Udio &amp; Sampla.ai'
+            'Late 60s/70s era-locked · 78–90 BPM · Minor/modal · 2-inch tape · Live band feel · Loopable · Ready for Suno, Udio &amp; Sampla.ai'
             '</div>',
             unsafe_allow_html=True,
         )
