@@ -14,6 +14,7 @@ const GENRE_LABELS: Record<Genre, string> = {
   "boom-bap": "Boom Bap",
   house: "House",
   trap: "Trap",
+  "baltimore-club": "Baltimore Club",
 };
 
 const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15 MB
