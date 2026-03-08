@@ -1,1 +1,8 @@
-{}
+{
+  "functions": {
+    "app/api/analyze/route.ts": {
+      "maxDuration": 60,
+      "bodySizeLimit": "15mb"
+    }
+  }
+}

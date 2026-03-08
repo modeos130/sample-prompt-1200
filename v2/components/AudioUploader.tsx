@@ -70,9 +70,12 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
       formData.append("genre", genre);
 
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
-      const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || "Analysis failed");
+      const text = await res.text();
+      let data: { analysis?: string; generatedPrompt?: string; error?: string } = {};
+      try { data = JSON.parse(text); } catch { throw new Error(text.slice(0, 200) || `HTTP ${res.status}`); }
+
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
       onResult(data.analysis, data.generatedPrompt);
       onStatusChange("done");
