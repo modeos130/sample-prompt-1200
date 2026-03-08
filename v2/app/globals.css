@@ -25,6 +25,12 @@ html, body {
 }
 .animate-pulse-slow { animation: pulse 1.4s ease-in-out infinite; }
 
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+.animate-pulse-subtle { animation: subtlePulse 2.5s ease-in-out infinite; }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
@@ -42,6 +48,20 @@ html, body {
 }
 .animate-fade-in { animation: fadeIn 0.4s ease forwards; }
 
+@keyframes staggerFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-stagger-1 { animation: staggerFadeIn 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both; }
+.animate-stagger-2 { animation: staggerFadeIn 0.4s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
+.animate-stagger-3 { animation: staggerFadeIn 0.4s cubic-bezier(0.16,1,0.3,1) 0.25s both; }
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(201,168,76,0.2); }
+  50%       { box-shadow: 0 0 40px rgba(201,168,76,0.5); }
+}
+.animate-glow { animation: glow 2s ease-in-out infinite; }
+
 @keyframes borderPulse {
   0%, 100% { border-color: rgba(201,168,76,0.35); }
   50%       { border-color: rgba(201,168,76,0.85); }
@@ -57,3 +77,9 @@ html, body {
   background-size: 400px 100%;
   animation: shimmer 2.5s ease-in-out infinite;
 }
+
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-toast { animation: toastSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }

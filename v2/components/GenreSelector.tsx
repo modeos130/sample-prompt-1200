@@ -53,25 +53,29 @@ interface Props {
 
 export default function GenreSelector({ selected, onSelect }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {GENRES.map((g) => {
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+      {GENRES.map((g, i) => {
         const isSelected = selected === g.id;
+        const staggerClass = i === 0 ? "animate-stagger-1" : i === 1 ? "animate-stagger-2" : "animate-stagger-3";
         return (
           <button
             key={g.id}
             onClick={() => onSelect(g.id)}
             className={[
               "relative flex flex-col text-left p-7 rounded-2xl border-2 transition-all duration-200 overflow-hidden",
-              "focus:outline-none min-h-[230px]",
+              "focus:outline-none focus:ring-2 focus:ring-[#c9a84c] focus:ring-offset-2 focus:ring-offset-[#080a0c]",
+              "min-h-[230px]",
+              staggerClass,
               isSelected
-                ? "border-[#c9a84c] bg-[#0d1118] shadow-[0_0_60px_rgba(201,168,76,0.12),0_0_0_1px_rgba(201,168,76,0.08)_inset]"
-                : "border-[#141c28] bg-[#0d1118] hover:border-[#1e2838] hover:bg-[#0f1420]",
+                ? "border-[#c9a84c] bg-[#0d1118] shadow-[0_0_80px_rgba(201,168,76,0.18),0_0_0_1px_rgba(201,168,76,0.1)_inset]"
+                : "border-[#141c28] bg-[#0a0d14] hover:border-[#1e2838] hover:bg-[#0f1420] hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]",
             ].join(" ")}
           >
-            {/* Large ghost number */}
+            {/* Large ghost number — fluid size */}
             <span
               className={[
-                "absolute -bottom-3 right-3 font-['Syne',sans-serif] font-extrabold text-[100px] leading-none select-none pointer-events-none transition-colors duration-200",
+                "absolute -bottom-3 right-3 font-['Syne',sans-serif] font-extrabold leading-none select-none pointer-events-none transition-colors duration-200",
+                "text-[clamp(60px,10vw,100px)]",
                 isSelected ? "text-[rgba(201,168,76,0.07)]" : "text-[#0d1118]",
               ].join(" ")}
             >
@@ -80,7 +84,7 @@ export default function GenreSelector({ selected, onSelect }: Props) {
 
             {/* Selected dot */}
             {isSelected && (
-              <span className="absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-[#c9a84c] shadow-[0_0_10px_rgba(201,168,76,0.7)]" />
+              <span className="absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-[#c9a84c] shadow-[0_0_10px_rgba(201,168,76,0.7)] animate-pulse-subtle" />
             )}
 
             {/* Content */}
@@ -99,7 +103,7 @@ export default function GenreSelector({ selected, onSelect }: Props) {
               <span
                 className={[
                   "font-['Syne',sans-serif] font-bold text-[11px] leading-none mt-1.5 mb-6 block transition-colors duration-200",
-                  isSelected ? "text-[#7a6230]" : "text-[#2a3545]",
+                  isSelected ? "text-[#c9a84c]/60" : "text-[#2a3545]",
                 ].join(" ")}
               >
                 {g.sub}
@@ -117,7 +121,14 @@ export default function GenreSelector({ selected, onSelect }: Props) {
               >
                 {g.bpm}
               </div>
-              <div className="text-[10px] font-mono text-[#2a3545] mb-5">{g.era}</div>
+              <div
+                className={[
+                  "text-[10px] font-mono mb-5 transition-colors duration-200",
+                  isSelected ? "text-[#7a6230]" : "text-[#2a3545]",
+                ].join(" ")}
+              >
+                {g.era}
+              </div>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1.5">
@@ -127,7 +138,7 @@ export default function GenreSelector({ selected, onSelect }: Props) {
                     className={[
                       "text-[8px] font-mono px-2.5 py-1 rounded-full border transition-all duration-200",
                       isSelected
-                        ? "text-[#c9a84c] border-[rgba(201,168,76,0.28)] bg-[rgba(201,168,76,0.07)]"
+                        ? "text-[#c9a84c] border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.09)]"
                         : "text-[#2a3545] border-[#141c28] bg-[#0a0d14]",
                     ].join(" ")}
                   >
