@@ -12,7 +12,7 @@ export const maxDuration = 60;
 
 const MAX_FILE_MB = 4;
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
 const API_VERSIONS = ["v1beta", "v1"];
 
