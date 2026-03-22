@@ -577,12 +577,12 @@ body {
     <div class="input-footer">
       <span class="quick-label">Quick vibes:</span>
       <div class="quick-vibes">
-        <span class="vibe-chip" onclick="setVibe('Dark and eerie, haunting flute, sounds like a lost 1960s European film score')">Haunting Flute</span>
-        <span class="vibe-chip" onclick="setVibe('Lush orchestral soul with dramatic strings and wailing female vocals, very emotional')">Lush Soul Strings</span>
-        <span class="vibe-chip" onclick="setVibe('Raw funky 70s groove, live band, imperfect timing, feels like a basement session')">Raw 70s Funk</span>
-        <span class="vibe-chip" onclick="setVibe('Eerie and cinematic, very dark minor key, sounds like it would be sampled for drill music')">Dark Drill Source</span>
-        <span class="vibe-chip" onclick="setVibe('Warm gospel organ with choir harmonies, feels like a small Black church in the late 60s')">Gospel Church</span>
-        <span class="vibe-chip" onclick="setVibe('Dreamy and distant, Japanese city at night, muffled Rhodes piano, reverb-soaked female vocal')">Tokyo Night</span>
+        <span class="vibe-chip" onclick="setVibe('Dark and eerie, haunting flute, sounds like a lost 1960s European film score', this)">Haunting Flute</span>
+        <span class="vibe-chip" onclick="setVibe('Lush orchestral soul with dramatic strings and wailing female vocals, very emotional', this)">Lush Soul Strings</span>
+        <span class="vibe-chip" onclick="setVibe('Raw funky 70s groove, live band, imperfect timing, feels like a basement session', this)">Raw 70s Funk</span>
+        <span class="vibe-chip" onclick="setVibe('Eerie and cinematic, very dark minor key, sounds like it would be sampled for drill music', this)">Dark Drill Source</span>
+        <span class="vibe-chip" onclick="setVibe('Warm gospel organ with choir harmonies, feels like a small Black church in the late 60s', this)">Gospel Church</span>
+        <span class="vibe-chip" onclick="setVibe('Dreamy and distant, Japanese city at night, muffled Rhodes piano, reverb-soaked female vocal', this)">Tokyo Night</span>
       </div>
     </div>
   </div>
@@ -704,10 +704,30 @@ const GENRE_CLOSERS = {
   'modern-trap': 'the kind of simple orchestral source material [modern trap producers / streaming era beatmakers] would loop, filter, and place under 808s to make something emotionally overwhelming.',
 };
 
-// Set vibe from quick chips
-function setVibe(text) {
+// Quick vibe → genre mapping
+const VIBE_GENRE_MAP = {
+  'Haunting Flute':    'italian-film',
+  'Lush Soul Strings': 'soul-gospel',
+  'Raw 70s Funk':      'boom-bap',
+  'Dark Drill Source':  'cinematic-dark',
+  'Gospel Church':     'soul-gospel',
+  'Tokyo Night':       'japanese',
+};
+
+// Set vibe from quick chips — also auto-selects the matching genre
+function setVibe(text, chipEl) {
   document.getElementById('vibeInput').value = text;
   document.getElementById('vibeInput').focus();
+
+  // Find the chip label from the element that was clicked
+  const label = chipEl ? chipEl.textContent.trim() : '';
+  const matchedGenre = VIBE_GENRE_MAP[label];
+  if (matchedGenre) {
+    selectedGenre = matchedGenre;
+    document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+    const target = document.querySelector(`.genre-btn[data-genre="${matchedGenre}"]`);
+    if (target) target.classList.add('active');
+  }
 }
 
 // Genre selection
