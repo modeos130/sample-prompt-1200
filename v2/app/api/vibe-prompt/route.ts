@@ -1,0 +1,164 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 30;
+
+// ─── RATE LIMITING ────────────────────────────────────────────────────────────
+// In-memory store: resets on each cold start (every ~few hours on Vercel free tier)
+// Good enough for limited beta testing — upgrade to Upstash Redis for production
+const ipCallLog = new Map<string, { count: number; windowStart: number }>();
+
+const RATE_LIMIT_CALLS   = parseInt(process.env.RATE_LIMIT_CALLS   ?? "10"); // calls per window
+const RATE_LIMIT_WINDOW  = parseInt(process.env.RATE_LIMIT_WINDOW  ?? "86400000"); // 24h in ms
+const MONTHLY_HARD_CAP   = parseInt(process.env.MONTHLY_HARD_CAP   ?? "500"); // total calls this instance
+
+let totalCallsThisInstance = 0;
+
+function checkRateLimit(ip: string): { allowed: boolean; reason?: string; remaining?: number } {
+  // Hard cap on total instance calls (resets on cold start)
+  if (totalCallsThisInstance >= MONTHLY_HARD_CAP) {
+    return { allowed: false, reason: "Daily capacity reached. Check back tomorrow." };
+  }
+
+  const now = Date.now();
+  const record = ipCallLog.get(ip);
+
+  if (!record || now - record.windowStart > RATE_LIMIT_WINDOW) {
+    // New window
+    ipCallLog.set(ip, { count: 1, windowStart: now });
+    totalCallsThisInstance++;
+    return { allowed: true, remaining: RATE_LIMIT_CALLS - 1 };
+  }
+
+  if (record.count >= RATE_LIMIT_CALLS) {
+    const resetIn = Math.ceil((RATE_LIMIT_WINDOW - (now - record.windowStart)) / 3600000);
+    return { allowed: false, reason: `Rate limit reached. You get ${RATE_LIMIT_CALLS} generations per day. Resets in ~${resetIn}h.` };
+  }
+
+  record.count++;
+  totalCallsThisInstance++;
+  return { allowed: true, remaining: RATE_LIMIT_CALLS - record.count };
+}
+
+// ─── GENRE RULES ─────────────────────────────────────────────────────────────
+const GENRE_RULES: Record<string, string> = {
+  "boom-bap": `ERA LOCK: Late 1960s–1970s. Soul-jazz, hard bop, spiritual jazz, blaxploitation scores, CTI soul-jazz, Stax soul. BPM: 78–90. Minor/modal only. Live band, 2-inch tape, upright bass anchor, featured horn or piano solo. Obscurity framing: pressed in small quantities, regional label, found in a crate. End: "the kind of forgotten record [era/aesthetic descriptor, no real names] would spend years hunting in overseas crates and flip into something timeless."`,
+  "dark-underground": `ERA LOCK: Late 1960s–early 1970s. Eastern European modal jazz, Italian film score, obscure foreign library records, psychedelic soul. BPM: 63–80. Dorian, Phrygian, diminished — maximum tension, zero resolution. Flute, organ, or harpsichord lead. Heavy vinyl degradation, wow-flutter. End: "the kind of forgotten foreign record a serious crate digger would spend decades hunting in an overseas record shop."`,
+  "soul-gospel": `ERA LOCK: Late 1960s Black American gospel and sacred soul. Small church or small studio recording. BPM: 70–86. Hammond B3 organ mandatory, full choir harmonies, call-and-response. Hand claps not drums. Raw, imperfect, devotional. "Recorded live in a small church, never commercially distributed." End: "the kind of sacred recording [descriptor] would chop, pitch up, and place underneath something hard to make it feel like church."`,
+  "jazz": `ERA LOCK: Early 1970s small ensemble jazz. Regional jazz label. BPM: 82–96. Upright bass walking line anchor, muted trumpet or tenor saxophone lead, dry room acoustics, analog tape hiss. Minor or Dorian. Late-night intimate feel. "Pressed in small quantities for local distribution." End: "the kind of warm dusty record [descriptor] would loop two bars of and build entire worlds around."`,
+  "latin": `ERA LOCK: Late 1960s New York Latin soul orchestral. Small NYC indie label for Spanish-speaking audience. BPM: 74–86. Dramatic dark string section, wordless female vocal hum as texture only, sparse congas and timbales, muted brass. Very cinematic, barrio midnight feeling. End: "the kind of orchestral Latin soul recording [descriptor] would loop and transform into something devastating."`,
+  "japanese": `ERA LOCK: Late 1970s Japanese soul (Wamono). Small regional Japanese label, never exported. BPM: 76–86. Muffled Rhodes or electric piano, light bass that sits back, minimal brushed drums, reverb-soaked distant female vocal floating above the mix, flute or vibraphone accents. 3am Tokyo city feeling. End: "the kind of obscure Japanese pressing [descriptor] would discover and flip into something completely transformed."`,
+  "brazilian": `ERA LOCK: Late 1970s Brazilian jazz-fusion. São Paulo small regional label, never exported outside Brazil. BPM: 88–100. Rhodes piano with Brazilian harmonic sensibility, surdo and pandeiro percussion, breathy flute or nylon-string guitar, wordless female vocal hum, humid room sound. Afro-Brazilian rhythmic pulse. End: "the kind of record [descriptor] would change their life the first time they heard it in a crate in São Paulo."`,
+  "italian-film": `ERA LOCK: Early 1970s Italian Poliziotteschi crime film or giallo horror score. Roman studio, pressed for cinema distribution only. BPM: 65–82. Wah-wah rhythm guitar, overdriven walking bass, flute or harpsichord or tremolo strings, sparse Hammond stabs. Eerie and funky simultaneously. "Never released commercially outside Italian cinema." End: "the kind of forgotten European score cue [descriptor] would pitch down, slow, and loop into something that hits like a freight train."`,
+  "soulful-house": `ERA LOCK: Early 1990s NYC underground soulful house. BPM: 118–128. Four-on-the-floor implied, gospel piano upbeat stabs, Hammond B3, live bass, full choir harmonies, congas alongside drum machine. Spiritual and physical simultaneously. Church-trained female vocal. End: "the kind of record [descriptor] would drop at 4am and make the room levitate."`,
+  "disco-house": `ERA LOCK: Late 1990s French-influenced disco house. BPM: 120–126. Four-on-the-floor implied, filter sweep on bass opening and closing over the 8-bar cycle, lush 1970s disco strings, wah rhythm guitar, brass stabs, vocal chop as instrument. The filter movement is the defining element. Euphoric, sleek. End: "the kind of record [descriptor] would loop for eight minutes without losing momentum."`,
+  "tv-score": `ERA LOCK: Early 1970s American television crime drama score cue. Three sections: sparse electric piano intro → wah-wah guitar groove with muted brass → strip back to piano. BPM: 82–96. Surveillance scene feeling, city at 2am. Written to loop under dialogue. "Composed for a gritty weekly crime drama on a major American network, 1972." End: "the kind of TV score cue [descriptor] would isolate, chop, and pitch into something completely unrecognizable and dangerous."`,
+  "cinematic-dark": `ERA LOCK: Late 1980s–early 1990s orchestral. Simple 4–8 note piano melody in natural minor. Long slow string pads as patient presence. Deep resonant cello. BPM: 65–80. Silence between notes. Emotional ambiguity. Analog warmth without heavy vinyl degradation. End: "the kind of orchestral source material [descriptor] would low-pass filter and build their most emotional record around."`,
+  "drum-break": `ERA LOCK: 1970s live funk drum performance. NO melody, NO harmony, NO bass — pure drums. Three-act structure: locked groove → extended solo breakdown (snare rolls, tom fills, open hi-hat splashes, 8–16 bars pure percussive improvisation) → groove return. BPM: 95–108. Raw room acoustics, minimal mic placement, human rushing and dragging. End: "the kind of isolated drum performance where the solo section alone can be chopped into dozens of separate hits and loops."`,
+  "chipmunk": `ERA LOCK: Early 1960s girl group soul recording. Designed to be sped up. BPM: 108–120 source (will chipmunk to 130–145). Bright and clear. Call-and-response female harmonies, horn stabs, bouncy minor key progression. "Regional 45 single, local airplay only." End: "the kind of bright regional 45 [descriptor] would speed up, pitch up, and transform into something buoyant and undeniable."`,
+  "marching-band": `ERA LOCK: Early 1970s college marching band live stadium recording. 60–80 horns in unison. BPM: 68–80, slow and majestic. Minor-to-major emotional arc. Dynamic: low brass foundation → full eruption → single trumpet soloist → full ensemble crash. Outdoor field microphones, crowd noise. End: "the kind of live brass recording [descriptor] would isolate a single horn stab from and place under a rolling 808 to make something feel enormous."`,
+  "modern-trap": `ERA LOCK: Late 1980s–early 1990s orchestral. Simple haunting 4–8 note piano melody in natural minor. String pads as background texture, deep cello, silence between notes. BPM: 65–80 source (doubles to 130–140 trap range). Emotional ambiguity — works under introspective verses and drops. Analog warmth without heavy vinyl degradation. End: "the kind of simple orchestral source material [descriptor] would loop, filter, and place under 808s to make something emotionally overwhelming."`,
+};
+
+// ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
+const BASE_SYSTEM_PROMPT = `You are the master prompt engineer behind the 130 Mode Prompt Lab — the most respected AI sample generation prompt library in producer culture. Your prompts produce raw, vintage, sampleable source material for hip-hop and beat producers.
+
+CORE DNA — NON-NEGOTIABLE RULES FOR EVERY PROMPT:
+
+1. ONE single flowing paragraph. No headers, no labels, no bullet points. Pure prompt text only.
+2. HARD MAX 1000 characters. Count carefully. Stay under.
+3. NEVER use any real artist name, producer name, musician name, or band name. Suno blocks these.
+4. NEVER mention drums, kick, snare, hi-hat, cymbals, or any rhythmic element explicitly. Genre-lock naturally instead ("jazz trio", "soul quartet", "string ensemble").
+5. ALWAYS minor scale or modal tonality — Dorian, Phrygian, harmonic minor, diminished. No major key unless the genre specifically requires it (gospel/house).
+6. Instrument names must be PRECISE: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "Hammond B3 organ" not "organ".
+7. ALWAYS include a featured solo instrument or melodic statement.
+8. ALWAYS include specific geographic and era framing: not "vintage" but "Late 1960s New York hard bop session" or "Early 1970s Italian film score recorded at a Roman studio".
+9. ALWAYS include obscurity/scarcity framing: "pressed in 300 copies on a small regional label", "never distributed outside its home country", "recorded for a film that was never widely released".
+10. Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) that repeats hypnotically without fatigue.
+11. Emotional register must be specific and evocative — not "sad" but "weighted with grief that has been carried for years" or "the feeling of a city at 3am when everything is possible and nothing is certain".
+
+THE PROVEN STRUCTURE:
+[ERA and SPECIFIC LOCATION] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [BPM] BPM — [minor/modal description with emotional color] — [featured instrument solo or melodic statement] — [texture: tape saturation, vinyl surface noise, room character] — [2–3 emotional words] — [obscurity/scarcity framing] — designed to feel loopable — [genre-specific closer phrase with NO real names]
+
+Output ONLY the prompt text. No preamble, no explanation, no quotes around it. Just the raw prompt.`;
+
+// ─── HANDLER ─────────────────────────────────────────────────────────────────
+export async function POST(req: NextRequest) {
+  // Get real IP (Vercel sets x-forwarded-for)
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+          ?? req.headers.get("x-real-ip")
+          ?? "unknown";
+
+  // Rate limit check
+  const limit = checkRateLimit(ip);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: limit.reason },
+      {
+        status: 429,
+        headers: { "X-RateLimit-Remaining": "0" },
+      }
+    );
+  }
+
+  try {
+    const body = await req.json() as { vibe?: string; genre?: string };
+    const { vibe, genre } = body;
+
+    if (!vibe?.trim()) {
+      return NextResponse.json({ error: "No vibe description provided." }, { status: 400 });
+    }
+    if (!genre || !GENRE_RULES[genre]) {
+      return NextResponse.json({ error: "Invalid genre." }, { status: 400 });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "API not configured." }, { status: 500 });
+    }
+
+    const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\nGENRE-SPECIFIC RULES FOR THIS REQUEST:\n${GENRE_RULES[genre]}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: process.env.CLAUDE_MODEL ?? "claude-haiku-4-5-20251001",
+        max_tokens: 400,
+        system: systemPrompt,
+        messages: [{
+          role: "user",
+          content: `Producer vibe: "${vibe.trim()}"\n\nWrite the Suno prompt now. Remember: one paragraph, under 1000 characters, no real names, no drums.`,
+        }],
+      }),
+    });
+
+    const data = await response.json() as {
+      content?: Array<{ text: string }>;
+      error?: { message: string };
+    };
+
+    if (!response.ok) {
+      const msg = data.error?.message ?? `Claude API error ${response.status}`;
+      if (response.status === 429) {
+        return NextResponse.json({ error: "Claude API quota exceeded. Try again shortly." }, { status: 503 });
+      }
+      throw new Error(msg);
+    }
+
+    const prompt = data.content?.[0]?.text?.trim() ?? "";
+    if (!prompt) throw new Error("Empty response from Claude.");
+
+    return NextResponse.json(
+      { prompt, remaining: limit.remaining ?? 0 },
+      { headers: { "X-RateLimit-Remaining": String(limit.remaining ?? 0) } }
+    );
+
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 });
+  }
+}

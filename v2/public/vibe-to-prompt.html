@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>130 MODE — Vibe to Prompt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f3ff;
+  --bg2: #ffffff;
+  --bg3: #f0ebff;
+  --border: #e4deff;
+  --purple: #6c3fff;
+  --purple-dim: #9c6fff;
+  --purple-light: rgba(108,63,255,0.08);
+  --yellow: #ffd84a;
+  --dark: #18083a;
+  --text: #2a1a5e;
+  --muted: #8070b0;
+  --white: #ffffff;
+  --font: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 12px rgba(108,63,255,0.06);
+}
+.logo {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--dark);
+}
+.logo span { color: var(--purple); }
+.header-badge {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, #3a0a6e 55%, var(--purple) 100%);
+  padding: 56px 40px 64px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 60%, rgba(255,216,74,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 78% 30%, rgba(0,230,200,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: var(--display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--yellow);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  position: relative;
+  opacity: 0.9;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.05;
+  margin-bottom: 10px;
+  position: relative;
+  letter-spacing: -0.5px;
+}
+.hero-title em { color: var(--yellow); font-style: normal; }
+.hero-sub {
+  font-family: var(--font);
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0;
+  position: relative;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+.hero-line {
+  width: 60px; height: 3px;
+  background: linear-gradient(90deg, var(--purple), var(--yellow));
+  margin: 24px auto 0;
+  border-radius: 2px;
+  position: relative;
+}
+
+/* MAIN */
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 100px;
+}
+
+/* VIBE INPUT BLOCK */
+.input-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(108,63,255,0.08);
+  margin-bottom: 28px;
+}
+
+.input-header {
+  padding: 18px 24px 0;
+}
+.input-label {
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.input-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.vibe-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  background: transparent;
+  padding: 4px 24px 20px;
+  min-height: 120px;
+}
+.vibe-textarea::placeholder {
+  color: #c4b8e8;
+  font-style: italic;
+}
+
+.input-footer {
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg3);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* QUICK VIBES */
+.quick-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.quick-vibes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.vibe-chip {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.vibe-chip:hover {
+  border-color: var(--purple);
+  color: var(--purple);
+  background: var(--purple-light);
+}
+
+/* GENRE SELECTOR */
+.genre-block {
+  margin-bottom: 20px;
+}
+.genre-label {
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.genre-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.genre-btn {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+.genre-btn:hover {
+  border-color: var(--purple-dim);
+  color: var(--purple);
+}
+.genre-btn.active {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border-color: transparent;
+  color: var(--white);
+  box-shadow: 0 2px 10px rgba(108,63,255,0.3);
+}
+
+/* GENERATE BUTTON */
+.generate-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border: none;
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(108,63,255,0.25);
+}
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(108,63,255,0.35);
+}
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.generate-btn.loading {
+  background: linear-gradient(135deg, #5a2eee, var(--purple));
+}
+
+/* LOADING STATE */
+.loading-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  display: none;
+}
+.loading-block.visible { display: block; }
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--purple);
+  text-transform: uppercase;
+}
+.loading-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* OUTPUT CARD */
+.output-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(108,63,255,0.08);
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+.output-card.visible { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.output-header {
+  background: linear-gradient(135deg, var(--bg3), var(--bg));
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.output-title {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--purple);
+  text-transform: uppercase;
+}
+.output-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.output-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  color: var(--white);
+  text-transform: uppercase;
+}
+.output-tag.plain {
+  background: var(--bg3);
+  color: var(--muted);
+}
+
+.output-body { padding: 22px; }
+
+.prompt-display {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text);
+  font-style: italic;
+  background: var(--bg3);
+  border-left: 3px solid var(--purple);
+  padding: 18px 20px;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 18px;
+  user-select: all;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.prompt-display:hover { background: #e8e2ff; }
+
+.output-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border: none;
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.copy-btn.copied { background: #22c55e; }
+
+.regen-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.regen-btn:hover { border-color: var(--purple-dim); color: var(--purple); }
+
+.slider-tips {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--purple-light);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 0 8px 8px 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.slider-tips strong { color: var(--purple); }
+
+/* ERROR */
+.error-block {
+  background: #fff5f5;
+  border: 1px solid #fca5a5;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 12px;
+  color: #dc2626;
+  display: none;
+}
+.error-block.visible { display: block; }
+
+/* CHAR COUNT */
+.char-count {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.char-count.good { color: #22c55e; }
+.char-count.warn { color: #f59e0b; }
+.char-count.over { color: #ef4444; }
+
+/* HOW TO USE */
+.how-to {
+  margin-top: 40px;
+  padding: 20px 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.how-to-title {
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.how-to ol {
+  padding-left: 18px;
+}
+.how-to ol li { margin-bottom: 4px; }
+.how-to strong { color: var(--text); }
+
+/* FOOTER */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+  margin-top: 40px;
+}
+.footer-text { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.footer-logo { font-family: var(--display); font-size: 13px; font-weight: 800; color: var(--purple); }
+
+@media (max-width: 600px) {
+  .hero { padding: 40px 20px 48px; }
+  .main { padding: 32px 16px 80px; }
+  .header { padding: 14px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">130 MODE <span>PROMPT LAB</span></div>
+  <div class="header-badge">Vibe to Prompt Generator</div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">130 Mode · Jedi Knight Soul Academy</div>
+  <div class="hero-title">Describe the <em>Vibe</em><br>Get the Prompt</div>
+  <div class="hero-sub">Tell us what you're hearing in your head. We'll write a Suno-ready sample generation prompt in the exact formula that's been producing fire for producers.</div>
+  <div class="hero-line"></div>
+</div>
+
+<div class="main">
+
+  <!-- GENRE SELECTOR -->
+  <div class="genre-block">
+    <div class="genre-label">Select Target Genre</div>
+    <div class="genre-grid" id="genreGrid">
+      <button class="genre-btn active" data-genre="boom-bap">Boom Bap</button>
+      <button class="genre-btn" data-genre="dark-underground">Dark Underground</button>
+      <button class="genre-btn" data-genre="soul-gospel">Soul / Gospel</button>
+      <button class="genre-btn" data-genre="jazz">Jazz / Soul-Jazz</button>
+      <button class="genre-btn" data-genre="latin">Latin Soul</button>
+      <button class="genre-btn" data-genre="japanese">Japanese Soul</button>
+      <button class="genre-btn" data-genre="brazilian">Brazilian Rare Groove</button>
+      <button class="genre-btn" data-genre="italian-film">Italian Film / Giallo</button>
+      <button class="genre-btn" data-genre="soulful-house">Soulful House</button>
+      <button class="genre-btn" data-genre="disco-house">Disco House</button>
+      <button class="genre-btn" data-genre="tv-score">TV Score</button>
+      <button class="genre-btn" data-genre="cinematic-dark">Dark Cinematic</button>
+      <button class="genre-btn" data-genre="drum-break">Drum Break</button>
+      <button class="genre-btn" data-genre="chipmunk">45 Flip / Chipmunk</button>
+      <button class="genre-btn" data-genre="marching-band">Marching Band</button>
+      <button class="genre-btn" data-genre="modern-trap">Modern Trap / TikTok</button>
+    </div>
+  </div>
+
+  <!-- VIBE INPUT -->
+  <div class="input-block">
+    <div class="input-header">
+      <div class="input-label">Describe Your Vibe</div>
+    </div>
+    <textarea
+      class="vibe-textarea"
+      id="vibeInput"
+      placeholder="e.g. Something dark and eerie with a lone flute, feels like it was recorded in Eastern Europe in 1968, nobody has ever found this record... or just: menacing piano loop with violin swells, slow and heavy, very minor key..."
+      rows="5"
+    ></textarea>
+    <div class="input-footer">
+      <span class="quick-label">Quick vibes:</span>
+      <div class="quick-vibes">
+        <span class="vibe-chip" onclick="setVibe('Dark and eerie, haunting flute, sounds like a lost 1960s European film score')">Haunting Flute</span>
+        <span class="vibe-chip" onclick="setVibe('Lush orchestral soul with dramatic strings and wailing female vocals, very emotional')">Lush Soul Strings</span>
+        <span class="vibe-chip" onclick="setVibe('Raw funky 70s groove, live band, imperfect timing, feels like a basement session')">Raw 70s Funk</span>
+        <span class="vibe-chip" onclick="setVibe('Eerie and cinematic, very dark minor key, sounds like it would be sampled for drill music')">Dark Drill Source</span>
+        <span class="vibe-chip" onclick="setVibe('Warm gospel organ with choir harmonies, feels like a small Black church in the late 60s')">Gospel Church</span>
+        <span class="vibe-chip" onclick="setVibe('Dreamy and distant, Japanese city at night, muffled Rhodes piano, reverb-soaked female vocal')">Tokyo Night</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="generate-btn" id="generateBtn" onclick="generatePrompt()">
+    ⊕ Generate Suno Prompt
+  </button>
+
+  <div class="loading-block" id="loadingBlock">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Crafting Your Prompt</div>
+    <div class="loading-sub">Applying Prompt Lab DNA...</div>
+  </div>
+
+  <div class="error-block" id="errorBlock"></div>
+
+  <div class="output-card" id="outputCard">
+    <div class="output-header">
+      <div class="output-title">Generated Suno Prompt</div>
+      <div class="output-meta">
+        <span class="output-tag" id="genreTag">Boom Bap</span>
+        <span class="output-tag plain" id="charTag">— chars</span>
+        <span class="output-tag plain">Suno Ready</span>
+      </div>
+    </div>
+    <div class="output-body">
+      <div class="prompt-display" id="promptDisplay" onclick="copyPrompt()">
+        <!-- Generated prompt appears here -->
+      </div>
+      <div class="output-actions">
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">⊕ Copy Prompt</button>
+        <button class="regen-btn" onclick="generatePrompt()">↺ Regenerate</button>
+        <span class="char-count" id="charCount"></span>
+      </div>
+      <div class="slider-tips" id="sliderTips"></div>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <div class="how-to-title">How to Use This</div>
+    <ol>
+      <li>Select a target genre above — this locks the era and production style</li>
+      <li>Describe your vibe in plain language — instruments, mood, feel, era, anything</li>
+      <li>Hit Generate — the prompt is written in the proven 130 Mode formula</li>
+      <li>In Suno: <strong>Custom Mode → Advanced tab → paste into Style field only</strong>. Leave Lyrics blank.</li>
+      <li>Set Weirdness and Style Influence per the tips shown after generation</li>
+      <li>Run 2–3 variations. Download the best. Chop in your DAW.</li>
+    </ol>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-text">130 Mode Prompt Lab · Jedi Knight Soul Academy</div>
+  <div class="footer-logo">DJ BOOMAN</div>
+</div>
+
+<script>
+let selectedGenre = 'boom-bap';
+let lastPrompt = '';
+
+// Genre display names and slider recommendations
+const GENRE_CONFIG = {
+  'boom-bap':       { label: 'Boom Bap',            weirdness: '84–90%', style: '68–76%' },
+  'dark-underground': { label: 'Dark Underground',  weirdness: '88–92%', style: '64–70%' },
+  'soul-gospel':    { label: 'Soul / Gospel',        weirdness: '80%',    style: '76%'    },
+  'jazz':           { label: 'Jazz Soul',            weirdness: '82%',    style: '78%'    },
+  'latin':          { label: 'Latin Soul',           weirdness: '82%',    style: '76%'    },
+  'japanese':       { label: 'Japanese Soul',        weirdness: '83%',    style: '77%'    },
+  'brazilian':      { label: 'Brazilian Rare Groove',weirdness: '85%',    style: '73%'    },
+  'italian-film':   { label: 'Italian Film / Giallo',weirdness: '87–92%', style: '63–71%' },
+  'soulful-house':  { label: 'Soulful House',        weirdness: '75%',    style: '82%'    },
+  'disco-house':    { label: 'Disco House',          weirdness: '76%',    style: '84%'    },
+  'tv-score':       { label: 'TV Score',             weirdness: '82%',    style: '76%'    },
+  'cinematic-dark': { label: 'Dark Cinematic',       weirdness: '88%',    style: '70%'    },
+  'drum-break':     { label: 'Drum Break',           weirdness: '76%',    style: '74%'    },
+  'chipmunk':       { label: '45 Flip / Chipmunk',   weirdness: '78%',    style: '82%'    },
+  'marching-band':  { label: 'Marching Band',        weirdness: '79%',    style: '81%'    },
+  'modern-trap':    { label: 'Modern Trap',          weirdness: '80%',    style: '74%'    },
+};
+
+// Genre-specific era locks and production rules for the system prompt
+const GENRE_RULES = {
+  'boom-bap': `ERA LOCK: Late 1960s–1970s. Soul-jazz, hard bop, spiritual jazz, blaxploitation scores, CTI soul-jazz, Stax soul. BPM: 78–90. Minor/modal only. Live band, 2-inch tape, upright bass anchor, featured horn or piano solo. Obscurity framing: pressed in small quantities, regional label, found in a crate.`,
+  'dark-underground': `ERA LOCK: Late 1960s–early 1970s. Eastern European modal jazz, Italian film score, obscure foreign library records, psychedelic soul. BPM: 63–80. Dorian, Phrygian, diminished — maximum tension, zero resolution. Flute, organ, or harpsichord lead. Heavy vinyl degradation, wow-flutter, tape splice artifacts.`,
+  'soul-gospel': `ERA LOCK: Late 1960s Black American gospel and sacred soul. Small church or small studio recording. BPM: 70–86. Hammond B3 organ mandatory, full choir harmonies, call-and-response structure. Hand claps not drums. Raw, imperfect, devotional. "Recorded live in a small church, never commercially distributed."`,
+  'jazz': `ERA LOCK: Early 1970s small ensemble jazz. Regional jazz label. BPM: 82–96. Upright bass walking line as anchor, muted trumpet or tenor saxophone lead, dry room acoustics, analog tape hiss. Minor or Dorian. Late-night intimate feel. Pressed in small quantities for local distribution.`,
+  'latin': `ERA LOCK: Late 1960s New York Latin soul orchestral. Small NYC indie label for Spanish-speaking audience. BPM: 74–86. Dramatic dark string section, wordless female vocal hum as texture, sparse congas and timbales, muted brass. Very cinematic, barrio midnight feeling.`,
+  'japanese': `ERA LOCK: Late 1970s Japanese soul (Wamono). Small regional Japanese label, never exported. BPM: 76–86. Muffled Rhodes or electric piano, clean light bass that sits back, minimal brushed drums, reverb-soaked distant female vocal floating above the mix, flute or vibraphone accents. 3am Tokyo city feeling, slightly melancholic and dreamy.`,
+  'brazilian': `ERA LOCK: Late 1970s Brazilian jazz-fusion. São Paulo small regional label, never exported outside Brazil. BPM: 88–100. Rhodes piano with Brazilian harmonic sensibility, surdo and pandeiro percussion, breathy flute or nylon-string guitar, wordless female vocal hum, humid room sound. Afro-Brazilian rhythmic pulse.`,
+  'italian-film': `ERA LOCK: Early 1970s Italian Poliziotteschi crime film or giallo horror score. Roman studio, pressed for cinema distribution only. BPM: 65–82. Wah-wah rhythm guitar, overdriven walking bass, flute or harpsichord lead, tremolo strings, sparse Hammond stabs. Eerie and funky simultaneously. "Never released commercially outside Italian cinema."`,
+  'soulful-house': `ERA LOCK: Early 1990s NYC underground soulful house. Late-night underground club. BPM: 118–128. Four-on-the-floor, gospel piano upbeat stabs, Hammond B3, live bass, full choir harmonies, congas alongside drum machine. Spiritual and physical simultaneously. Church-trained female vocal.`,
+  'disco-house': `ERA LOCK: Late 1990s French-influenced disco house. BPM: 120–126. Four-on-the-floor, filter sweep on bass opening and closing, lush 1970s disco strings, wah rhythm guitar, brass stabs, vocal chop as instrument. The filter movement is the defining element. Euphoric, sleek.`,
+  'tv-score': `ERA LOCK: Early 1970s American television crime drama score cue. Three sections: sparse electric piano intro → wah-wah guitar groove with muted brass → strip back to piano. BPM: 82–96. Surveillance scene feeling, city at 2am. Written to loop under dialogue. "Composed for a gritty weekly crime drama on a major American network, 1972."`,
+  'cinematic-dark': `ERA LOCK: Late 1980s–early 1990s orchestral. Simple 4–8 note piano melody in natural minor. Long slow string pads as patient presence not dramatic swells. Deep resonant cello underneath. BPM: 65–80. No drums, no percussion, silence as much as sound. Emotional ambiguity — grief that could also be triumph. Late 80s analog warmth without heavy vinyl degradation.`,
+  'drum-break': `ERA LOCK: 1970s live funk drum performance. NO melody, NO harmony, NO bass — pure drums. Three-act structure: locked groove → extended solo breakdown (snare rolls, tom fills, open hi-hat splashes, 8–16 bars of pure percussive improvisation) → groove return. BPM: 95–108. Raw room acoustics, minimal mic placement, human rushing and dragging throughout.`,
+  'chipmunk': `ERA LOCK: Early 1960s girl group soul recording. Designed to be sped up. BPM: 108–120 (at this tempo will chipmunk up to 130–145 and stay musical). Bright and clear enough to survive pitch-shifting. Call-and-response female harmonies, horn stabs, bouncy minor key progression. "Regional 45 single, local airplay only."`,
+  'marching-band': `ERA LOCK: Early 1970s college marching band live stadium recording. 60–80 horns in unison. BPM: 68–80, slow and majestic (allows clean chop of individual hits). Minor-to-major emotional arc. Dynamic structure: low brass foundation → full eruption → single trumpet soloist → full ensemble crash. Outdoor field microphones, crowd noise, slight distortion. Designed for stadium anthem horn chops.`,
+  'modern-trap': `ERA LOCK: Late 1980s–early 1990s orchestral. Simple haunting 4–8 note piano melody in natural minor. String pads as background texture, deep cello, silence between notes. BPM: 65–80 source (will double to 130–140 trap range). Emotional ambiguity — works under introspective verses and euphoric drops. Analog warmth without heavy vinyl degradation. Modern streaming-era aesthetic.`,
+};
+
+// Genre-specific example closers
+const GENRE_CLOSERS = {
+  'boom-bap': 'the kind of forgotten record [dark cinematic underground beatmakers / golden era East Coast boom bap producers / lo-fi spiritual crate-diggers] would spend years hunting in overseas crates and flip into something timeless.',
+  'dark-underground': 'the kind of forgotten foreign record a serious crate digger would spend decades hunting in an overseas record shop.',
+  'soul-gospel': 'the kind of sacred recording [soul-flip generation beatmakers] would chop, pitch up, and place underneath something hard to make it feel like church.',
+  'jazz': 'the kind of warm dusty record [golden era boom bap producers] would loop two bars of and build entire worlds around.',
+  'latin': 'the kind of orchestral Latin soul recording [dark cinematic underground beatmakers] would loop and transform into something devastating.',
+  'japanese': 'the kind of obscure Japanese pressing [lo-fi spiritual crate-diggers] would discover decades after pressing and flip into something completely transformed.',
+  'brazilian': 'the kind of record [lo-fi spiritual crate-diggers / underground West Coast soul diggers] would change their life the first time they heard it in a crate in São Paulo.',
+  'italian-film': 'the kind of forgotten European score cue [dark cinematic underground beatmakers] would pitch down, slow, and loop into something that hits like a freight train.',
+  'soulful-house': 'the kind of record [spiritual dance floor constructors from the Chicago warehouse era] would drop at 4am and make the room levitate.',
+  'disco-house': 'the kind of record [soulful house producers from the basement era] would loop for eight minutes without losing momentum.',
+  'tv-score': 'the kind of TV score cue [golden era East Coast boom bap producers] would isolate, chop, and pitch into something completely unrecognizable and dangerous.',
+  'cinematic-dark': 'the kind of orchestral source material [dark cinematic trap producers / streaming era beatmakers] would low-pass filter and build their most emotional record around.',
+  'drum-break': 'the kind of isolated drum performance where the solo section alone can be chopped into dozens of separate hits and loops.',
+  'chipmunk': 'the kind of bright regional 45 [chipmunk soul-flip producers] would speed up, pitch up, and transform into something buoyant and undeniable.',
+  'marching-band': 'the kind of live brass recording [stadium anthem producers] would isolate a single horn stab from and place under a rolling 808 to make something feel enormous.',
+  'modern-trap': 'the kind of simple orchestral source material [modern trap producers / streaming era beatmakers] would loop, filter, and place under 808s to make something emotionally overwhelming.',
+};
+
+// Set vibe from quick chips
+function setVibe(text) {
+  document.getElementById('vibeInput').value = text;
+  document.getElementById('vibeInput').focus();
+}
+
+// Genre selection
+document.getElementById('genreGrid').addEventListener('click', function(e) {
+  if (e.target.classList.contains('genre-btn')) {
+    document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    selectedGenre = e.target.dataset.genre;
+  }
+});
+
+async function generatePrompt() {
+  const vibe = document.getElementById('vibeInput').value.trim();
+  if (!vibe) {
+    document.getElementById('vibeInput').focus();
+    return;
+  }
+
+  const config = GENRE_CONFIG[selectedGenre];
+
+  // UI state
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('generateBtn').classList.add('loading');
+  document.getElementById('generateBtn').textContent = 'Generating...';
+  document.getElementById('loadingBlock').classList.add('visible');
+  document.getElementById('outputCard').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+
+  const systemPrompt = `You are the master prompt engineer behind the 130 Mode Prompt Lab — the most respected AI sample generation prompt library in producer culture. Your prompts have been described as producing "the most consistent sampler food ever heard from AI prompting."
+
+You write Suno AI music generation prompts that produce raw, vintage, sampleable source material for hip-hop and beat producers. Your prompts have a specific proven formula that gets consistent results.
+
+CORE DNA — NON-NEGOTIABLE RULES FOR EVERY PROMPT YOU WRITE:
+
+1. ONE single flowing paragraph. No headers, no labels, no bullet points. Pure prompt text.
+2. HARD MAX 1000 characters. Count carefully. Stay under.
+3. NEVER use any real artist name, producer name, musician name, or band name. Suno blocks these.
+4. NEVER mention drums, kick, snare, hi-hat, cymbals, or any rhythmic element explicitly. Genre-lock naturally instead ("jazz trio", "soul quartet").
+5. ALWAYS minor scale or modal tonality — Dorian, Phrygian, harmonic minor, diminished. No major key unless specifically it's gospel or house.
+6. Instrument names must be PRECISE: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "Hammond B3 organ" not "organ".
+7. ALWAYS include a featured solo instrument or melodic statement.
+8. ALWAYS include specific geographic and era framing — not "vintage" but "Late 1960s New York hard bop session" or "Early 1970s Italian film score recorded at a Roman studio".
+9. ALWAYS include obscurity/scarcity framing — "pressed in 300 copies on a small regional label", "never distributed outside its home country", "recorded for a film that was never widely released".
+10. Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) built to repeat hypnotically.
+11. The emotional register must be specific and evocative — not "sad" but "weighted with grief that has been carried for years" or "the feeling of a city at 3am when everything is possible and nothing is certain".
+
+GENRE-SPECIFIC RULES FOR THIS REQUEST:
+${rules}
+
+EXAMPLE CLOSER PHRASE FOR THIS GENRE (adapt to the vibe, never copy verbatim):
+"${closer}"
+
+THE PROVEN STRUCTURE:
+[ERA and SPECIFIC LOCATION] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [BPM from genre rules] — [minor/modal description with emotional color] — [featured instrument solo or melodic statement] — [texture anchors: tape saturation, vinyl surface noise, room character] — [2–3 emotional words] — [obscurity/scarcity framing] — designed to feel loopable — [closer phrase adapted to the vibe]
+
+Now write ONE prompt in this formula for the producer's vibe description. Output ONLY the prompt text — no preamble, no explanation, no quotes around it. Just the raw prompt.`;
+
+  try {
+    const response = await fetch('/api/vibe-prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vibe, genre: selectedGenre })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || `API error ${response.status}`);
+    }
+
+    const prompt = data.prompt || '';
+    if (!prompt) throw new Error('Empty response from API');
+    
+    // Show remaining generations if provided
+    if (data.remaining !== undefined) {
+      console.log('Generations remaining today:', data.remaining);
+    }
+
+    lastPrompt = prompt;
+    showOutput(prompt, config);
+
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtn').classList.remove('loading');
+    document.getElementById('generateBtn').textContent = '⊕ Generate Suno Prompt';
+    document.getElementById('loadingBlock').classList.remove('visible');
+  }
+}
+
+function showOutput(prompt, config) {
+  const n = prompt.length;
+  const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
+
+  document.getElementById('promptDisplay').textContent = prompt;
+  document.getElementById('genreTag').textContent = config.label;
+  document.getElementById('charTag').textContent = `${n} chars`;
+  document.getElementById('charCount').textContent = `${n}/1000`;
+  document.getElementById('charCount').className = `char-count ${statusClass}`;
+  document.getElementById('sliderTips').innerHTML = `<strong>Recommended Suno settings for this prompt:</strong> Weirdness ${config.weirdness} · Style Influence ${config.style}`;
+  document.getElementById('outputCard').classList.add('visible');
+
+  // Scroll to output
+  setTimeout(() => {
+    document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBlock');
+  el.textContent = `Error: ${msg}`;
+  el.classList.add('visible');
+}
+
+function copyPrompt() {
+  if (!lastPrompt) return;
+  navigator.clipboard.writeText(lastPrompt).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '⊕ Copy Prompt';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Enter key shortcut (Ctrl/Cmd + Enter)
+document.getElementById('vibeInput').addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    generatePrompt();
+  }
+});
+</script>
+
+</body>
+</html>
