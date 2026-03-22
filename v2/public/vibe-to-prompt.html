@@ -650,7 +650,8 @@ body {
   <div class="loading-block" id="loadingBlock">
     <div class="loading-spinner"></div>
     <div class="loading-text">Crafting Your Prompt</div>
-    <div class="loading-sub">Applying Prompt Lab DNA...</div>
+    <div class="loading-sub" id="loadingSub">Applying Prompt Lab DNA...</div>
+    <div class="loading-timer" id="loadingTimer" style="font-size:10px;color:var(--muted);margin-top:8px;font-family:var(--font);"></div>
   </div>
 
   <div class="error-block" id="errorBlock">
@@ -803,6 +804,8 @@ document.getElementById('genreGrid').addEventListener('click', function(e) {
   }
 });
 
+let loadingInterval = null;
+
 async function generatePrompt() {
   const vibe = document.getElementById('vibeInput').value.trim();
   if (!vibe) {
@@ -812,7 +815,7 @@ async function generatePrompt() {
 
   const config = GENRE_CONFIG[selectedGenre];
 
-  // UI state
+  // UI state — reset everything
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('generateBtn').classList.add('loading');
   document.getElementById('generateBtn').textContent = 'Generating...';
@@ -820,34 +823,19 @@ async function generatePrompt() {
   document.getElementById('outputCard').classList.remove('visible');
   document.getElementById('errorBlock').classList.remove('visible');
 
-  const systemPrompt = `You are the master prompt engineer behind the 130 Mode Prompt Lab — the most respected AI sample generation prompt library in producer culture. Your prompts have been described as producing "the most consistent sampler food ever heard from AI prompting."
-
-You write Suno AI music generation prompts that produce raw, vintage, sampleable source material for hip-hop and beat producers. Your prompts have a specific proven formula that gets consistent results.
-
-CORE DNA — NON-NEGOTIABLE RULES FOR EVERY PROMPT YOU WRITE:
-
-1. ONE single flowing paragraph. No headers, no labels, no bullet points. Pure prompt text.
-2. HARD MAX 1000 characters. Count carefully. Stay under.
-3. NEVER use any real artist name, producer name, musician name, or band name. Suno blocks these.
-4. NEVER mention drums, kick, snare, hi-hat, cymbals, or any rhythmic element explicitly. Genre-lock naturally instead ("jazz trio", "soul quartet").
-5. ALWAYS minor scale or modal tonality — Dorian, Phrygian, harmonic minor, diminished. No major key unless specifically it's gospel or house.
-6. Instrument names must be PRECISE: "upright bass" not "bass", "Rhodes electric piano" not "keys", "Harmon-muted trumpet" not "trumpet", "Hammond B3 organ" not "organ".
-7. ALWAYS include a featured solo instrument or melodic statement.
-8. ALWAYS include specific geographic and era framing — not "vintage" but "Late 1960s New York hard bop session" or "Early 1970s Italian film score recorded at a Roman studio".
-9. ALWAYS include obscurity/scarcity framing — "pressed in 300 copies on a small regional label", "never distributed outside its home country", "recorded for a film that was never widely released".
-10. Designed to feel loopable — a short harmonic cycle (2, 4, or 8 bars) built to repeat hypnotically.
-11. The emotional register must be specific and evocative — not "sad" but "weighted with grief that has been carried for years" or "the feeling of a city at 3am when everything is possible and nothing is certain".
-
-GENRE-SPECIFIC RULES FOR THIS REQUEST:
-${rules}
-
-EXAMPLE CLOSER PHRASE FOR THIS GENRE (adapt to the vibe, never copy verbatim):
-"${closer}"
-
-THE PROVEN STRUCTURE:
-[ERA and SPECIFIC LOCATION] [RECORDING AESTHETIC] — [specific named instruments, comma-separated] — recorded at [BPM from genre rules] — [minor/modal description with emotional color] — [featured instrument solo or melodic statement] — [texture anchors: tape saturation, vinyl surface noise, room character] — [2–3 emotional words] — [obscurity/scarcity framing] — designed to feel loopable — [closer phrase adapted to the vibe]
-
-Now write ONE prompt in this formula for the producer's vibe description. Output ONLY the prompt text — no preamble, no explanation, no quotes around it. Just the raw prompt.`;
+  // Loading timer so user sees progress
+  const startTime = Date.now();
+  const timerEl = document.getElementById('loadingTimer');
+  const subEl = document.getElementById('loadingSub');
+  timerEl.textContent = '';
+  subEl.textContent = 'Applying Prompt Lab DNA...';
+  loadingInterval = setInterval(() => {
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    timerEl.textContent = `${elapsed}s`;
+    if (elapsed >= 5) subEl.textContent = 'Still working — Claude is writing your prompt...';
+    if (elapsed >= 15) subEl.textContent = 'Taking longer than usual...';
+    if (elapsed >= 22) subEl.textContent = 'Almost at timeout — hang tight...';
+  }, 1000);
 
   try {
     // 25-second timeout so the spinner doesn't run forever
@@ -865,17 +853,26 @@ Now write ONE prompt in this formula for the producer's vibe description. Output
     // Check if we got HTML back (Vercel auth wall) instead of JSON
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
-      throw new Error('Authentication Required — the server returned a login page instead of data.');
+      const text = await response.text();
+      if (text.includes('Authenticat') || text.includes('vercel')) {
+        throw new Error('Authentication Required — the server returned a login page instead of data.');
+      }
+      throw new Error(`Unexpected response from server (got ${contentType || 'unknown'} instead of JSON).`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      throw new Error('Server returned an invalid response. Try again.');
+    }
 
     if (!response.ok) {
       throw new Error(data.error || `API error ${response.status}`);
     }
 
     const prompt = data.prompt || '';
-    if (!prompt) throw new Error('Empty response from API');
+    if (!prompt) throw new Error('Empty response from API. The AI may have returned nothing — try a different vibe description.');
 
     // Show remaining generations if provided
     if (data.remaining !== undefined) {
@@ -887,11 +884,14 @@ Now write ONE prompt in this formula for the producer's vibe description. Output
 
   } catch (err) {
     if (err.name === 'AbortError') {
-      showError('The request timed out. The server took too long to respond.');
+      showError('The request timed out after 25 seconds. The server took too long to respond.');
     } else {
       showError(err.message);
     }
   } finally {
+    // ALWAYS clean up — no matter what happens
+    clearInterval(loadingInterval);
+    loadingInterval = null;
     document.getElementById('generateBtn').disabled = false;
     document.getElementById('generateBtn').classList.remove('loading');
     document.getElementById('generateBtn').textContent = '⊕ Generate Suno Prompt';
