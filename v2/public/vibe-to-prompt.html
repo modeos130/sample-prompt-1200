@@ -460,13 +460,69 @@ body {
 .error-block {
   background: #fff5f5;
   border: 1px solid #fca5a5;
-  border-radius: 12px;
-  padding: 16px 20px;
-  font-size: 12px;
-  color: #dc2626;
+  border-radius: 14px;
+  padding: 20px 22px;
   display: none;
+  animation: fadeUp 0.3s ease;
+  margin-bottom: 20px;
 }
 .error-block.visible { display: block; }
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.error-icon {
+  width: 28px;
+  height: 28px;
+  background: #fecaca;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.error-title {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #b91c1c;
+  text-transform: uppercase;
+}
+.error-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #dc2626;
+  margin-bottom: 14px;
+}
+.error-hint {
+  font-size: 11px;
+  color: #9a3412;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.error-retry {
+  background: #dc2626;
+  border: none;
+  color: #fff;
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.error-retry:hover { background: #b91c1c; transform: translateY(-1px); }
 
 /* CHAR COUNT */
 .char-count {
@@ -597,7 +653,15 @@ body {
     <div class="loading-sub">Applying Prompt Lab DNA...</div>
   </div>
 
-  <div class="error-block" id="errorBlock"></div>
+  <div class="error-block" id="errorBlock">
+    <div class="error-header">
+      <div class="error-icon">⚠</div>
+      <div class="error-title" id="errorTitle">Something Went Wrong</div>
+    </div>
+    <div class="error-message" id="errorMessage"></div>
+    <div class="error-hint" id="errorHint" style="display:none;"></div>
+    <button class="error-retry" onclick="generatePrompt()">↺ Try Again</button>
+  </div>
 
   <div class="output-card" id="outputCard">
     <div class="output-header">
@@ -786,11 +850,23 @@ THE PROVEN STRUCTURE:
 Now write ONE prompt in this formula for the producer's vibe description. Output ONLY the prompt text — no preamble, no explanation, no quotes around it. Just the raw prompt.`;
 
   try {
+    // 25-second timeout so the spinner doesn't run forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
     const response = await fetch('/api/vibe-prompt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vibe, genre: selectedGenre })
+      body: JSON.stringify({ vibe, genre: selectedGenre }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
+
+    // Check if we got HTML back (Vercel auth wall) instead of JSON
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('Authentication Required — the server returned a login page instead of data.');
+    }
 
     const data = await response.json();
 
@@ -800,7 +876,7 @@ Now write ONE prompt in this formula for the producer's vibe description. Output
 
     const prompt = data.prompt || '';
     if (!prompt) throw new Error('Empty response from API');
-    
+
     // Show remaining generations if provided
     if (data.remaining !== undefined) {
       console.log('Generations remaining today:', data.remaining);
@@ -810,7 +886,11 @@ Now write ONE prompt in this formula for the producer's vibe description. Output
     showOutput(prompt, config);
 
   } catch (err) {
-    showError(err.message);
+    if (err.name === 'AbortError') {
+      showError('The request timed out. The server took too long to respond.');
+    } else {
+      showError(err.message);
+    }
   } finally {
     document.getElementById('generateBtn').disabled = false;
     document.getElementById('generateBtn').classList.remove('loading');
@@ -839,8 +919,55 @@ function showOutput(prompt, config) {
 
 function showError(msg) {
   const el = document.getElementById('errorBlock');
-  el.textContent = `Error: ${msg}`;
+  const messageEl = document.getElementById('errorMessage');
+  const titleEl = document.getElementById('errorTitle');
+  const hintEl = document.getElementById('errorHint');
+
+  // Smart error messages based on the actual problem
+  let title = 'Something Went Wrong';
+  let message = msg;
+  let hint = '';
+
+  if (msg.includes('API not configured')) {
+    title = 'API Key Missing';
+    message = 'The Anthropic API key has not been configured on the server.';
+    hint = 'The site owner needs to add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy.';
+  } else if (msg.includes('Rate limit') || msg.includes('429')) {
+    title = 'Rate Limit Reached';
+    message = msg;
+    hint = 'You\'ve hit the daily generation limit. Try again tomorrow or ask the site owner to increase the limit.';
+  } else if (msg.includes('quota exceeded') || msg.includes('capacity')) {
+    title = 'Capacity Reached';
+    message = 'The daily generation capacity has been reached.';
+    hint = 'This resets automatically. Try again in a few hours.';
+  } else if (msg.includes('timed out') || msg.includes('timeout') || msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
+    title = 'Connection Issue';
+    message = 'The request timed out or couldn\'t reach the server.';
+    hint = 'Check your internet connection and try again. If the problem persists, the server may be temporarily unavailable.';
+  } else if (msg.includes('Authentication') || msg.includes('Authenticat')) {
+    title = 'Access Restricted';
+    message = 'This preview deployment requires Vercel authentication.';
+    hint = 'The site owner needs to disable Deployment Protection in Vercel → Settings → Deployment Protection for preview links to work publicly.';
+  } else if (msg.includes('Invalid genre') || msg.includes('No vibe')) {
+    title = 'Missing Input';
+    message = msg;
+  }
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  if (hint) {
+    hintEl.textContent = hint;
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
+
   el.classList.add('visible');
+
+  // Scroll to error
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
 }
 
 function copyPrompt() {
