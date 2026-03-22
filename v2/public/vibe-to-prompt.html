@@ -251,13 +251,17 @@ body {
 .filter-tabs {
   display: flex;
   gap: 4px;
-  padding: 12px 22px;
-  overflow-x: auto;
+  padding: 12px 22px 14px;
+  overflow-x: scroll;
   border-bottom: 1px solid var(--border);
-  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+  scrollbar-color: var(--purple-dim) var(--bg3);
 }
-.filter-tabs::-webkit-scrollbar { display: none; }
+.filter-tabs::-webkit-scrollbar { height: 6px; }
+.filter-tabs::-webkit-scrollbar-track { background: var(--bg3); border-radius: 3px; }
+.filter-tabs::-webkit-scrollbar-thumb { background: var(--purple-dim); border-radius: 3px; min-width: 30px; }
+.filter-tabs::-webkit-scrollbar-thumb:hover { background: var(--purple); }
 .filter-tab {
   font-family: var(--display);
   font-size: 9px;
