@@ -1,6 +1,14 @@
 "use client";
 
-export type Genre = "boom-bap" | "house" | "trap" | "baltimore-club";
+export type Genre =
+  | "boom-bap"
+  | "house"
+  | "trap"
+  | "baltimore-club"
+  | "gospel"
+  | "jazz-soul"
+  | "latin-soul"
+  | "cinematic-dark";
 
 interface GenreConfig {
   id: Genre;
@@ -23,22 +31,58 @@ const GENRES: GenreConfig[] = [
     num: "01",
   },
   {
-    id: "house",
-    label: "House",
-    sub: "Music",
-    bpm: "118–128 BPM",
-    era: "Late 70s / 80s",
-    tags: ["Deep House", "Gospel Soul", "Dance Floor"],
+    id: "jazz-soul",
+    label: "Jazz Soul",
+    sub: "Small Ensemble",
+    bpm: "82–96 BPM",
+    era: "Early 1970s",
+    tags: ["Regional Label", "Late Night", "Loop Dig"],
     num: "02",
+  },
+  {
+    id: "gospel",
+    label: "Gospel",
+    sub: "Sacred Soul",
+    bpm: "70–86 BPM",
+    era: "Late 1960s",
+    tags: ["Hammond B3", "Choir", "Black Church"],
+    num: "03",
+  },
+  {
+    id: "latin-soul",
+    label: "Latin Soul",
+    sub: "Orchestral",
+    bpm: "74–86 BPM",
+    era: "Late 1960s NYC",
+    tags: ["Strings", "Barrio", "Cinematic"],
+    num: "04",
+  },
+  {
+    id: "cinematic-dark",
+    label: "Cinematic",
+    sub: "Dark European",
+    bpm: "65–82 BPM",
+    era: "Early 70s Europe",
+    tags: ["Giallo", "Library", "Film Score"],
+    num: "05",
   },
   {
     id: "trap",
     label: "Trap",
-    sub: "Music",
+    sub: "Dark Orchestral",
     bpm: "65–75 BPM",
-    era: "70s–90s Dark Cinematic",
-    tags: ["Gothic Orchestral", "Dark Ambient", "Cinematic"],
-    num: "03",
+    era: "70s–90s Cinematic",
+    tags: ["Gothic Orchestral", "Dark Ambient", "Half-Time"],
+    num: "06",
+  },
+  {
+    id: "house",
+    label: "House",
+    sub: "Soulful",
+    bpm: "118–128 BPM",
+    era: "Late 70s / 80s",
+    tags: ["Deep House", "Gospel Soul", "Dance Floor"],
+    num: "07",
   },
   {
     id: "baltimore-club",
@@ -47,7 +91,7 @@ const GENRES: GenreConfig[] = [
     bpm: "130–145 BPM",
     era: "Late 70s / Early 80s",
     tags: ["Up-Tempo Funk", "Staccato Soul", "Party Floor"],
-    num: "04",
+    num: "08",
   },
 ];
 
@@ -107,7 +151,6 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
                 : "border-[#141c28] bg-[#0a0d14] hover:border-[#1e2838] hover:bg-[#0f1420] hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]",
             ].join(" ")}
           >
-            {/* Large ghost number — fluid size */}
             <span
               className={[
                 "absolute -bottom-3 right-3 font-['Syne',sans-serif] font-extrabold leading-none select-none pointer-events-none transition-colors duration-200",
@@ -118,19 +161,15 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
               {g.num}
             </span>
 
-            {/* Selected dot */}
             {isSelected && (
               <span className="absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-[#c9a84c] shadow-[0_0_10px_rgba(201,168,76,0.7)] animate-pulse-subtle" />
             )}
 
-            {/* Content */}
             <div className="relative flex flex-col h-full gap-0">
-
-              {/* Genre name */}
               <span
                 className={[
                   "font-['Syne',sans-serif] font-extrabold leading-none tracking-tight block transition-colors duration-200",
-                  g.label.length > 6 ? "text-[32px]" : "text-[40px]",
+                  g.label.length > 6 ? "text-[28px]" : "text-[40px]",
                   isSelected ? "text-[#c9a84c]" : "text-[#eef2f7]",
                 ].join(" ")}
               >
@@ -145,10 +184,8 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
                 {g.sub}
               </span>
 
-              {/* Spacer */}
               <div className="flex-1" />
 
-              {/* BPM */}
               <div
                 className={[
                   "text-[12px] font-mono font-medium mb-1 transition-colors duration-200",
@@ -166,7 +203,6 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
                 {g.era}
               </div>
 
-              {/* Tags */}
               <div className="flex flex-wrap gap-1.5">
                 {g.tags.map((t) => (
                   <span
@@ -182,7 +218,6 @@ export default function GenreSelector({ selected, onSelect, compact = false }: P
                   </span>
                 ))}
               </div>
-
             </div>
           </button>
         );

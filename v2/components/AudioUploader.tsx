@@ -15,6 +15,10 @@ const GENRE_LABELS: Record<Genre, string> = {
   house: "House",
   trap: "Trap",
   "baltimore-club": "Baltimore Club",
+  gospel: "Gospel",
+  "jazz-soul": "Jazz Soul",
+  "latin-soul": "Latin Soul",
+  "cinematic-dark": "Cinematic Dark",
 };
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB — Vercel's multipart body limit is 4.5 MB

@@ -21,6 +21,10 @@ const GENRE_PRESETS: Record<Genre, GenrePreset> = {
   "house":          { loudness: 6, clarity: 5, loudnessLabel: "Medium · analog warmth",           clarityLabel: "Balanced · soulful depth"         },
   "trap":           { loudness: 8, clarity: 7, loudnessLabel: "Loud · dense & compressed",        clarityLabel: "Clean · cold and sharp"           },
   "baltimore-club": { loudness: 8, clarity: 6, loudnessLabel: "Loud · high-energy punchy",        clarityLabel: "Bright · staccato attack"         },
+  "gospel":         { loudness: 5, clarity: 4, loudnessLabel: "Moderate · raw church warmth",     clarityLabel: "Warm / lo-fi · room ambience"     },
+  "jazz-soul":      { loudness: 4, clarity: 3, loudnessLabel: "Soft · late night intimacy",       clarityLabel: "Warm / dusty · analog tape hiss"  },
+  "latin-soul":     { loudness: 5, clarity: 5, loudnessLabel: "Moderate · orchestral dynamics",   clarityLabel: "Balanced · cinematic warmth"      },
+  "cinematic-dark": { loudness: 6, clarity: 4, loudnessLabel: "Medium · hollow studio tension",   clarityLabel: "Dark / cold · analog menace"      },
 };
 
 const VOCAL_NOTES: Record<VocalGender, string> = {
