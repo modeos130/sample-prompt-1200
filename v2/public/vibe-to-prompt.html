@@ -359,6 +359,38 @@ body {
   .proven-search input { width: 100%; }
 }
 
+/* MODE TABS */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+}
+.mode-tab {
+  flex: 1;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg2);
+  color: var(--muted);
+}
+.mode-tab:hover { color: var(--purple); }
+.mode-tab.active {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  color: var(--white);
+}
+.tab-panel { display: block; }
+.tab-panel.hidden { display: none; }
+
 /* GENRE SELECTOR */
 .genre-block {
   margin-bottom: 20px;
@@ -770,70 +802,82 @@ body {
 
 <div class="main">
 
-  <!-- GENRE SELECTOR -->
-  <div class="genre-block">
-    <div class="genre-label">Select Target Genre</div>
-    <div class="genre-grid" id="genreGrid">
-      <button class="genre-btn active" data-genre="boom-bap">Boom Bap</button>
-      <button class="genre-btn" data-genre="dark-underground">Dark Underground</button>
-      <button class="genre-btn" data-genre="soul-gospel">Soul / Gospel</button>
-      <button class="genre-btn" data-genre="jazz">Jazz / Soul-Jazz</button>
-      <button class="genre-btn" data-genre="latin">Latin Soul</button>
-      <button class="genre-btn" data-genre="japanese">Japanese Soul</button>
-      <button class="genre-btn" data-genre="brazilian">Brazilian Rare Groove</button>
-      <button class="genre-btn" data-genre="italian-film">Italian Film / Giallo</button>
-      <button class="genre-btn" data-genre="soulful-house">Soulful House</button>
-      <button class="genre-btn" data-genre="disco-house">Disco House</button>
-      <button class="genre-btn" data-genre="tv-score">TV Score</button>
-      <button class="genre-btn" data-genre="cinematic-dark">Dark Cinematic</button>
-      <button class="genre-btn" data-genre="drum-break">Drum Break</button>
-      <button class="genre-btn" data-genre="chipmunk">45 Flip / Chipmunk</button>
-      <button class="genre-btn" data-genre="marching-band">Marching Band</button>
-      <button class="genre-btn" data-genre="modern-trap">Modern Trap / TikTok</button>
-    </div>
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="proven" onclick="switchMode('proven')">Proven Prompts</button>
+    <button class="mode-tab" data-mode="create" onclick="switchMode('create')">Create Your Own</button>
   </div>
 
-  <!-- PROVEN PROMPTS SECTION -->
-  <div class="proven-section" id="provenSection">
-    <div class="proven-header">
-      <div class="proven-title">
-        Proven Prompts
-        <span class="proven-count" id="provenCount">23</span>
+  <!-- TAB 1: PROVEN PROMPTS -->
+  <div class="tab-panel" id="panelProven">
+    <div class="proven-section" id="provenSection">
+      <div class="proven-header">
+        <div class="proven-title">
+          Suno-Tested Prompts
+          <span class="proven-count" id="provenCount">23</span>
+        </div>
+        <div class="proven-search">
+          <input type="text" id="promptSearch" placeholder="Search by name, genre, or mood..." oninput="filterPrompts()">
+          <button class="clear-search" id="clearSearch" onclick="clearPromptSearch()">&times;</button>
+        </div>
       </div>
-      <div class="proven-search">
-        <input type="text" id="promptSearch" placeholder="Search by name, genre, or mood..." oninput="filterPrompts()">
-        <button class="clear-search" id="clearSearch" onclick="clearPromptSearch()">&times;</button>
+      <div class="filter-tabs" id="filterTabs">
+        <!-- Built dynamically by JS -->
+      </div>
+      <div class="prompt-grid" id="promptGrid">
+        <!-- Built dynamically by JS -->
+      </div>
+      <div class="prompt-grid-empty" id="promptEmpty">No prompts match your search.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="surprise-btn" onclick="surpriseMe()">
+        🎲 Surprise Me
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 2: CREATE YOUR OWN -->
+  <div class="tab-panel hidden" id="panelCreate">
+    <div class="genre-block">
+      <div class="genre-label">Select Target Genre</div>
+      <div class="genre-grid" id="genreGrid">
+        <button class="genre-btn active" data-genre="boom-bap">Boom Bap</button>
+        <button class="genre-btn" data-genre="dark-underground">Dark Underground</button>
+        <button class="genre-btn" data-genre="soul-gospel">Soul / Gospel</button>
+        <button class="genre-btn" data-genre="jazz">Jazz / Soul-Jazz</button>
+        <button class="genre-btn" data-genre="latin">Latin Soul</button>
+        <button class="genre-btn" data-genre="japanese">Japanese Soul</button>
+        <button class="genre-btn" data-genre="brazilian">Brazilian Rare Groove</button>
+        <button class="genre-btn" data-genre="italian-film">Italian Film / Giallo</button>
+        <button class="genre-btn" data-genre="soulful-house">Soulful House</button>
+        <button class="genre-btn" data-genre="disco-house">Disco House</button>
+        <button class="genre-btn" data-genre="tv-score">TV Score</button>
+        <button class="genre-btn" data-genre="cinematic-dark">Dark Cinematic</button>
+        <button class="genre-btn" data-genre="drum-break">Drum Break</button>
+        <button class="genre-btn" data-genre="chipmunk">45 Flip / Chipmunk</button>
+        <button class="genre-btn" data-genre="marching-band">Marching Band</button>
+        <button class="genre-btn" data-genre="modern-trap">Modern Trap / TikTok</button>
       </div>
     </div>
-    <div class="filter-tabs" id="filterTabs">
-      <!-- Built dynamically by JS -->
-    </div>
-    <div class="prompt-grid" id="promptGrid">
-      <!-- Built dynamically by JS -->
-    </div>
-    <div class="prompt-grid-empty" id="promptEmpty">No prompts match your search.</div>
-  </div>
 
-  <!-- VIBE INPUT -->
-  <div class="input-block">
-    <div class="input-header">
-      <div class="input-label">Describe Your Vibe</div>
+    <div class="input-block">
+      <div class="input-header">
+        <div class="input-label">Describe Your Vibe</div>
+      </div>
+      <textarea
+        class="vibe-textarea"
+        id="vibeInput"
+        placeholder="e.g. Something dark and eerie with a lone flute, feels like it was recorded in Eastern Europe in 1968, nobody has ever found this record... or just: menacing piano loop with violin swells, slow and heavy, very minor key..."
+        rows="5"
+      ></textarea>
     </div>
-    <textarea
-      class="vibe-textarea"
-      id="vibeInput"
-      placeholder="e.g. Something dark and eerie with a lone flute, feels like it was recorded in Eastern Europe in 1968, nobody has ever found this record... or just: menacing piano loop with violin swells, slow and heavy, very minor key..."
-      rows="5"
-    ></textarea>
-  </div>
 
-  <div class="btn-row">
-    <button class="generate-btn" id="generateBtn" onclick="generatePrompt()">
-      ⊕ Generate Suno Prompt
-    </button>
-    <button class="surprise-btn" onclick="surpriseMe()">
-      🎲 Surprise Me
-    </button>
+    <div class="btn-row">
+      <button class="generate-btn" id="generateBtn" onclick="generatePrompt()">
+        ⊕ Generate Suno Prompt
+      </button>
+    </div>
   </div>
 
   <div class="loading-block" id="loadingBlock">
@@ -855,7 +899,7 @@ body {
 
   <div class="output-card" id="outputCard">
     <div class="output-header">
-      <div class="output-title">Generated Suno Prompt</div>
+      <div class="output-title" id="outputTitle">Suno Prompt</div>
       <div class="output-meta">
         <span class="output-tag" id="genreTag">Boom Bap</span>
         <span class="output-tag ref" id="refTag" style="display:none;">Reference</span>
@@ -898,6 +942,23 @@ body {
 <script>
 let selectedGenre = 'boom-bap';
 let lastPrompt = '';
+let activeMode = 'proven';
+
+// ─── MODE SWITCHING ─────────────────────────────────────────────────────────
+function switchMode(mode) {
+  activeMode = mode;
+  // Update tab buttons
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.mode-tab[data-mode="${mode}"]`)?.classList.add('active');
+  // Show/hide panels
+  document.getElementById('panelProven').classList.toggle('hidden', mode !== 'proven');
+  document.getElementById('panelCreate').classList.toggle('hidden', mode !== 'create');
+  // Clear output on switch
+  document.getElementById('outputCard').classList.remove('visible');
+  document.getElementById('loadingBlock').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+  lastPrompt = '';
+}
 
 // Genre display names and slider recommendations
 const GENRE_CONFIG = {
@@ -1070,20 +1131,42 @@ function buildPromptGrid() {
 }
 
 // Select a prompt card
+// Display a reference prompt instantly (no API call)
+function showReferencePrompt(ref) {
+  // Hide loading/error
+  document.getElementById('loadingBlock').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+  // Display the exact proven prompt
+  lastPrompt = ref.prompt;
+  const n = ref.prompt.length;
+  const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
+  document.getElementById('outputTitle').textContent = ref.id + ' \u00b7 ' + ref.name;
+  document.getElementById('promptDisplay').textContent = ref.prompt;
+  document.getElementById('genreTag').textContent = GENRE_CONFIG[ref.genre]?.label || ref.genre;
+  document.getElementById('charTag').textContent = `${n} chars`;
+  document.getElementById('charCount').textContent = `${n}/1000`;
+  document.getElementById('charCount').className = `char-count ${statusClass}`;
+  document.getElementById('refTag').style.display = 'inline-block';
+  document.getElementById('refTag').className = 'output-tag ref';
+  document.getElementById('refTag').textContent = 'Proven';
+  document.getElementById('sliderTips').innerHTML = `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}`;
+  document.getElementById('outputCard').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// Select a prompt card — shows the exact proven prompt instantly
 function selectPromptCard(index) {
   const ref = REFERENCE_PROMPTS[index];
   if (!ref) return;
   selectedPromptIdx = index;
-  document.getElementById('vibeInput').value = ref.vibe;
-  // Auto-select genre
-  selectedGenre = ref.genre;
-  document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
-  const target = document.querySelector(`.genre-btn[data-genre="${ref.genre}"]`);
-  if (target) target.classList.add('active');
   // Highlight card
   document.querySelectorAll('.prompt-card').forEach(c => c.classList.remove('selected'));
   const card = document.querySelector(`.prompt-card[data-index="${index}"]`);
   if (card) card.classList.add('selected');
+  // Show the exact prompt
+  showReferencePrompt(ref);
 }
 
 // Filter by genre tab
@@ -1133,33 +1216,7 @@ buildPromptGrid();
 // Surprise Me — pick random reference prompt, display instantly (no API call)
 function surpriseMe() {
   const idx = Math.floor(Math.random() * REFERENCE_PROMPTS.length);
-  const ref = REFERENCE_PROMPTS[idx];
-  // Set genre
-  selectedGenre = ref.genre;
-  document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
-  const target = document.querySelector(`.genre-btn[data-genre="${ref.genre}"]`);
-  if (target) target.classList.add('active');
-  // Fill textarea with the vibe
-  document.getElementById('vibeInput').value = ref.vibe;
-  // Hide loading/error, show output directly
-  document.getElementById('loadingBlock').classList.remove('visible');
-  document.getElementById('errorBlock').classList.remove('visible');
-  // Display the reference prompt
-  lastPrompt = ref.prompt;
-  const n = ref.prompt.length;
-  const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
-  document.getElementById('promptDisplay').textContent = ref.prompt;
-  document.getElementById('genreTag').textContent = GENRE_CONFIG[ref.genre]?.label || ref.genre;
-  document.getElementById('charTag').textContent = `${n} chars`;
-  document.getElementById('charCount').textContent = `${n}/1000`;
-  document.getElementById('charCount').className = `char-count ${statusClass}`;
-  document.getElementById('refTag').style.display = 'inline-block';
-  document.getElementById('refTag').textContent = ref.id + ' \u00b7 ' + ref.name;
-  document.getElementById('sliderTips').innerHTML = `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}`;
-  document.getElementById('outputCard').classList.add('visible');
-  setTimeout(() => {
-    document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  showReferencePrompt(REFERENCE_PROMPTS[idx]);
 }
 
 // Genre selection
@@ -1270,9 +1327,12 @@ function showOutput(prompt, config) {
   const n = prompt.length;
   const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
 
+  document.getElementById('outputTitle').textContent = 'AI Generated Prompt';
   document.getElementById('promptDisplay').textContent = prompt;
   document.getElementById('genreTag').textContent = config.label;
-  document.getElementById('refTag').style.display = 'none'; // hide reference tag for AI-generated prompts
+  document.getElementById('refTag').style.display = 'inline-block';
+  document.getElementById('refTag').textContent = 'AI Generated';
+  document.getElementById('refTag').className = 'output-tag plain';
   document.getElementById('charTag').textContent = `${n} chars`;
   document.getElementById('charCount').textContent = `${n}/1000`;
   document.getElementById('charCount').className = `char-count ${statusClass}`;
