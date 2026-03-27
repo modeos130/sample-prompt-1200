@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>130 MODE — Sound Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080b10;
+  --bg2: #0f1318;
+  --bg3: #141a22;
+  --border: #1a2030;
+  --accent: #3b9eff;
+  --accent-dim: #2878cc;
+  --accent-light: rgba(59,158,255,0.1);
+  --cyan: #00d4ff;
+  --dark: #e0e8f0;
+  --text: #d0d8e4;
+  --muted: #5a6a80;
+  --white: #ffffff;
+  --font: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.3);
+}
+.logo {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--dark);
+}
+.logo .studio { color: var(--accent); }
+.header-badge {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #080b10 0%, #0a1020 50%, #0d1530 100%);
+  padding: 56px 40px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 60%, rgba(59,158,255,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 78% 30%, rgba(0,212,255,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--dark);
+  position: relative;
+}
+.hero-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-top: 12px;
+  position: relative;
+}
+.accent-line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  margin: 20px auto 0;
+  border-radius: 2px;
+  position: relative;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+/* MODE TABS */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.mode-tab {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.mode-tab:hover { color: var(--text); }
+.mode-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* SEARCH BAR */
+.search-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+.search-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px 12px 42px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--accent-dim); }
+
+/* FILTER TABS */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) var(--bg2);
+}
+.filter-row::-webkit-scrollbar { height: 6px; }
+.filter-row::-webkit-scrollbar-track { background: var(--bg2); border-radius: 3px; }
+.filter-row::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+.filter-tab {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.filter-tab:hover { color: var(--text); border-color: var(--muted); }
+.filter-tab.active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.filter-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* SOUND CARDS */
+.cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.sound-card {
+  width: calc(25% - 9px);
+  min-width: 180px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sound-card:hover {
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(59,158,255,0.1);
+}
+.sound-card.selected {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--bg2) 0%, rgba(59,158,255,0.06) 100%);
+  box-shadow: 0 0 16px rgba(59,158,255,0.15);
+}
+.card-name {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+.card-genre {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.card-vibe {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* MODEL TOGGLE */
+.model-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+.model-btn {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  background: var(--bg2);
+  color: var(--muted);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.model-btn:hover { color: var(--text); }
+.model-btn.active {
+  background: var(--accent);
+  color: var(--white);
+}
+
+/* ACTION BUTTONS */
+.btn-surprise {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--cyan), var(--accent));
+  color: var(--bg);
+  margin-bottom: 10px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-surprise:hover { opacity: 0.9; }
+.btn-surprise:active { transform: scale(0.99); }
+
+.btn-generate {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+  color: var(--white);
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-generate:hover:not(:disabled) { opacity: 0.9; }
+.btn-generate:active:not(:disabled) { transform: scale(0.99); }
+.btn-generate:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* CREATE YOUR OWN TAB */
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.genre-btn {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+.genre-btn:hover { color: var(--text); border-color: var(--muted); }
+.genre-btn.active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.vibe-textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+}
+.vibe-textarea::placeholder { color: var(--muted); }
+.vibe-textarea:focus { border-color: var(--accent-dim); }
+
+/* OUTPUT AREA */
+.output-area {
+  margin-top: 32px;
+  display: none;
+}
+.output-area.visible { display: block; }
+
+/* LOADING STATE */
+.loading-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  margin-bottom: 20px;
+}
+.waveform .bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: waveform 1.2s ease-in-out infinite;
+}
+.waveform .bar:nth-child(1) { height: 16px; animation-delay: 0s; }
+.waveform .bar:nth-child(2) { height: 28px; animation-delay: 0.15s; }
+.waveform .bar:nth-child(3) { height: 36px; animation-delay: 0.3s; }
+.waveform .bar:nth-child(4) { height: 24px; animation-delay: 0.45s; }
+.waveform .bar:nth-child(5) { height: 20px; animation-delay: 0.6s; }
+@keyframes waveform {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+.loading-text {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.loading-timer {
+  font-family: var(--font);
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 20px;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+
+/* SUCCESS STATE */
+.result-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+}
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.result-name {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark);
+}
+.result-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border: 1px solid rgba(59,158,255,0.2);
+}
+.audio-container {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.audio-container audio {
+  width: 100%;
+  height: 40px;
+  outline: none;
+}
+.btn-download {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--cyan), var(--accent));
+  color: var(--bg);
+  margin-bottom: 10px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-download:hover { opacity: 0.9; }
+.btn-download:active { transform: scale(0.99); }
+
+.btn-again {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.btn-again:hover { border-color: var(--muted); }
+
+.remaining-text {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ERROR STATE */
+.error-card {
+  background: #1a0f0f;
+  border: 1px solid #4a2020;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+}
+.error-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.error-title {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #e05656;
+  margin-bottom: 8px;
+}
+.error-msg {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.btn-retry {
+  padding: 10px 28px;
+  border: 1px solid #4a2020;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: transparent;
+  color: #e05656;
+  transition: all 0.2s;
+}
+.btn-retry:hover { background: rgba(224,86,86,0.1); }
+
+/* HIDDEN */
+.hidden { display: none !important; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .header { padding: 14px 18px; }
+  .logo { font-size: 17px; }
+  .hero { padding: 36px 20px 32px; }
+  .hero-title { font-size: 24px; letter-spacing: 2px; }
+  .hero-sub { font-size: 14px; }
+  .container { padding: 24px 16px 48px; }
+  .mode-tab { padding: 12px 16px; font-size: 12px; }
+  .sound-card { width: calc(50% - 6px); min-width: 0; }
+  .cards-grid { gap: 10px; }
+  .result-card { padding: 20px; }
+}
+@media (max-width: 480px) {
+  .sound-card { width: 100%; }
+  .mode-tab { padding: 10px 12px; font-size: 11px; letter-spacing: 1px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">130 MODE <span class="studio">STUDIO</span></div>
+  <div class="header-badge">Beta &middot; Lyria 3</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">SOUND STUDIO</div>
+  <div class="hero-sub">Select a sound or describe your own vibe. We handle the rest.</div>
+  <div class="accent-line"></div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-tab="library">Sound Library</button>
+    <button class="mode-tab" data-tab="create">Create Your Own</button>
+  </div>
+
+  <!-- TAB 1: SOUND LIBRARY -->
+  <div id="tab-library">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search sounds...">
+    </div>
+
+    <div class="filter-row" id="filterRow"></div>
+    <div class="filter-count" id="filterCount"></div>
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <div class="model-toggle" id="modelToggle1">
+      <button class="model-btn active" data-model="clip">Preview (30s)</button>
+      <button class="model-btn" data-model="pro">Full Track</button>
+    </div>
+
+    <button class="btn-surprise" id="btnSurprise">&#127922; SURPRISE ME</button>
+    <button class="btn-generate" id="btnGenLib" disabled>GENERATE</button>
+  </div>
+
+  <!-- TAB 2: CREATE YOUR OWN -->
+  <div id="tab-create" class="hidden">
+    <div class="genre-grid" id="genreGrid"></div>
+    <textarea class="vibe-textarea" id="vibeInput" rows="3" placeholder="Describe the sound you're hearing..."></textarea>
+
+    <div class="model-toggle" id="modelToggle2">
+      <button class="model-btn active" data-model="clip">Preview (30s)</button>
+      <button class="model-btn" data-model="pro">Full Track</button>
+    </div>
+
+    <button class="btn-generate" id="btnGenCreate" disabled>GENERATE</button>
+  </div>
+
+  <!-- OUTPUT AREA -->
+  <div class="output-area" id="outputArea">
+    <!-- Loading state -->
+    <div class="loading-card" id="stateLoading" class="hidden">
+      <div class="waveform">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <div class="loading-text">Generating your sound...</div>
+      <div class="loading-timer" id="timerDisplay">0:00</div>
+      <button class="btn-cancel" id="btnCancel">Cancel</button>
+    </div>
+
+    <!-- Success state -->
+    <div class="result-card hidden" id="stateSuccess">
+      <div class="result-header">
+        <div class="result-name" id="resultName"></div>
+        <div class="result-badge" id="resultBadge"></div>
+      </div>
+      <div class="audio-container">
+        <audio id="audioPlayer" controls></audio>
+      </div>
+      <button class="btn-download" id="btnDownload">DOWNLOAD MP3</button>
+      <button class="btn-again" id="btnAgain">GENERATE AGAIN</button>
+      <div class="remaining-text" id="remainingText"></div>
+    </div>
+
+    <!-- Error state -->
+    <div class="error-card hidden" id="stateError">
+      <div class="error-icon">&#9888;&#65039;</div>
+      <div class="error-title">GENERATION FAILED</div>
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn-retry" id="btnRetry">Try Again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== SOUND LIBRARY DATA =====
+const SOUNDS = [
+  { id: 'P01', name: 'The Flute Digger', genre: 'italian-film', vibe: 'Haunting solo flute, 1960s Italian film score, eerie and cinematic' },
+  { id: 'P02', name: 'Cold Organ', genre: 'dark-underground', vibe: 'Haunting Hammond organ, Eastern European modal jazz, 3am atmosphere' },
+  { id: 'P03', name: 'Psych Soul Ghost', genre: 'dark-underground', vibe: 'Psychedelic soul, harpsichord, ghostly female vocal, hallucinatory' },
+  { id: 'P04', name: 'Middle East Menace', genre: 'dark-underground', vibe: 'Middle Eastern oud, Hijaz scale, cinematic dread, 1970s orchestral' },
+  { id: 'P05', name: 'Hybrid Bridge', genre: 'boom-bap', vibe: 'Rhodes piano in Dorian mode, ghostly vocal hum, lush yet menacing' },
+  { id: 'P06', name: 'Black Church', genre: 'soul-gospel', vibe: 'Hammond B3 organ, gospel choir, small church, raw and spiritual' },
+  { id: 'P07', name: 'Late Night Jazz Session', genre: 'jazz', vibe: 'Small ensemble jazz, walking bass, muted trumpet, intimate late-night' },
+  { id: 'P08', name: 'Aching Soul Vocal', genre: 'soul-gospel', vibe: 'Wailing female soul vocal, gospel-drenched, lush strings, devastating' },
+  { id: 'P09', name: '45 Flip Ready', genre: 'chipmunk', vibe: 'Upbeat 1960s girl group, bouncy call-and-response, built to speed up' },
+  { id: 'P10', name: 'The Break', genre: 'drum-break', vibe: 'Pure drums, 1970s funk, three-act structure with solo breakdown' },
+  { id: 'P11', name: 'Library Cue', genre: 'tv-score', vibe: 'Production library music, flute or vibraphone, tense and unresolved' },
+  { id: 'P12', name: 'Tokyo Deep', genre: 'japanese', vibe: 'Japanese soul, muffled Rhodes, distant female vocal, dreamy' },
+  { id: 'P13', name: 'Cinemascope Nero', genre: 'italian-film', vibe: 'Italian crime film, wah-wah guitar, walking bass, flute and strings' },
+  { id: 'P14', name: 'Midnight Sanctuary', genre: 'soulful-house', vibe: 'Underground soulful house, gospel piano, powerful female vocal' },
+  { id: 'P15', name: 'Filtered Gold', genre: 'disco-house', vibe: 'French disco house, filter sweep bass, disco strings, euphoric' },
+  { id: 'P16', name: 'Barrio Nocturno', genre: 'latin', vibe: 'Latin soul orchestra, dark strings, congas, ghostly vocal, midnight' },
+  { id: 'P17', name: 'Giallo Nero', genre: 'italian-film', vibe: 'Italian horror score, pulsing bass, analog synth arpeggio, funeral pace' },
+  { id: 'P18', name: 'Murda Muzik Source', genre: 'cinematic-dark', vibe: 'Dark orchestral, obsessive minor piano motif, mournful strings, menace' },
+  { id: 'P19', name: 'Late Night Broadcast', genre: 'tv-score', vibe: 'TV crime drama cue, electric piano, wah-wah guitar, surveillance 2am' },
+  { id: 'P20', name: 'S\u00e3o Paulo Basement', genre: 'brazilian', vibe: 'Brazilian jazz-funk, Rhodes piano, breathy flute, humid room' },
+  { id: 'P21', name: 'Thunder Soul', genre: 'boom-bap', vibe: 'Live high school funk band, raw and imperfect, flute solo, gymnasium' },
+  { id: 'P22', name: 'Stadium Brass', genre: 'marching-band', vibe: 'College marching band, 60-80 horns, solo trumpet, triumphant' },
+  { id: 'P23', name: 'Dark Cinematic Loop', genre: 'cinematic-dark', vibe: 'Minimal piano, slow string pads, deep cello, cinematic grief' },
+  { id: 'P24', name: 'Warsaw Glass', genre: 'polish-jazz', vibe: 'Cold Polish jazz, crystalline piano, Harmon-muted trumpet, midnight' },
+  { id: 'P25', name: 'Dead Sea Scroll', genre: 'israeli-psych', vibe: 'Israeli psych folk, oud in Hijaz, bouzouki tremolo, ancient' },
+  { id: 'P26', name: 'Budapest Hammer', genre: 'hungarian-psych', vibe: 'Hungarian psych folk, cimbalom and t\u00e1rogat\u00f3, fuzz drones, intense' },
+  { id: 'P27', name: 'Autobahn Noir', genre: 'krautrock', vibe: 'German kosmische, Moog filter sweeps, Farfisa drone, cold and vast' },
+  { id: 'P28', name: 'Anatolian Dust', genre: 'turkish-psych', vibe: 'Turkish psych, amplified ba\u011flama in Hicaz makam, raw and furious' },
+  { id: 'P29', name: 'Addis Midnight', genre: 'ethio-jazz', vibe: 'Ethio-Jazz, Hammond organ in ambassel mode, raw tenor sax, 1973' },
+  { id: 'P30', name: 'Accra Gold', genre: 'ghana-funk', vibe: 'Ghanaian highlife funk, shimmering guitar ostinato, cowbell, bright' },
+];
+
+const CREATE_GENRES = [
+  'boom-bap','dark-underground','soul-gospel','jazz','latin','japanese','brazilian',
+  'italian-film','soulful-house','disco-house','tv-score','cinematic-dark','drum-break',
+  'chipmunk','marching-band','modern-trap','polish-jazz','israeli-psych','hungarian-psych',
+  'krautrock','turkish-psych','ethio-jazz','ghana-funk'
+];
+
+// ===== STATE =====
+let selectedSound = null;
+let selectedGenre = null;
+let currentModel = 'clip';
+let currentTab = 'library';
+let currentFilter = 'all';
+let timerInterval = null;
+let abortController = null;
+let currentAudio = null;
+let lastPayload = null;
+
+// ===== DOM REFS =====
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+const tabLibrary = $('#tab-library');
+const tabCreate = $('#tab-create');
+const searchInput = $('#searchInput');
+const filterRow = $('#filterRow');
+const filterCount = $('#filterCount');
+const cardsGrid = $('#cardsGrid');
+const genreGrid = $('#genreGrid');
+const vibeInput = $('#vibeInput');
+const outputArea = $('#outputArea');
+const stateLoading = $('#stateLoading');
+const stateSuccess = $('#stateSuccess');
+const stateError = $('#stateError');
+const timerDisplay = $('#timerDisplay');
+const audioPlayer = $('#audioPlayer');
+const resultName = $('#resultName');
+const resultBadge = $('#resultBadge');
+const remainingText = $('#remainingText');
+const errorMsg = $('#errorMsg');
+const btnGenLib = $('#btnGenLib');
+const btnGenCreate = $('#btnGenCreate');
+
+// ===== INIT =====
+function init() {
+  buildFilterTabs();
+  renderCards();
+  buildGenreGrid();
+  bindEvents();
+}
+
+// ===== FILTER TABS =====
+function buildFilterTabs() {
+  const genres = [...new Set(SOUNDS.map(s => s.genre))];
+  let html = `<button class="filter-tab active" data-filter="all">All (${SOUNDS.length})</button>`;
+  genres.forEach(g => {
+    const count = SOUNDS.filter(s => s.genre === g).length;
+    const label = g.replace(/-/g, ' ');
+    html += `<button class="filter-tab" data-filter="${g}">${label} (${count})</button>`;
+  });
+  filterRow.innerHTML = html;
+}
+
+// ===== RENDER SOUND CARDS =====
+function renderCards() {
+  const query = searchInput.value.toLowerCase().trim();
+  let filtered = SOUNDS;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(s => s.genre === currentFilter);
+  }
+  if (query) {
+    filtered = filtered.filter(s =>
+      s.name.toLowerCase().includes(query) || s.vibe.toLowerCase().includes(query)
+    );
+  }
+
+  filterCount.textContent = `Showing ${filtered.length} of ${SOUNDS.length}`;
+
+  cardsGrid.innerHTML = filtered.map(s => `
+    <div class="sound-card${selectedSound && selectedSound.id === s.id ? ' selected' : ''}"
+         data-id="${s.id}" data-genre="${s.genre}" data-name="${s.name}">
+      <div class="card-name">${s.name}</div>
+      <div class="card-genre">${s.genre.replace(/-/g, ' ')}</div>
+      <div class="card-vibe">${s.vibe}</div>
+    </div>
+  `).join('');
+}
+
+// ===== GENRE GRID (Create Your Own) =====
+function buildGenreGrid() {
+  genreGrid.innerHTML = CREATE_GENRES.map(g => {
+    const label = g.replace(/-/g, ' ');
+    return `<button class="genre-btn" data-genre="${g}">${label}</button>`;
+  }).join('');
+}
+
+// ===== UPDATE GENERATE BUTTON STATES =====
+function updateGenButtons() {
+  btnGenLib.disabled = !selectedSound;
+  btnGenCreate.disabled = !(selectedGenre && vibeInput.value.trim());
+}
+
+// ===== EVENT BINDING =====
+function bindEvents() {
+  // Mode tabs
+  $$('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.mode-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.dataset.tab;
+      tabLibrary.classList.toggle('hidden', currentTab !== 'library');
+      tabCreate.classList.toggle('hidden', currentTab !== 'create');
+      clearOutput();
+    });
+  });
+
+  // Search
+  searchInput.addEventListener('input', renderCards);
+
+  // Filter tabs (delegated)
+  filterRow.addEventListener('click', (e) => {
+    const tab = e.target.closest('.filter-tab');
+    if (!tab) return;
+    filterRow.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderCards();
+  });
+
+  // Sound card selection (delegated)
+  cardsGrid.addEventListener('click', (e) => {
+    const card = e.target.closest('.sound-card');
+    if (!card) return;
+    const id = card.dataset.id;
+    selectedSound = SOUNDS.find(s => s.id === id) || null;
+    cardsGrid.querySelectorAll('.sound-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    updateGenButtons();
+  });
+
+  // Genre buttons (delegated)
+  genreGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.genre-btn');
+    if (!btn) return;
+    genreGrid.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedGenre = btn.dataset.genre;
+    updateGenButtons();
+  });
+
+  // Vibe textarea
+  vibeInput.addEventListener('input', updateGenButtons);
+
+  // Model toggles
+  document.querySelectorAll('.model-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      const btn = e.target.closest('.model-btn');
+      if (!btn) return;
+      currentModel = btn.dataset.model;
+      document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll(`.model-btn[data-model="${currentModel}"]`).forEach(b => b.classList.add('active'));
+    });
+  });
+
+  // Surprise Me
+  $('#btnSurprise').addEventListener('click', () => {
+    const rand = SOUNDS[Math.floor(Math.random() * SOUNDS.length)];
+    selectedSound = rand;
+
+    // Set filter to all so the card is visible
+    currentFilter = 'all';
+    filterRow.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    filterRow.querySelector('[data-filter="all"]').classList.add('active');
+    searchInput.value = '';
+    renderCards();
+
+    // Highlight card
+    const card = cardsGrid.querySelector(`[data-id="${rand.id}"]`);
+    if (card) {
+      cardsGrid.querySelectorAll('.sound-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    updateGenButtons();
+    generateMusic({ promptId: rand.id, model: currentModel });
+  });
+
+  // Generate (Library)
+  btnGenLib.addEventListener('click', () => {
+    if (!selectedSound) return;
+    generateMusic({ promptId: selectedSound.id, model: currentModel });
+  });
+
+  // Generate (Create)
+  btnGenCreate.addEventListener('click', () => {
+    if (!selectedGenre || !vibeInput.value.trim()) return;
+    generateMusic({ vibe: vibeInput.value.trim(), genre: selectedGenre, model: currentModel });
+  });
+
+  // Cancel
+  $('#btnCancel').addEventListener('click', cancelGeneration);
+
+  // Download
+  $('#btnDownload').addEventListener('click', downloadAudio);
+
+  // Generate Again
+  $('#btnAgain').addEventListener('click', () => {
+    if (lastPayload) generateMusic(lastPayload);
+  });
+
+  // Retry
+  $('#btnRetry').addEventListener('click', () => {
+    if (lastPayload) generateMusic(lastPayload);
+  });
+}
+
+// ===== GENERATE MUSIC =====
+async function generateMusic(payload) {
+  lastPayload = payload;
+  showLoading();
+  startTimer();
+  abortController = new AbortController();
+
+  try {
+    const res = await fetch('/api/generate-music', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: abortController.signal
+    });
+
+    const data = await res.json();
+    stopTimer();
+
+    if (!res.ok) {
+      showError(data.error || 'Something went wrong');
+      return;
+    }
+
+    if (!data.audio) {
+      showError('No audio was generated. Try a different sound or vibe.');
+      return;
+    }
+
+    showResult(data);
+  } catch (err) {
+    stopTimer();
+    if (err.name === 'AbortError') {
+      clearOutput();
+      return;
+    }
+    showError('Network error. Please check your connection.');
+  }
+}
+
+// ===== CANCEL =====
+function cancelGeneration() {
+  if (abortController) abortController.abort();
+  stopTimer();
+  clearOutput();
+}
+
+// ===== TIMER =====
+function startTimer() {
+  let seconds = 0;
+  timerDisplay.textContent = '0:00';
+  timerInterval = setInterval(() => {
+    seconds++;
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    timerDisplay.textContent = `${min}:${String(sec).padStart(2, '0')}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+// ===== OUTPUT STATES =====
+function clearOutput() {
+  outputArea.classList.remove('visible');
+  stateLoading.classList.add('hidden');
+  stateSuccess.classList.add('hidden');
+  stateError.classList.add('hidden');
+  stopTimer();
+}
+
+function showLoading() {
+  outputArea.classList.add('visible');
+  stateLoading.classList.remove('hidden');
+  stateSuccess.classList.add('hidden');
+  stateError.classList.add('hidden');
+}
+
+function showResult(data) {
+  stateLoading.classList.add('hidden');
+  stateError.classList.add('hidden');
+  stateSuccess.classList.remove('hidden');
+
+  // Determine display name
+  let name = 'Custom Sound';
+  let badge = currentModel === 'clip' ? '30s Preview' : 'Full Track';
+
+  if (lastPayload.promptId) {
+    const sound = SOUNDS.find(s => s.id === lastPayload.promptId);
+    if (sound) name = sound.name;
+  } else if (lastPayload.genre) {
+    const label = lastPayload.genre.replace(/-/g, ' ');
+    name = 'Custom \u00b7 ' + label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  if (data.soundName) name = data.soundName;
+
+  resultName.textContent = name;
+  resultBadge.textContent = badge;
+
+  const mimeType = data.mimeType || 'audio/mpeg';
+  const audioSrc = `data:${mimeType};base64,${data.audio}`;
+  audioPlayer.src = audioSrc;
+
+  currentAudio = {
+    base64: data.audio,
+    mimeType: mimeType,
+    name: name
+  };
+
+  if (data.remaining !== undefined) {
+    remainingText.textContent = `${data.remaining} generations remaining today`;
+    remainingText.style.display = 'block';
+  } else {
+    remainingText.style.display = 'none';
+  }
+}
+
+function showError(msg) {
+  stateLoading.classList.add('hidden');
+  stateSuccess.classList.add('hidden');
+  stateError.classList.remove('hidden');
+  errorMsg.textContent = msg;
+}
+
+// ===== DOWNLOAD =====
+function downloadAudio() {
+  if (!currentAudio) return;
+  const byteChars = atob(currentAudio.base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNumbers[i] = byteChars.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: currentAudio.mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `130mode-${(currentAudio.name || 'custom').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}.mp3`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ===== BOOT =====
+init();
+</script>
+</body>
+</html>
