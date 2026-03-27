@@ -715,13 +715,23 @@ const SOUNDS = [
   { id: 'P28', name: 'Anatolian Dust', genre: 'turkish-psych', vibe: 'Turkish psych, amplified ba\u011flama in Hicaz makam, raw and furious' },
   { id: 'P29', name: 'Addis Midnight', genre: 'ethio-jazz', vibe: 'Ethio-Jazz, Hammond organ in ambassel mode, raw tenor sax, 1973' },
   { id: 'P30', name: 'Accra Gold', genre: 'ghana-funk', vibe: 'Ghanaian highlife funk, shimmering guitar ostinato, cowbell, bright' },
+  { id: 'P31', name: 'Bombay Reel', genre: 'bollywood', vibe: 'Bollywood film score, solo sitar, tablas, lush strings, Bombay 1970s' },
+  { id: 'P32', name: 'Paris Noir', genre: 'french-library', vibe: 'French library music, harpsichord, solo flute, Parisian orchestral noir' },
+  { id: 'P33', name: 'Sigma Gold', genre: 'philly-soul', vibe: 'Philly soul orchestral, massive string section, flugelhorn solo, dramatic' },
+  { id: 'P34', name: 'Shaft Alley', genre: 'blaxploitation', vibe: 'Blaxploitation score, wah-wah guitar, muted trumpet, urban midnight 1973' },
+  { id: 'P35', name: 'Astral Temple', genre: 'spiritual-jazz', vibe: 'Spiritual jazz, Rhodes drone, solo flute, congas, cosmic and devotional' },
+  { id: 'P36', name: 'Chrome Love', genre: 'synth-funk', vibe: '1980s synth-funk, Prophet pads, Moog bass, talk box, quiet storm' },
+  { id: 'P37', name: 'Temple Fist', genre: 'kung-fu-score', vibe: 'Shaw Brothers film score, erhu, Chinese percussion, martial arts tension' },
+  { id: 'P38', name: 'Aegean Ghost', genre: 'greek-rebetiko', vibe: 'Greek laiko, bouzouki tremolo, Phrygian mode, Athens nightclub 1972' },
 ];
 
 const CREATE_GENRES = [
   'boom-bap','dark-underground','soul-gospel','jazz','latin','japanese','brazilian',
   'italian-film','soulful-house','disco-house','tv-score','cinematic-dark','drum-break',
   'chipmunk','marching-band','modern-trap','polish-jazz','israeli-psych','hungarian-psych',
-  'krautrock','turkish-psych','ethio-jazz','ghana-funk'
+  'krautrock','turkish-psych','ethio-jazz','ghana-funk',
+  'bollywood','french-library','philly-soul','blaxploitation',
+  'spiritual-jazz','synth-funk','kung-fu-score','greek-rebetiko'
 ];
 
 // ===== STATE =====
@@ -806,9 +816,19 @@ function renderCards() {
 }
 
 // ===== GENRE GRID (Create Your Own) =====
+const GENRE_LABELS = {
+  'bollywood': 'Bollywood Score',
+  'french-library': 'French Library',
+  'philly-soul': 'Philly Soul',
+  'blaxploitation': 'Blaxploitation',
+  'spiritual-jazz': 'Spiritual Jazz',
+  'synth-funk': 'Synth-Funk / Quiet Storm',
+  'kung-fu-score': 'Kung Fu Score',
+  'greek-rebetiko': 'Greek Rebetiko',
+};
 function buildGenreGrid() {
   genreGrid.innerHTML = CREATE_GENRES.map(g => {
-    const label = g.replace(/-/g, ' ');
+    const label = GENRE_LABELS[g] || g.replace(/-/g, ' ');
     return `<button class="genre-btn" data-genre="${g}">${label}</button>`;
   }).join('');
 }
