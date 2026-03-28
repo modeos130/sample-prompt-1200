@@ -9,6 +9,32 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── Network URL endpoint (so clients know the share link) ─────────
+function getNetworkURL(port) {
+  const os = require('os');
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return `http://${net.address}:${port}`;
+      }
+    }
+  }
+  return null;
+}
+
+app.get('/api/network-url', async (req, res) => {
+  const url = getNetworkURL(PORT);
+  let qr = null;
+  if (url) {
+    const QRCode = require('qrcode');
+    const code = req.query.code || '';
+    const joinUrl = code ? `${url}?join=${code}` : url;
+    qr = await QRCode.toDataURL(joinUrl, { width: 200, margin: 1 });
+  }
+  res.json({ url, qr });
+});
+
 // ── Card definitions ──────────────────────────────────────────────
 const COLORS = ['red', 'blue', 'green', 'yellow'];
 const VALUES = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','draw2'];

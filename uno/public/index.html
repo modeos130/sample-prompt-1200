@@ -37,7 +37,9 @@
   <div id="waiting">
     <h2 style="color:var(--text-dim)">Room Code</h2>
     <div class="room-code" id="roomCode"></div>
-    <p style="color:var(--text-dim);font-size:0.85rem">Share this code with your family!</p>
+    <p style="color:var(--text-dim);font-size:0.85rem">Scan or share to join!</p>
+    <img id="qrCode" style="border-radius:12px;display:none;width:180px;height:180px" alt="QR Code">
+    <button class="btn btn-share" id="shareBtn" style="max-width:300px">Share Game Link</button>
     <div class="player-list" id="playerList"></div>
     <button class="btn btn-start" id="startBtn" style="max-width:300px;display:none">Start Game</button>
     <p id="waitMsg" style="color:var(--text-dim);font-size:0.85rem"></p>

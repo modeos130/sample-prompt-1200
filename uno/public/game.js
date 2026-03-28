@@ -29,6 +29,8 @@ const toast = $('toast');
 let currentState = null;
 let pendingWildCard = null;
 let isHost = false;
+let networkUrl = null;
+let currentRoomCode = null;
 
 // ── Card display helpers ──────────────────────────────────
 const SYMBOLS = {
@@ -94,7 +96,53 @@ function showWaiting(code) {
   lobby.style.display = 'none';
   waiting.style.display = 'flex';
   roomCodeEl.textContent = code;
+  currentRoomCode = code;
+  loadQRCode(code);
 }
+
+async function loadQRCode(code) {
+  try {
+    const res = await fetch(`/api/network-url?code=${code}`);
+    const data = await res.json();
+    networkUrl = data.url;
+    const qrImg = $('qrCode');
+    const shareBtn = $('shareBtn');
+    if (data.qr) {
+      qrImg.src = data.qr;
+      qrImg.style.display = 'inline-block';
+    }
+    if (data.url) {
+      const joinUrl = `${data.url}?join=${code}`;
+      shareBtn.onclick = () => {
+        if (navigator.share) {
+          navigator.share({
+            title: 'Join my UNO game!',
+            text: `Join my UNO game! Room code: ${code}`,
+            url: joinUrl,
+          }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(joinUrl).then(() => {
+            shareBtn.textContent = 'Link Copied!';
+            setTimeout(() => { shareBtn.textContent = 'Share Game Link'; }, 2000);
+          });
+        }
+      };
+    }
+  } catch (e) {
+    // Non-critical, skip QR
+  }
+}
+
+// Auto-join from QR code URL
+(function autoJoin() {
+  const params = new URLSearchParams(window.location.search);
+  const joinCode = params.get('join');
+  if (joinCode) {
+    codeInput.value = joinCode;
+    // Clean URL
+    window.history.replaceState({}, '', '/');
+  }
+})();
 
 startBtn.addEventListener('click', () => {
   socket.emit('startGame');

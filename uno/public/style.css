@@ -122,6 +122,11 @@ body {
   color: #1a1a1a;
 }
 
+.btn-share {
+  background: var(--blue);
+  color: white;
+}
+
 .btn-draw {
   background: var(--card-bg);
   border: 2px dashed var(--border);
