@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>UNO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Lobby -->
+  <div id="lobby">
+    <h1><span>U</span><span>N</span><span>O</span></h1>
+
+    <div class="lobby-section">
+      <h2>Your Name</h2>
+      <input type="text" id="nameInput" placeholder="Enter your name" maxlength="12" autocomplete="off">
+    </div>
+
+    <div class="lobby-section">
+      <h2>New Game</h2>
+      <button class="btn btn-create" id="createBtn">Create Room</button>
+    </div>
+
+    <div class="lobby-section">
+      <h2>Join Game</h2>
+      <input type="text" id="codeInput" placeholder="Room code" maxlength="4" autocomplete="off" style="text-transform:uppercase">
+      <button class="btn btn-join" id="joinBtn">Join Room</button>
+    </div>
+
+    <div class="error" id="lobbyError"></div>
+  </div>
+
+  <!-- Waiting Room -->
+  <div id="waiting">
+    <h2 style="color:var(--text-dim)">Room Code</h2>
+    <div class="room-code" id="roomCode"></div>
+    <p style="color:var(--text-dim);font-size:0.85rem">Share this code with your family!</p>
+    <div class="player-list" id="playerList"></div>
+    <button class="btn btn-start" id="startBtn" style="max-width:300px;display:none">Start Game</button>
+    <p id="waitMsg" style="color:var(--text-dim);font-size:0.85rem"></p>
+  </div>
+
+  <!-- Game -->
+  <div id="game">
+    <div class="opponents" id="opponents"></div>
+
+    <div class="play-area">
+      <div class="direction-indicator" id="dirIndicator">↻ Clockwise</div>
+      <div class="pile-container">
+        <div class="top-card" id="topCard"></div>
+      </div>
+      <div class="color-indicator" id="colorDot"></div>
+      <div class="turn-label" id="turnLabel"></div>
+      <div class="actions">
+        <button class="btn btn-draw" id="drawBtn">Draw Card</button>
+        <button class="btn-uno" id="unoBtn" style="display:none">UNO!</button>
+      </div>
+    </div>
+
+    <div class="hand-container">
+      <div class="hand" id="hand"></div>
+    </div>
+  </div>
+
+  <!-- Color Picker -->
+  <div class="color-picker-overlay" id="colorPicker">
+    <div class="color-picker">
+      <h3>Pick a color</h3>
+      <div class="color-options">
+        <div class="color-option opt-red" data-color="red"></div>
+        <div class="color-option opt-blue" data-color="blue"></div>
+        <div class="color-option opt-green" data-color="green"></div>
+        <div class="color-option opt-yellow" data-color="yellow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner Overlay -->
+  <div class="winner-overlay" id="winnerOverlay">
+    <h2>🎉 <span class="winner-name" id="winnerName"></span> wins!</h2>
+    <button class="btn btn-play-again" id="playAgainBtn" style="max-width:240px;display:none">Play Again</button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
