@@ -663,6 +663,37 @@ body {
 }
 .slider-tips strong { color: var(--purple); }
 
+/* LYRICS SECTION */
+.lyrics-section {
+  margin-top: 16px;
+  padding: 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid #00d4ff;
+  border-radius: 0 12px 12px 0;
+}
+.lyrics-label {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+.lyrics-display {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  cursor: pointer;
+  padding: 12px;
+  background: var(--bg2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.lyrics-display:hover { background: #1a2030; }
+
 /* ERROR */
 .error-block {
   background: #1a0f0f;
@@ -866,6 +897,7 @@ body {
         <button class="genre-btn" data-genre="turkish-psych">Turkish Psych</button>
         <button class="genre-btn" data-genre="ethio-jazz">Ethio-Jazz</button>
         <button class="genre-btn" data-genre="ghana-funk">Ghana Funk</button>
+        <button class="genre-btn" data-genre="vocal-chop">Vocal Chop Source</button>
         <button class="genre-btn" data-genre="bollywood">Bollywood Score</button>
         <button class="genre-btn" data-genre="french-library">French Library</button>
         <button class="genre-btn" data-genre="philly-soul">Philly Soul</button>
@@ -927,6 +959,11 @@ body {
       <div class="prompt-display" id="promptDisplay" onclick="copyPrompt()">
         <!-- Generated prompt appears here -->
       </div>
+      <div class="lyrics-section" id="lyricsSection" style="display:none;">
+        <div class="lyrics-label">SUNO LYRICS FIELD</div>
+        <div class="lyrics-display" id="lyricsDisplay" onclick="copyLyrics()"></div>
+        <button class="copy-btn" id="copyLyricsBtn" onclick="copyLyrics()" style="margin-top:8px;">⊕ Copy Lyrics</button>
+      </div>
       <div class="output-actions">
         <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">⊕ Copy Prompt</button>
         <button class="regen-btn" onclick="generatePrompt()">↺ Regenerate</button>
@@ -942,7 +979,7 @@ body {
       <li>Select a target genre above — this locks the era and production style</li>
       <li>Describe your vibe in plain language — instruments, mood, feel, era, anything</li>
       <li>Hit Generate — the prompt is written in the proven 130 Mode formula</li>
-      <li>In Suno: <strong>Custom Mode → Advanced tab → paste into Style field only</strong>. Leave Lyrics blank.</li>
+      <li>In Suno: <strong>Custom Mode → Advanced tab → paste into Style field</strong>. Leave Lyrics blank unless it's a Vocal Chop prompt (those include lyrics to copy separately).</li>
       <li>Set Weirdness and Style Influence per the tips shown after generation</li>
       <li>Run 2–3 variations. Download the best. Chop in your DAW.</li>
     </ol>
@@ -973,6 +1010,7 @@ function switchMode(mode) {
   document.getElementById('outputCard').classList.remove('visible');
   document.getElementById('loadingBlock').classList.remove('visible');
   document.getElementById('errorBlock').classList.remove('visible');
+  document.getElementById('lyricsSection').style.display = 'none';
   lastPrompt = '';
 }
 
@@ -1152,6 +1190,22 @@ const REFERENCE_PROMPTS = [
   { id: 'P38', name: 'Aegean Ghost', genre: 'greek-rebetiko', weirdness: '88%', style: '70%',
     vibe: 'Greek laiko, bouzouki tremolo, Phrygian mode, smoky Athens nightclub 1972',
     prompt: 'Early 1970s Greek laiko recording from Athens, warm analog tape with heavy midrange saturation and deep vinyl crackle. A solo bouzouki carrying a rapid tremolo melody in a Phrygian-influenced mode \u2014 bright, metallic, each picked note ringing with a Mediterranean intensity. Nylon-string guitar comping dark minor chords underneath in a slow rhythmic pattern. Electric bass following the melodic contour, warm and round. Sparse string section sustaining long tones in the background. Mid-section: the bouzouki breaks into an extended solo \u2014 rapid descending runs through the Phrygian intervals, each phrase more urgent than the last before retreating to the central riff. Tempo 72\u201382 BPM, swaying and hypnotic. No vocals. The atmosphere of a smoky Athens nightclub in 1972. Pressed on a small Greek label, limited domestic run, never distributed outside the Mediterranean. Loopable \u2014 the kind of forgotten Greek recording a crate digger would spend years hunting and flip into something haunting.' },
+  { id: 'VC01', name: 'Soul Confession', genre: 'vocal-chop', weirdness: '84%', style: '80%',
+    vibe: 'Philly soul, wailing female vocal, lush strings and Rhodes, devastating and choppable',
+    prompt: 'Mid 1970s Philadelphia soul recording, heavy analog tape saturation and deep vinyl crackle throughout. A wailing female lead vocal \u2014 emotive, strained, gospel-drenched \u2014 singing a slow aching minor key melody over lush tremolo strings and warm Rhodes electric piano chords in D Dorian \u2014 searching and unresolved. Deep upright bass walking underneath. Mid-section: the strings and bass drop to silence and the voice carries alone for eight bars, completely exposed, trembling with spiritual weight, then the Rhodes returns with deeper fuller chords. Tempo 74\u201384 BPM, slow and weighted. Warm analog room sound with natural tape hiss. A short harmonic cycle built to repeat hypnotically. Pressed in a quantity of 300 on a small Philadelphia soul label in 1974, the B-side that got overlooked entirely. The kind of devastating soul vocal performance built to be chopped into a two-bar loop and transformed into something unrecognizable but emotionally overwhelming.',
+    lyrics: '[Intro]\nOoh... ooh...\n\n[Chorus]\nI gave you everything I had\nEverything I had\nAnd you left me standing in the cold\nLeft me standing in the cold\n\n[Chorus]\nI gave you everything I had\nOh, everything\nAnd you left me standing in the cold\nOoh, standing in the cold\n\n[Bridge]\nOoh... ahh...\nMmm... ooh...\n\n[Chorus]\nEverything I had\nEverything I had\nYou left me standing in the cold\nStanding in the cold...' },
+  { id: 'VC02', name: 'Church Window', genre: 'vocal-chop', weirdness: '80%', style: '76%',
+    vibe: 'Black church gospel, solo female voice over Hammond B3, choir call and response',
+    prompt: 'Late 1960s Black church recording, warm analog tape saturation and subtle vinyl surface noise. A solo female gospel voice \u2014 raw, untrained, trembling with devotion \u2014 singing a slow hymn melody in harmonic minor over a full Hammond B3 organ with Leslie speaker rotating slowly. Thick background choir harmonies rising and falling in waves behind the lead, call and response between the soloist and the congregation. Deep upright bass walking slowly underneath. Mid-section: the organ swells to full volume and the choir drops to a hum, leaving only the lead voice and the organ in a moment of pure spiritual intensity. Tempo 68\u201378 BPM. Recorded live in a small wooden church on a portable tape machine, never mastered. A single pressing for the church archive. The kind of sacred recording that becomes transcendent when chopped, pitched up, and placed underneath something hard.',
+    lyrics: '[Intro]\nMmm... Lord...\nMmm... oh Lord...\n\n[Chorus]\nTake me to the water\nTake me to the water\nWash my soul clean\nLord, wash my soul clean\n\n[Chorus]\nTake me to the water\nOh, take me\nWash my soul clean\nWash my soul\n\n[Bridge]\nHallelujah... hallelujah...\nOoh... hallelujah...\n\n[Chorus]\nTake me to the water\nTake me to the water\nWash my soul clean\nOh Lord, wash my soul clean...' },
+  { id: 'VC03', name: 'Midnight Plea', genre: 'vocal-chop', weirdness: '84%', style: '78%',
+    vibe: 'Detroit soul, male falsetto over Rhodes and strings, fragile and devastating',
+    prompt: 'Early 1970s Detroit soul recording, heavy analog tape degradation and deep vinyl surface noise throughout. A male falsetto vocal \u2014 fragile, aching, straining at the edges \u2014 singing a slow devastating melody in natural minor over sparse Rhodes electric piano chords and a lush sweeping string arrangement. Upright bass holding long sustained notes underneath. Solo flute weaving between the vocal phrases, doubling the melody in a higher register. Mid-section: the strings swell to full volume and the vocal rides above them, the falsetto cracking and bending with raw emotion before the arrangement strips back to just voice and Rhodes. Tempo 72\u201382 BPM. Warm analog room sound with natural tape compression. Pressed on a small Detroit independent label in 1971, limited to 500 copies, never distributed outside Michigan. A short harmonic cycle designed to feel loopable. The kind of rare soul vocal performance a producer would pitch up three semitones and build entire worlds around.',
+    lyrics: '[Intro]\nOoh... baby...\nOoh...\n\n[Chorus]\nDon\'t walk away from me now\nDon\'t walk away\nI been trying so hard\nOh, I been trying so hard\n\n[Chorus]\nDon\'t walk away from me now\nOh, don\'t you walk away\nI been trying so hard\nTrying so hard for you\n\n[Bridge]\nAhh... ooh...\nMmm... baby please...\n\n[Chorus]\nDon\'t walk away\nDon\'t walk away from me\nI been trying so hard\nOh, so hard...' },
+  { id: 'VC04', name: 'Golden Dust', genre: 'vocal-chop', weirdness: '78%', style: '82%',
+    vibe: 'Girl group trio, bright harmonies, punchy horns, built to be pitched up and chipmunked',
+    prompt: 'Mid 1970s orchestral soul recording, warm analog tape saturation and moderate vinyl surface noise. A female vocal trio singing tight minor-key harmonies \u2014 bright, youthful, slightly breathless \u2014 over a dramatic string section and punchy horn stabs. Rhodes electric piano playing rich extended chord voicings underneath, live electric bass locked into a bouncy groove. Mid-section: the horns and strings drop to silence and the lead voice breaks away from the trio into a brief solo passage \u2014 raw, pleading, straining at the top of her range \u2014 before the full arrangement crashes back in with the harmonies stacking. Tempo 96\u2013108 BPM, energetic and propulsive. Bright analog tape with light vinyl crackle. Pressed as the B-side of a regional 45 single in 1974, the A-side got minor local airplay but this side was overlooked entirely. Designed to be pitched up several semitones and transformed into a buoyant chipmunked sample flip.',
+    lyrics: '[Intro]\nDoo doo doo... doo doo doo...\n\n[Chorus]\nHe don\'t know what he lost\nHe don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Chorus]\nHe don\'t know what he lost\nOh, he don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Bridge]\nOoh la la la... ooh la la la...\nDoo doo doo... ahh...\n\n[Chorus]\nHe don\'t know\nHe don\'t know what he lost\nHe don\'t know what he lost\nWhen he let me go...' },
 ];
 
 // ─── PROVEN PROMPTS UI ──────────────────────────────────────────────────────
@@ -1209,12 +1263,34 @@ function showReferencePrompt(ref) {
   document.getElementById('charCount').className = `char-count ${statusClass}`;
   document.getElementById('refTag').style.display = 'inline-block';
   document.getElementById('refTag').className = 'output-tag ref';
-  document.getElementById('refTag').textContent = 'Proven';
-  document.getElementById('sliderTips').innerHTML = `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}`;
+  document.getElementById('refTag').textContent = ref.lyrics ? 'Vocal Chop' : 'Proven';
+  // Show/hide lyrics section
+  const lyricsSection = document.getElementById('lyricsSection');
+  if (ref.lyrics) {
+    document.getElementById('lyricsDisplay').textContent = ref.lyrics;
+    lyricsSection.style.display = 'block';
+  } else {
+    lyricsSection.style.display = 'none';
+  }
+  document.getElementById('sliderTips').innerHTML = ref.lyrics
+    ? `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}<br><strong>Paste prompt into Style field. Paste lyrics into Lyrics field.</strong>`
+    : `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}`;
   document.getElementById('outputCard').classList.add('visible');
   setTimeout(() => {
     document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
+}
+
+let lastLyrics = '';
+function copyLyrics() {
+  const ref = REFERENCE_PROMPTS.find(p => p.lyrics && document.getElementById('lyricsDisplay').textContent === p.lyrics);
+  const text = document.getElementById('lyricsDisplay').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyLyricsBtn');
+    btn.textContent = '\u2713 Lyrics Copied!';
+    setTimeout(() => { btn.textContent = '\u2295 Copy Lyrics'; }, 2000);
+  });
 }
 
 // Select a prompt card — shows the exact proven prompt instantly
@@ -1307,6 +1383,7 @@ async function generatePrompt() {
   document.getElementById('loadingBlock').classList.add('visible');
   document.getElementById('outputCard').classList.remove('visible');
   document.getElementById('errorBlock').classList.remove('visible');
+  document.getElementById('lyricsSection').style.display = 'none';
 
   // Loading timer so user sees progress
   const startTime = Date.now();
