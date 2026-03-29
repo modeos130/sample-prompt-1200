@@ -310,39 +310,87 @@ body {
 
 .prompt-card {
   width: calc(50% - 5px);
-  padding: 12px 14px;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--bg2);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  min-height: 72px;
 }
 .prompt-card:hover {
   border-color: var(--purple);
-  box-shadow: 0 2px 12px rgba(59,158,255,0.12);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59,158,255,0.15);
+  transform: translateY(-2px);
 }
 .prompt-card.selected {
-  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
-  border-color: transparent;
-  box-shadow: 0 2px 12px rgba(59,158,255,0.3);
+  border-color: var(--purple);
+  box-shadow: 0 4px 20px rgba(59,158,255,0.3);
 }
 .prompt-card.hidden { display: none; }
+.prompt-card-art {
+  width: 64px;
+  min-height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.prompt-card-art::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 30%, transparent 31%);
+}
+.prompt-card-info {
+  padding: 10px 14px 10px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
 .prompt-card-name {
   font-family: var(--display);
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.prompt-card.selected .prompt-card-name { color: var(--white); }
+.prompt-card.selected .prompt-card-name { color: #ffffff; }
 .prompt-card-genre {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: var(--display);
+  font-weight: 600;
+}
+.prompt-card.selected .prompt-card-genre { color: var(--purple); }
+.prompt-card-vibe {
   font-size: 11px;
   color: var(--muted);
-  letter-spacing: 0.3px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
 }
-.prompt-card.selected .prompt-card-genre { color: rgba(255,255,255,0.7); }
 .prompt-grid-empty {
   width: 100%;
   text-align: center;
@@ -898,6 +946,7 @@ body {
         <button class="genre-btn" data-genre="ethio-jazz">Ethio-Jazz</button>
         <button class="genre-btn" data-genre="ghana-funk">Ghana Funk</button>
         <button class="genre-btn" data-genre="vocal-chop">Vocal Chop Source</button>
+        <button class="genre-btn" data-genre="8-bit">8-Bit / Chiptune</button>
         <button class="genre-btn" data-genre="bollywood">Bollywood Score</button>
         <button class="genre-btn" data-genre="french-library">French Library</button>
         <button class="genre-btn" data-genre="philly-soul">Philly Soul</button>
@@ -1206,6 +1255,15 @@ const REFERENCE_PROMPTS = [
     vibe: 'Girl group trio, bright harmonies, punchy horns, built to be pitched up and chipmunked',
     prompt: 'Mid 1970s orchestral soul recording, warm analog tape saturation and moderate vinyl surface noise. A female vocal trio singing tight minor-key harmonies \u2014 bright, youthful, slightly breathless \u2014 over a dramatic string section and punchy horn stabs. Rhodes electric piano playing rich extended chord voicings underneath, live electric bass locked into a bouncy groove. Mid-section: the horns and strings drop to silence and the lead voice breaks away from the trio into a brief solo passage \u2014 raw, pleading, straining at the top of her range \u2014 before the full arrangement crashes back in with the harmonies stacking. Tempo 96\u2013108 BPM, energetic and propulsive. Bright analog tape with light vinyl crackle. Pressed as the B-side of a regional 45 single in 1974, the A-side got minor local airplay but this side was overlooked entirely. Designed to be pitched up several semitones and transformed into a buoyant chipmunked sample flip.',
     lyrics: '[Intro]\nDoo doo doo... doo doo doo...\n\n[Chorus]\nHe don\'t know what he lost\nHe don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Chorus]\nHe don\'t know what he lost\nOh, he don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Bridge]\nOoh la la la... ooh la la la...\nDoo doo doo... ahh...\n\n[Chorus]\nHe don\'t know\nHe don\'t know what he lost\nHe don\'t know what he lost\nWhen he let me go...' },
+  { id: 'P39', name: 'Cartridge Quest', genre: '8-bit', weirdness: '82%', style: '74%',
+    vibe: '8-bit adventure game, heroic Dorian melody, pulse wave lead, quest beginning at midnight',
+    prompt: 'Early 1980s 8-bit home console adventure game soundtrack, raw square wave synthesis with limited polyphony. A pulse wave lead carrying a heroic minor key melody in D Dorian \u2014 bold, determined, each note clipped and precise with zero sustain. Triangle wave bass underneath playing a simple repeating two-bar pattern, deep and round. Second pulse wave playing arpeggiated chord tones rapidly cycling through minor triads, creating a shimmering harmonic bed. Mid-section: the lead melody steps into an extended passage \u2014 climbing through the Dorian scale in a sequence of ascending fourths, each phrase building urgency before cycling back to the opening motif. Tempo 130\u2013140 BPM but designed to be pitched down and halved to 65\u201370 BPM for sampling. No reverb, no effects \u2014 pure digital synthesis through a low-resolution DAC, all aliasing and bit-crushing artifacts intact. The sound of a quest beginning at midnight in 1986. Composed for a cartridge-based adventure game that sold modestly in Japan and was never localized. A two-bar phrase that cycles without resolution \u2014 the kind of forgotten 8-bit melody a producer would slow to half-speed and flip into something unexpectedly emotional.' },
+  { id: 'P40', name: 'Coin Drop', genre: '8-bit', weirdness: '80%', style: '76%',
+    vibe: '8-bit arcade action, dark urgent arpeggios, harmonic minor, neon-lit 1987 arcade',
+    prompt: 'Mid 1980s standup arcade game soundtrack, bright and aggressive square wave synthesis with rapid arpeggiation. A pulse wave lead playing a tight minor key melody in A harmonic minor \u2014 dark, urgent, the raised seventh creating tension on every phrase. Noise channel providing a rapid hi-hat-like rhythmic pulse. Triangle wave bass locked into a driving eighth-note pattern, punchy and percussive. Second pulse wave firing rapid descending arpeggios through diminished chords between the lead phrases \u2014 each arpeggio cascading downward in sixteenth notes. Mid-section: the lead drops to silence and the arpeggiated channel takes over \u2014 a solo passage of rapidly cycling chord tones spiraling through harmonic minor, frantic and virtuosic, before the lead crashes back in. Tempo 150\u2013160 BPM, relentless arcade energy. Raw digital synthesis with audible quantization noise and aliasing. The sound of a dark neon-lit arcade in 1987, quarters lined up on the cabinet. Composed for a side-scrolling action game, distributed on a single PCB, never ported. Built to loop \u2014 the kind of forgotten arcade melody a producer would pitch down to 75 BPM and build something menacing around.' },
+  { id: 'P41', name: 'Dungeon Crawl', genre: '8-bit', weirdness: '86%', style: '70%',
+    vibe: '8-bit dungeon RPG, sparse Phrygian motif, eerie pulse tremolo, underground labyrinth',
+    prompt: 'Late 1980s 8-bit console dungeon exploration soundtrack, sparse and atmospheric square wave synthesis. A single pulse wave playing a slow repeating four-note motif in E Phrygian \u2014 cold, ancient, each note hanging in digital silence before the next arrives. Triangle wave bass holding long sustained root notes, deep and hollow. Second pulse wave entering with a high-register tremolo \u2014 a single note pulsing rapidly, creating an eerie texture like something breathing in a dark corridor. Noise channel providing sparse percussive accents \u2014 not a beat, just occasional sharp bursts punctuating the silence. Mid-section: the bass drops out entirely and the lead motif plays alone, exposed, the Phrygian flat-second interval creating maximum unease before the bass returns with a lower, darker root note. Tempo 80\u201390 BPM, slow and deliberate. Pure 8-bit synthesis with 4-bit DAC artifacts, zero effects processing. The sound of descending into an underground labyrinth in 1988. Composed for a dungeon-crawling RPG cartridge pressed in a small run for the Japanese domestic market. Designed to loop endlessly \u2014 the kind of haunting 8-bit composition a producer would sample raw and build their most atmospheric record around.' },
 ];
 
 // ─── PROVEN PROMPTS UI ──────────────────────────────────────────────────────
@@ -1227,19 +1285,57 @@ function buildFilterTabs() {
   });
 }
 
+// Genre visual config: gradient + icon for record cover cards
+const GENRE_ART = {
+  'boom-bap':        { grad: 'linear-gradient(135deg, #1a1a2e, #16213e)', icon: '\ud83c\udfa4' },
+  'dark-underground': { grad: 'linear-gradient(135deg, #0a0a0a, #1a0a2e)', icon: '\ud83d\udd73\ufe0f' },
+  'soul-gospel':     { grad: 'linear-gradient(135deg, #2d1b00, #4a2800)', icon: '\u2728' },
+  'jazz':            { grad: 'linear-gradient(135deg, #0a1628, #1a2a4a)', icon: '\ud83c\udfb7' },
+  'latin':           { grad: 'linear-gradient(135deg, #2a0a00, #4a1a0a)', icon: '\ud83c\udf19' },
+  'japanese':        { grad: 'linear-gradient(135deg, #1a0020, #2a1040)', icon: '\ud83c\udf38' },
+  'brazilian':       { grad: 'linear-gradient(135deg, #002a1a, #004a2a)', icon: '\ud83c\udf34' },
+  'italian-film':    { grad: 'linear-gradient(135deg, #1a0a00, #3a1a0a)', icon: '\ud83c\udfac' },
+  'soulful-house':   { grad: 'linear-gradient(135deg, #0a0a2e, #1a1a4e)', icon: '\ud83c\udfe0' },
+  'disco-house':     { grad: 'linear-gradient(135deg, #2a0a2e, #4a1a4e)', icon: '\ud83d\udd7a' },
+  'tv-score':        { grad: 'linear-gradient(135deg, #0a1a0a, #1a2a1a)', icon: '\ud83d\udcfa' },
+  'cinematic-dark':  { grad: 'linear-gradient(135deg, #0a0a0a, #1a1a1a)', icon: '\ud83c\udf11' },
+  'drum-break':      { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83e\udd41' },
+  'chipmunk':        { grad: 'linear-gradient(135deg, #2a2a00, #4a3a10)', icon: '\u23eb' },
+  'marching-band':   { grad: 'linear-gradient(135deg, #1a0a00, #2a1a10)', icon: '\ud83c\udfc8' },
+  'modern-trap':     { grad: 'linear-gradient(135deg, #1a0020, #2a0040)', icon: '\ud83d\udd25' },
+  'polish-jazz':     { grad: 'linear-gradient(135deg, #0a1020, #1a2040)', icon: '\u2744\ufe0f' },
+  'israeli-psych':   { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83c\udfb6' },
+  'hungarian-psych': { grad: 'linear-gradient(135deg, #1a0a10, #2a1a20)', icon: '\ud83d\udd28' },
+  'krautrock':       { grad: 'linear-gradient(135deg, #0a0a1a, #1a1a2a)', icon: '\ud83d\udef8' },
+  'turkish-psych':   { grad: 'linear-gradient(135deg, #2a0a00, #4a1a00)', icon: '\ud83c\udf0d' },
+  'ethio-jazz':      { grad: 'linear-gradient(135deg, #1a1a00, #2a2a10)', icon: '\u2600\ufe0f' },
+  'ghana-funk':      { grad: 'linear-gradient(135deg, #0a2a0a, #1a3a1a)', icon: '\ud83c\udfb8' },
+  'bollywood':       { grad: 'linear-gradient(135deg, #2a0a1a, #4a1a2a)', icon: '\ud83c\udfaa' },
+  'french-library':  { grad: 'linear-gradient(135deg, #0a0a2a, #1a1a3a)', icon: '\ud83d\uddd3\ufe0f' },
+  'philly-soul':     { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83c\udfbb' },
+  'blaxploitation':  { grad: 'linear-gradient(135deg, #1a0a00, #2a1a00)', icon: '\ud83d\ude8e' },
+  'spiritual-jazz':  { grad: 'linear-gradient(135deg, #0a1a2a, #0a2a3a)', icon: '\ud83d\udd6e\ufe0f' },
+  'synth-funk':      { grad: 'linear-gradient(135deg, #1a002a, #2a0a3a)', icon: '\ud83c\udf9b\ufe0f' },
+  'kung-fu-score':   { grad: 'linear-gradient(135deg, #2a0000, #3a0a0a)', icon: '\ud83e\udd4b' },
+  'greek-rebetiko':  { grad: 'linear-gradient(135deg, #0a1a2a, #1a2a3a)', icon: '\ud83c\udfdb\ufe0f' },
+  'vocal-chop':      { grad: 'linear-gradient(135deg, #2a0a2a, #3a1a3a)', icon: '\ud83c\udfa4' },
+  '8-bit':           { grad: 'linear-gradient(135deg, #001a00, #003a1a)', icon: '\ud83d\udc7e' },
+};
+
 // Build prompt cards dynamically
 function buildPromptGrid() {
   const grid = document.getElementById('promptGrid');
   grid.innerHTML = '';
   REFERENCE_PROMPTS.forEach((p, i) => {
     const label = GENRE_CONFIG[p.genre]?.label || p.genre;
+    const art = GENRE_ART[p.genre] || { grad: 'linear-gradient(135deg, #1a1a2e, #0a0a1e)', icon: '\ud83c\udfb5' };
     const card = document.createElement('div');
     card.className = 'prompt-card';
     card.dataset.index = i;
     card.dataset.genre = p.genre;
     card.dataset.search = `${p.name} ${label} ${p.vibe}`.toLowerCase();
     card.onclick = () => selectPromptCard(i);
-    card.innerHTML = `<div class="prompt-card-name">${p.name}</div><div class="prompt-card-genre">${label}</div>`;
+    card.innerHTML = `<div class="prompt-card-art" style="background:${art.grad}">${art.icon}</div><div class="prompt-card-info"><div class="prompt-card-genre">${label}</div><div class="prompt-card-name">${p.name}</div><div class="prompt-card-vibe">${p.vibe}</div></div>`;
     grid.appendChild(card);
   });
   updateCount();
