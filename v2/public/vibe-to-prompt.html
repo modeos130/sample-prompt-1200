@@ -332,26 +332,18 @@ body {
 }
 .prompt-card.hidden { display: none; }
 .prompt-card-art {
-  width: 64px;
+  width: 72px;
   min-height: 72px;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
   position: relative;
   overflow: hidden;
+  border-radius: 11px 0 0 11px;
 }
-.prompt-card-art::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 30%, transparent 31%);
+.prompt-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .prompt-card-info {
   padding: 10px 14px 10px 12px;
@@ -1329,7 +1321,7 @@ function buildPromptGrid() {
     card.dataset.genre = p.genre;
     card.dataset.search = `${p.name} ${label} ${p.vibe}`.toLowerCase();
     card.onclick = () => selectPromptCard(i);
-    card.innerHTML = `<div class="prompt-card-art" style="background:${art.grad}">${art.icon}</div><div class="prompt-card-info"><div class="prompt-card-genre">${label}</div><div class="prompt-card-name">${p.name}</div><div class="prompt-card-vibe">${p.vibe}</div></div>`;
+    card.innerHTML = `<div class="prompt-card-art"><img src="/art/${p.id}.jpg" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='${art.grad}';this.parentElement.innerHTML='${art.icon}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontSize='22px'"></div><div class="prompt-card-info"><div class="prompt-card-genre">${label}</div><div class="prompt-card-name">${p.name}</div><div class="prompt-card-vibe">${p.vibe}</div></div>`;
     grid.appendChild(card);
   });
   updateCount();
