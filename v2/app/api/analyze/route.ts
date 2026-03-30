@@ -7,6 +7,15 @@ import { GOSPEL_ANALYSIS_PROMPT, buildGospelPrompt } from "@/lib/genres/gospel";
 import { JAZZ_SOUL_ANALYSIS_PROMPT, buildJazzSoulPrompt } from "@/lib/genres/jazz-soul";
 import { LATIN_SOUL_ANALYSIS_PROMPT, buildLatinSoulPrompt } from "@/lib/genres/latin-soul";
 import { CINEMATIC_DARK_ANALYSIS_PROMPT, buildCinematicDarkPrompt } from "@/lib/genres/cinematic-dark";
+import { SOVIET_ESTRADA_ANALYSIS_PROMPT, buildSovietEstradaPrompt } from "@/lib/genres/soviet-estrada";
+import { YUGOSLAV_FUNK_ANALYSIS_PROMPT, buildYugoslavFunkPrompt } from "@/lib/genres/yugoslav-funk";
+import { KOREAN_PSYCH_ANALYSIS_PROMPT, buildKoreanPsychPrompt } from "@/lib/genres/korean-psych";
+import { JAPANESE_JAZZ_FUNK_ANALYSIS_PROMPT, buildJapaneseJazzFunkPrompt } from "@/lib/genres/japanese-jazz-funk";
+import { SOUTH_AFRICAN_JAZZ_ANALYSIS_PROMPT, buildSouthAfricanJazzPrompt } from "@/lib/genres/south-african-jazz";
+import { AFRO_CUBAN_JAZZ_ANALYSIS_PROMPT, buildAfroCubanJazzPrompt } from "@/lib/genres/afro-cuban-jazz";
+import { ALGERIAN_RAI_ANALYSIS_PROMPT, buildAlgerianRaiPrompt } from "@/lib/genres/algerian-rai";
+import { MOROCCAN_GNAWA_ANALYSIS_PROMPT, buildMoroccanGnawaPrompt } from "@/lib/genres/moroccan-gnawa";
+import { HAITIAN_VOODOO_JAZZ_ANALYSIS_PROMPT, buildHaitianVoodooJazzPrompt } from "@/lib/genres/haitian-voodoo-jazz";
 
 export const maxDuration = 60;
 
@@ -66,7 +75,16 @@ type Genre =
   | "gospel"
   | "jazz-soul"
   | "latin-soul"
-  | "cinematic-dark";
+  | "cinematic-dark"
+  | "soviet-estrada"
+  | "yugoslav-funk"
+  | "korean-psych"
+  | "japanese-jazz-funk"
+  | "south-african-jazz"
+  | "afro-cuban-jazz"
+  | "algerian-rai"
+  | "moroccan-gnawa"
+  | "haitian-voodoo-jazz";
 
 const VALID_GENRES: Genre[] = [
   "boom-bap",
@@ -77,6 +95,15 @@ const VALID_GENRES: Genre[] = [
   "jazz-soul",
   "latin-soul",
   "cinematic-dark",
+  "soviet-estrada",
+  "yugoslav-funk",
+  "korean-psych",
+  "japanese-jazz-funk",
+  "south-african-jazz",
+  "afro-cuban-jazz",
+  "algerian-rai",
+  "moroccan-gnawa",
+  "haitian-voodoo-jazz",
 ];
 
 function getGenrePrompts(genre: Genre) {
@@ -89,6 +116,15 @@ function getGenrePrompts(genre: Genre) {
     case "jazz-soul":      return { analysisPrompt: JAZZ_SOUL_ANALYSIS_PROMPT,       buildPrompt: buildJazzSoulPrompt      };
     case "latin-soul":     return { analysisPrompt: LATIN_SOUL_ANALYSIS_PROMPT,      buildPrompt: buildLatinSoulPrompt     };
     case "cinematic-dark": return { analysisPrompt: CINEMATIC_DARK_ANALYSIS_PROMPT,  buildPrompt: buildCinematicDarkPrompt };
+    case "soviet-estrada": return { analysisPrompt: SOVIET_ESTRADA_ANALYSIS_PROMPT, buildPrompt: buildSovietEstradaPrompt };
+    case "yugoslav-funk":  return { analysisPrompt: YUGOSLAV_FUNK_ANALYSIS_PROMPT,  buildPrompt: buildYugoslavFunkPrompt  };
+    case "korean-psych":       return { analysisPrompt: KOREAN_PSYCH_ANALYSIS_PROMPT,       buildPrompt: buildKoreanPsychPrompt       };
+    case "japanese-jazz-funk": return { analysisPrompt: JAPANESE_JAZZ_FUNK_ANALYSIS_PROMPT, buildPrompt: buildJapaneseJazzFunkPrompt };
+    case "south-african-jazz": return { analysisPrompt: SOUTH_AFRICAN_JAZZ_ANALYSIS_PROMPT, buildPrompt: buildSouthAfricanJazzPrompt };
+    case "afro-cuban-jazz":    return { analysisPrompt: AFRO_CUBAN_JAZZ_ANALYSIS_PROMPT,    buildPrompt: buildAfroCubanJazzPrompt    };
+    case "algerian-rai":       return { analysisPrompt: ALGERIAN_RAI_ANALYSIS_PROMPT,       buildPrompt: buildAlgerianRaiPrompt       };
+    case "moroccan-gnawa":     return { analysisPrompt: MOROCCAN_GNAWA_ANALYSIS_PROMPT,     buildPrompt: buildMoroccanGnawaPrompt     };
+    case "haitian-voodoo-jazz": return { analysisPrompt: HAITIAN_VOODOO_JAZZ_ANALYSIS_PROMPT, buildPrompt: buildHaitianVoodooJazzPrompt };
   }
 }
 
@@ -172,7 +208,7 @@ export async function POST(req: NextRequest) {
     const mimeType = getMimeType(file.name);
     const b64      = buffer.toString("base64");
 
-    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre);
+    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre)!;
 
     // Pass 1 — audio analysis
     const rawAnalysis = await geminiGenerate(apiKey, [

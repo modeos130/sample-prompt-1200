@@ -19,6 +19,15 @@ const GENRE_LABELS: Record<Genre, string> = {
   "jazz-soul": "Jazz Soul",
   "latin-soul": "Latin Soul",
   "cinematic-dark": "Cinematic Dark",
+  "soviet-estrada": "Soviet Estrada",
+  "yugoslav-funk": "Yugoslav Funk",
+  "south-african-jazz": "South African Jazz",
+  "afro-cuban-jazz": "Afro-Cuban Jazz",
+  "korean-psych": "Korean Psych",
+  "japanese-jazz-funk": "Japanese Jazz-Funk",
+  "algerian-rai": "Algerian Rai",
+  "moroccan-gnawa": "Moroccan Gnawa",
+  "haitian-voodoo-jazz": "Haitian Voodoo Jazz",
 };
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB — Vercel's multipart body limit is 4.5 MB

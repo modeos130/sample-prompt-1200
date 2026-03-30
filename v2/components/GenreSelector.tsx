@@ -8,7 +8,16 @@ export type Genre =
   | "gospel"
   | "jazz-soul"
   | "latin-soul"
-  | "cinematic-dark";
+  | "cinematic-dark"
+  | "soviet-estrada"
+  | "yugoslav-funk"
+  | "south-african-jazz"
+  | "afro-cuban-jazz"
+  | "korean-psych"
+  | "japanese-jazz-funk"
+  | "algerian-rai"
+  | "moroccan-gnawa"
+  | "haitian-voodoo-jazz";
 
 interface GenreConfig {
   id: Genre;
@@ -92,6 +101,87 @@ const GENRES: GenreConfig[] = [
     era: "Late 70s / Early 80s",
     tags: ["Up-Tempo Funk", "Staccato Soul", "Party Floor"],
     num: "08",
+  },
+  {
+    id: "soviet-estrada",
+    label: "Soviet",
+    sub: "Jazz-Funk / Estrada",
+    bpm: "78–96 BPM",
+    era: "Late 1970s USSR",
+    tags: ["Melodiya", "Conservatory Funk", "Iron Curtain"],
+    num: "09",
+  },
+  {
+    id: "yugoslav-funk",
+    label: "Yugoslav",
+    sub: "Prog-Funk / Rock",
+    bpm: "82–100 BPM",
+    era: "Mid-1970s Yugoslavia",
+    tags: ["Jugoton", "Balkan Modal", "Eastern Bloc"],
+    num: "10",
+  },
+  {
+    id: "south-african-jazz",
+    label: "S. African",
+    sub: "Township Jazz / Mbaqanga",
+    bpm: "88–118 BPM",
+    era: "Mid-1960s Johannesburg",
+    tags: ["Penny Whistle", "Marabi Piano", "Township Jive"],
+    num: "11",
+  },
+  {
+    id: "afro-cuban-jazz",
+    label: "Afro-Cuban",
+    sub: "Descarga / Jazz",
+    bpm: "95–130 BPM",
+    era: "Late 1950s Havana",
+    tags: ["Tres Guitar", "Piano Montuno", "Descarga"],
+    num: "12",
+  },
+  {
+    id: "algerian-rai",
+    label: "Algerian",
+    sub: "Electric Rai",
+    bpm: "88–110 BPM",
+    era: "Late 1970s Oran",
+    tags: ["Gasba Flute", "Casio", "North African"],
+    num: "13",
+  },
+  {
+    id: "moroccan-gnawa",
+    label: "Gnawa",
+    sub: "Trance Fusion",
+    bpm: "80–105 BPM",
+    era: "Mid-1970s Morocco",
+    tags: ["Sintir Lute", "Krakeb", "Spiritual Trance"],
+    num: "14",
+  },
+  {
+    id: "haitian-voodoo-jazz",
+    label: "Haitian",
+    sub: "Vodou-Jazz / Kompa",
+    bpm: "76–108 BPM",
+    era: "Mid-1960s Port-au-Prince",
+    tags: ["Tanbou Drum", "Accordion", "Caribbean"],
+    num: "15",
+  },
+  {
+    id: "korean-psych",
+    label: "Korean",
+    sub: "Psych-Rock / Folk",
+    bpm: "72–92 BPM",
+    era: "Late 1960s Seoul",
+    tags: ["Gayageum", "Fuzz Guitar", "Banned Records"],
+    num: "16",
+  },
+  {
+    id: "japanese-jazz-funk",
+    label: "Japanese",
+    sub: "Jazz-Funk / Spiritual",
+    bpm: "80–108 BPM",
+    era: "Mid-1970s Tokyo",
+    tags: ["Rhodes", "Audiophile Vinyl", "Domestic Only"],
+    num: "17",
   },
 ];
 
