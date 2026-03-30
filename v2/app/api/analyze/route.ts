@@ -10,6 +10,32 @@ import { CINEMATIC_DARK_ANALYSIS_PROMPT, buildCinematicDarkPrompt } from "@/lib/
 
 export const maxDuration = 60;
 
+// ─── RATE LIMITING ────────────────────────────────────────────────────────────
+const analyzeIpLog = new Map<string, { count: number; windowStart: number }>();
+const ANALYZE_RATE_LIMIT = parseInt(process.env.ANALYZE_RATE_LIMIT ?? "10");
+const ANALYZE_RATE_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW ?? "86400000");
+let analyzeTotalCalls = 0;
+const ANALYZE_HARD_CAP = parseInt(process.env.MONTHLY_HARD_CAP ?? "500");
+
+function checkAnalyzeRateLimit(ip: string): { allowed: boolean; reason?: string } {
+  if (analyzeTotalCalls >= ANALYZE_HARD_CAP) {
+    return { allowed: false, reason: "Daily capacity reached. Check back tomorrow." };
+  }
+  const now = Date.now();
+  const record = analyzeIpLog.get(ip);
+  if (!record || now - record.windowStart > ANALYZE_RATE_WINDOW) {
+    analyzeIpLog.set(ip, { count: 1, windowStart: now });
+    analyzeTotalCalls++;
+    return { allowed: true };
+  }
+  if (record.count >= ANALYZE_RATE_LIMIT) {
+    return { allowed: false, reason: `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day.` };
+  }
+  record.count++;
+  analyzeTotalCalls++;
+  return { allowed: true };
+}
+
 const MAX_FILE_MB = 4;
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
@@ -71,10 +97,10 @@ async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string>
   let lastMsg    = "";
 
   for (const version of API_VERSIONS) {
-    const url = `https://generativelanguage.googleapis.com/${version}/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/${version}/models/${GEMINI_MODEL}:generateContent`;
     const res  = await fetch(url, {
       method:  "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body:    JSON.stringify({ contents: [{ role: "user", parts }] }),
     });
 
@@ -95,11 +121,8 @@ async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string>
     return text;
   }
 
-  throw new Error(
-    `Model "${GEMINI_MODEL}" not found on v1beta or v1. ` +
-    `Set the GEMINI_MODEL environment variable in Vercel to a model your API key can access. ` +
-    `(Last error: ${lastMsg.slice(0, 120)})`
-  );
+  console.error(`Model "${GEMINI_MODEL}" not found. Last: ${lastMsg.slice(0, 120)}`);
+  throw new Error("AI model not available. Contact support.");
 }
 
 function extractSection(text: string, header: string): string {
@@ -116,6 +139,16 @@ function capPrompt(text: string, limit: number): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit
+  const fwd = req.headers.get("x-forwarded-for");
+  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
+          ?? req.headers.get("x-real-ip")
+          ?? "unknown";
+  const limit = checkAnalyzeRateLimit(ip);
+  if (!limit.allowed) {
+    return NextResponse.json({ error: limit.reason }, { status: 429 });
+  }
+
   try {
     const formData = await req.formData();
     const file  = formData.get("file")  as File  | null;
@@ -156,14 +189,17 @@ export async function POST(req: NextRequest) {
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    let userMessage = `${msg.slice(0, 400)}`;
+    console.error("[analyze]", msg);
 
+    let userMessage = "An error occurred processing your request.";
     if (msg.includes("[429]") || msg.includes("RESOURCE_EXHAUSTED")) {
-      userMessage = "API quota exceeded. Enable billing at aistudio.google.com or wait for the rate-limit window.";
+      userMessage = "API quota exceeded. Try again later.";
     } else if (msg.includes("[403]") || msg.includes("API_KEY_INVALID")) {
-      userMessage = "Invalid API key. Check GEMINI_KEY in your Vercel environment variables.";
+      userMessage = "Service configuration error. Contact support.";
     } else if (msg.includes("[413]") || msg.includes("Request payload size")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
+    } else if (msg.includes("safety filters")) {
+      userMessage = "Content was blocked by safety filters. Try different audio.";
     }
 
     return NextResponse.json({ error: userMessage }, { status: 500 });

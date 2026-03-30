@@ -101,8 +101,9 @@ Output ONLY the prompt text. No preamble, no explanation, no quotes around it. J
 
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // Get real IP (Vercel sets x-forwarded-for)
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+  // Get real IP — use last value in x-forwarded-for (Vercel appends real IP at end)
+  const fwd = req.headers.get("x-forwarded-for");
+  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
           ?? req.headers.get("x-real-ip")
           ?? "unknown";
 
@@ -119,11 +120,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Body size check
+    const contentLength = parseInt(req.headers.get("content-length") ?? "0");
+    if (contentLength > 2048) {
+      return NextResponse.json({ error: "Request too large." }, { status: 413 });
+    }
+
     const body = await req.json() as { vibe?: string; genre?: string };
     const { vibe, genre } = body;
 
     if (!vibe?.trim()) {
       return NextResponse.json({ error: "No vibe description provided." }, { status: 400 });
+    }
+    if (vibe.length > 500) {
+      return NextResponse.json({ error: "Vibe description too long. Max 500 characters." }, { status: 400 });
     }
     if (!genre || !GENRE_RULES[genre]) {
       return NextResponse.json({ error: "Invalid genre." }, { status: 400 });
@@ -177,6 +187,7 @@ export async function POST(req: NextRequest) {
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 });
+    console.error("[vibe-prompt]", msg);
+    return NextResponse.json({ error: "An error occurred generating your prompt." }, { status: 500 });
   }
 }

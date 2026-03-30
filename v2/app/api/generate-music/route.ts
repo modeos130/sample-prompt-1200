@@ -175,8 +175,9 @@ interface ClaudeApiResponse {
 
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // Get real IP (Vercel sets x-forwarded-for)
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+  // Get real IP — use last value in x-forwarded-for (Vercel appends real IP at end)
+  const fwd = req.headers.get("x-forwarded-for");
+  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
           ?? req.headers.get("x-real-ip")
           ?? "unknown";
 
@@ -193,6 +194,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Body size check
+    const contentLength = parseInt(req.headers.get("content-length") ?? "0");
+    if (contentLength > 2048) {
+      return NextResponse.json({ error: "Request too large." }, { status: 413 });
+    }
+
     const body = await req.json() as GenerateMusicRequest;
     const { promptId, vibe, genre, model } = body;
 
@@ -223,6 +230,9 @@ export async function POST(req: NextRequest) {
     } else {
       if (!vibe?.trim()) {
         return NextResponse.json({ error: "Please describe the sound you want." }, { status: 400 });
+      }
+      if (vibe.length > 500) {
+        return NextResponse.json({ error: "Description too long. Max 500 characters." }, { status: 400 });
       }
       if (!genre || !GENRE_RULES[genre]) {
         return NextResponse.json({ error: "Invalid genre." }, { status: 400 });
@@ -273,11 +283,11 @@ export async function POST(req: NextRequest) {
       ? (process.env.LYRIA_CLIP_MODEL ?? "lyria-3-clip-preview")
       : (process.env.LYRIA_PRO_MODEL ?? "lyria-3-pro-preview");
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent`;
 
     const lyriaResponse = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText + "\n\nInstrumental only, no vocals." }] }],
         generationConfig: { responseModalities: ["AUDIO", "TEXT"] },
@@ -359,6 +369,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 });
+    console.error("[generate-music]", msg);
+    return NextResponse.json({ error: "An error occurred generating music." }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'">
 <title>130 MODE — Vibe to Prompt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
@@ -1406,6 +1407,13 @@ let activeFilter = 'all';
 let selectedPromptIdx = -1;
 
 // Build genre filter tabs dynamically
+// HTML escape to prevent XSS
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 function buildFilterTabs() {
   const genres = {};
   REFERENCE_PROMPTS.forEach(p => {
@@ -1471,7 +1479,7 @@ function buildPromptGrid() {
     card.dataset.search = `${p.name} ${label} ${p.vibe}`.toLowerCase();
     card.onclick = () => selectPromptCard(i);
     const isFav = favorites.has(p.id);
-    card.innerHTML = `<div class="prompt-card-art"><img src="/art/${p.id}.jpg" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='${art.grad}';this.parentElement.innerHTML='${art.icon}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontSize='22px'"><button class="fav-star ${isFav ? 'favorited' : ''}" onclick="event.stopPropagation();toggleFav('${p.id}',this)" title="Add to favorites">${isFav ? '&#9733;' : '&#9734;'}</button></div><div class="prompt-card-info"><div class="prompt-card-genre">${label}</div><div class="prompt-card-name">${p.name}</div><div class="prompt-card-vibe">${p.vibe}</div></div>`;
+    card.innerHTML = `<div class="prompt-card-art"><img src="/art/${encodeURIComponent(p.id)}.jpg" alt="${esc(p.name)}" loading="lazy" onerror="this.parentElement.style.background='${art.grad}';this.parentElement.innerHTML='${art.icon}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontSize='22px'"><button class="fav-star ${isFav ? 'favorited' : ''}" onclick="event.stopPropagation();toggleFav('${esc(p.id)}',this)" title="Add to favorites">${isFav ? '&#9733;' : '&#9734;'}</button></div><div class="prompt-card-info"><div class="prompt-card-genre">${esc(label)}</div><div class="prompt-card-name">${esc(p.name)}</div><div class="prompt-card-vibe">${esc(p.vibe)}</div></div>`;
     grid.appendChild(card);
   });
   updateCount();
