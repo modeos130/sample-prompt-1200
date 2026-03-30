@@ -1,92 +1,403 @@
-# Sample Prompt 1200 — Claude Project Context
+# Sample Prompt 1200 — Claude Code Project Context
+# 130 Mode / Booman Systems — DJ Booman
 
-## Project Overview
-This repo contains two apps:
-- **V1** (root): Streamlit Python app (`app.py`) — legacy, do not modify unless asked
-- **V2** (`v2/`): Next.js 14 + TypeScript + Tailwind — the active project
+## READ THIS FIRST — HOW TO OPERATE
 
-## V2 Stack
-- Framework: Next.js 14 (App Router)
-- Language: TypeScript
-- Styling: Tailwind CSS + DM Mono + Syne fonts (Google Fonts)
-- AI: Gemini 2.5 Flash via `@google/generative-ai`
-- Deployment: Vercel (root directory = `v2/`)
+You are Claude Code working autonomously on this repo for Grant Burley III (DJ Booman),
+founder of 130 Mode. He is a non-developer. Your job is to make changes correctly,
+verify they compile, commit with clear messages, and push — all without manual steps
+from Grant. He describes what he wants in plain English. You do the rest.
 
-## V2 Architecture
+### Autonomous workflow (do without asking):
+- Read files before editing — never guess at existing content
+- Run `cd v2 && npm run build` after every change to catch TypeScript errors before commit
+- Fix any build errors before committing
+- Commit with a descriptive message
+- Push to `feature/genre-upgrade`
+- Report what you did and the expected Vercel preview URL
+
+### Always ask before:
+- Touching `app.py` or any V1 root-level files
+- Changing the production branch
+- Deleting any file
+- Adding a new paid external service
+
+---
+
+## PROJECT OVERVIEW
+
+Two apps in one repo:
+
+**V1** (root level) — `app.py` — Streamlit/Python app. LEGACY. Do not touch unless
+explicitly asked.
+
+**V2** (`v2/`) — Next.js 14 + TypeScript + Tailwind. THE ACTIVE PROJECT. Two features:
+1. Audio analysis — producer drops a song, gets a Suno prompt back (Gemini API)
+2. Vibe-to-prompt generator — producer describes a vibe, gets a Suno prompt back (Claude API)
+
+---
+
+## V2 STACK
+
+- Framework: Next.js 14 App Router
+- Language: TypeScript (strict)
+- Styling: Tailwind CSS utility classes only
+- Fonts: Syne (display/headings), DM Mono (body/mono) — Google Fonts
+- Audio Analysis AI: Gemini 2.5 Flash via `@google/generative-ai`
+- Vibe Generator AI: Claude Haiku via Anthropic API (server-side only)
+- Deployment: Vercel — root directory set to `v2/`
+
+---
+
+## V2 COMPLETE FILE MAP
+
 ```
 v2/
 ├── app/
-│   ├── page.tsx              # Main app — genre selector + uploader + results
-│   ├── layout.tsx            # Root layout
-│   ├── globals.css           # Global styles + custom animations
-│   └── api/analyze/route.ts  # Two-pass Gemini API route (POST)
+│   ├── page.tsx                    # Main app UI
+│   ├── layout.tsx                  # Root layout
+│   ├── globals.css                 # Global styles
+│   └── api/
+│       ├── analyze/route.ts        # Two-pass Gemini audio analysis (POST)
+│       ├── vibe-prompt/route.ts    # Claude vibe-to-prompt generator (POST)
+│       └── models/route.ts         # Diagnostic — lists available models
 ├── components/
-│   ├── GenreSelector.tsx     # 3-card genre picker (first screen)
-│   ├── AudioUploader.tsx     # Drag/drop file upload + analyze button
-│   ├── AnalysisOutput.tsx    # Structured analysis table
-│   └── PromptOutput.tsx      # Generated prompt + copy button + char counter
-└── lib/genres/
-    ├── boom-bap.ts           # Analysis prompt + buildBoomBapPrompt()
-    ├── house.ts              # Analysis prompt + buildHousePrompt()
-    └── trap.ts               # Analysis prompt + buildTrapPrompt()
+│   ├── GenreSelector.tsx           # Genre card grid
+│   ├── AudioUploader.tsx           # Drag/drop upload + analyze button
+│   ├── AnalysisOutput.tsx          # Structured analysis table
+│   ├── PromptOutput.tsx            # Generated prompt + copy + char counter
+│   └── SunoSettings.tsx            # Suno slider recommendations per genre
+├── lib/genres/
+│   ├── boom-bap.ts
+│   ├── house.ts
+│   ├── trap.ts
+│   ├── baltimore-club.ts
+│   ├── gospel.ts
+│   ├── jazz-soul.ts
+│   ├── latin-soul.ts
+│   └── cinematic-dark.ts
+├── public/
+│   └── vibe-to-prompt.html         # Standalone vibe generator UI at /vibe-to-prompt.html
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+├── next.config.ts
+└── vercel.json                     # analyze=60s, vibe-prompt=30s
 ```
 
-## Genre Logic
-Each genre has two exports:
-1. `[GENRE]_ANALYSIS_PROMPT` — sent to Gemini with audio for Pass 1 (analysis)
-2. `build[Genre]Prompt(analysisText)` — builds Pass 2 prompt (text only, returns generated AI music prompt)
+---
 
-### Genre Era Locks (non-negotiable in prompts)
-- **Boom Bap**: late 1960s–1970s, 78–90 BPM, minor/modal, live band, 2-inch tape
-- **House**: late 1970s–1980s, 118–128 BPM, soulful/gospel, analog warmth
-- **Trap**: 1970s–1990s dark cinematic/orchestral, 65–75 BPM, gothic atmosphere
+## ENVIRONMENT VARIABLES (Vercel)
 
-### Prompt Rules (all genres)
-- Max 1000 characters
-- NEVER mention real artist, producer, or band names
-- NEVER mention drums, kick, snare, hi-hat, 808, or any rhythmic element
-- Always minor/modal tonality — no major key
-- Designed to feel loopable
+| Variable | Purpose | Default |
+|---|---|---|
+| `GEMINI_KEY` | Google Gemini — audio analysis | required |
+| `ANTHROPIC_API_KEY` | Claude — vibe generator | required |
+| `CLAUDE_MODEL` | Claude model override | `claude-haiku-4-5-20251001` |
+| `GEMINI_MODEL` | Gemini model override | `gemini-2.0-flash` |
+| `RATE_LIMIT_CALLS` | Max generations per IP per day | `10` |
+| `RATE_LIMIT_WINDOW` | Rate limit window ms | `86400000` |
+| `MONTHLY_HARD_CAP` | Total calls per cold start | `500` |
 
-## Environment Variables
-- `GEMINI_KEY` — Google Gemini API key (required)
-- Get one free at: https://aistudio.google.com/app/apikey
+---
 
-## Git Workflow
-- **Active dev branch**: `claude/audit-streamlit-genai-app-n38yj`
-- **Production branch**: `main` (push-restricted in this sandbox — only `claude/` branches can be pushed from here)
-- All changes: commit + push to `claude/audit-streamlit-genai-app-n38yj`
-- Merging to main: done manually via GitHub PR
+## GIT WORKFLOW
 
-## Vercel Setup
-- Project: `sample-prompt-1200`
-- Root Directory: `v2`
-- Production Branch: `claude/audit-streamlit-genai-app-n38yj` (or `main` after merge)
-- Function timeout: 60s (set in `v2/vercel.json`)
+- **Active dev branch**: `feature/genre-upgrade`
+- **Production branch**: `main`
+- All work goes to `feature/genre-upgrade`
+- Never push directly to `main`
+- When Grant says "ship it" — tell him to open a PR on GitHub from `feature/genre-upgrade` → `main`
 
-## Design System
-- Background: `#0d0f11`
-- Gold accent: `#c9a84c`
-- Gold dim: `#7a6230`
-- Text primary: `#d8e2ec`
-- Text secondary: `#7e8fa0`
-- Text muted: `#3d4d5c`
-- Green (success): `#34c97a`
-- Red (error): `#e05656`
-- Card bg: `#141820`
-- Border: `#1e2530`
-- Fonts: Syne (headings, bold labels), DM Mono (all body/mono text)
+Standard commit sequence:
+```bash
+cd v2 && npm run build
+cd ..
+git add [files]
+git commit -m "descriptive message"
+git push origin feature/genre-upgrade
+```
 
-## Do Autonomously (no need to ask)
-- Edit any file in `v2/`
-- Commit and push to `claude/audit-streamlit-genai-app-n38yj`
-- Add new genre modules in `v2/lib/genres/`
-- Update prompts in existing genre files
-- Fix build errors and TypeScript issues
-- Update dependencies in `v2/package.json`
+---
 
-## Always Ask Before
-- Modifying `app.py` or V1 files
-- Changing the Vercel production branch
-- Deleting any files
-- Adding paid services or external APIs beyond Gemini
+## DESIGN SYSTEM
+
+```
+Background primary:  #0d0f11
+Background card:     #141820
+Background surface:  #1a1f28
+Border:              #1e2530
+Gold accent:         #c9a84c
+Gold dim:            #7a6230
+Text primary:        #d8e2ec
+Text secondary:      #7e8fa0
+Text muted:          #3d4d5c
+Green success:       #34c97a
+Red error:           #e05656
+```
+
+Fonts: `font-['Syne',sans-serif]` for headings/labels, `font-mono` for body/values.
+
+---
+
+## THE PROMPT LAB DNA — 10 NON-NEGOTIABLE RULES
+
+Every Suno prompt generated by this tool must follow these rules. No exceptions.
+
+**1. ONE PARAGRAPH ONLY**
+One flowing paragraph. No headers, no bullets, no line breaks inside the prompt.
+
+**2. HARD MAX 1000 CHARACTERS**
+850–950 is ideal. Count before outputting. Trim if over, never truncate mid-sentence.
+
+**3. NEVER USE REAL NAMES**
+No real artist, producer, musician, or band names. Suno blocks or degrades output
+when real names appear. Use aesthetic descriptions instead:
+- ❌ "The Alchemist would flip this"
+- ✅ "the kind of dark cinematic record serious underground beatmakers flip"
+
+**4. NEVER MENTION RHYTHMIC ELEMENTS**
+No drums, kick, snare, hi-hat, 808, drum machine in the prompt.
+Use genre-lock instead: "jazz trio", "soul quartet", "string ensemble".
+Exception: House CAN use "four-on-the-floor" as a structural description.
+
+**5. ALWAYS MINOR OR MODAL TONALITY**
+Dorian, Phrygian, harmonic minor, diminished, Hijaz. No major key unless genre
+requires it. Always name the emotional color: "D Dorian — cold and searching".
+
+**6. PRECISE INSTRUMENT NAMES**
+| Generic ❌ | Precise ✅ |
+|---|---|
+| bass | upright bass / electric bass |
+| keys | Rhodes electric piano / Hammond B3 organ / harpsichord |
+| trumpet | Harmon-muted trumpet / flugelhorn |
+| guitar | wah-wah rhythm guitar / fingerpicked acoustic |
+| strings | tremolo strings / pizzicato strings / solo violin |
+| synth | Moog synthesizer / analog synthesizer |
+
+**7. FEATURED INSTRUMENT SOLO**
+Every prompt needs a named instrument making a specific melodic statement:
+"Harmon-muted trumpet solo over the minor changes"
+"Hammond B3 organ break with expression pedal swells"
+
+**8. GEOGRAPHIC AND ERA SPECIFICITY**
+Never say "vintage" or "old" alone. Always name era AND location:
+- ❌ "vintage soul recording"
+- ✅ "Late 1960s New York soul recording"
+
+**9. OBSCURITY AND SCARCITY FRAMING**
+Every prompt must include a rarity/obscurity phrase:
+- "pressed in a quantity of 300 copies on a small regional label"
+- "never distributed outside its home country"
+- "recorded for a film that was never widely released"
+- "pressed for state film studio archives, never commercially released"
+
+**10. LOOPABLE BY DESIGN**
+Always state or imply the music loops:
+- "designed to feel loopable"
+- "a short harmonic cycle built to repeat hypnotically"
+- "a two-bar phrase that cycles without resolution"
+
+---
+
+## PROVEN PROMPT STRUCTURE
+
+```
+[ERA + SPECIFIC LOCATION] [RECORDING AESTHETIC] — [precise named instruments] —
+recorded at [BPM] BPM — [key + modal description with emotional color] — [featured
+instrument solo] — [texture anchors: tape saturation, vinyl surface noise, room
+character] — [2–3 emotional words] — [obscurity/scarcity framing] — designed to
+feel loopable — [genre-specific closer with NO real names]
+```
+
+---
+
+## GENRE-SPECIFIC CLOSER PHRASES
+
+End every prompt with a closer describing the TYPE of producer — never real names.
+
+```
+Boom bap:        "the kind of forgotten record [descriptor] would spend years
+                  hunting in overseas crates and flip into something timeless."
+
+Dark underground: "the kind of forgotten foreign record a serious crate digger would
+                   spend decades hunting in an overseas record shop."
+
+Gospel:          "the kind of sacred recording [descriptor] would chop, pitch up, and
+                  place underneath something hard to make it feel like church."
+
+Jazz soul:       "the kind of warm dusty record [descriptor] would loop two bars of
+                  and build entire worlds around."
+
+Latin soul:      "the kind of orchestral Latin soul recording [descriptor] would loop
+                  and transform into something devastating."
+
+Italian film:    "the kind of forgotten European score cue [descriptor] would pitch
+                  down, slow, and loop into something that hits like a freight train."
+
+Soulful house:   "the kind of record [descriptor] would drop at 4am and make the
+                  room levitate."
+
+Dark cinematic:  "the kind of orchestral source material [descriptor] would low-pass
+                  filter and build their most emotional record around."
+```
+
+---
+
+## ALL 23 REFERENCE PROMPTS — QUALITY STANDARD
+
+Every output from this tool should match this quality. These are proven.
+
+**P01 — THE FLUTE DIGGER**
+Obscure 1960s Italian film score recording, heavy analog degradation and deep vinyl surface noise. Haunting solo flute melody in Dorian mode, sparse pizzicato strings, dry upright bass with no drums. Tempo around 68–76 BPM, slow and heavy. Cold, eerie atmosphere with unresolved tension — no catharsis, no chorus swell. Slight tape splice artifacts and wow-flutter. Sounds like a lost b-side no one has ever sampled. Loopable, cinematic dread, the kind of forgotten foreign record a serious crate digger would spend decades hunting in an overseas record shop.
+W:90% SI:68%
+
+**P02 — COLD ORGAN**
+Early 1970s Eastern European modal jazz recording, warped tape and thick vinyl crackle throughout. Haunting Hammond organ lead in Phrygian mode, cold tremolo strings low in the mix, barely-audible upright bass. Tempo 70–78 BPM, heavy and deliberate. No drums, no vocals. Claustrophobic, dimly-lit atmosphere — sounds like it was recorded in a concrete building at 3am. Sparse and menacing with long sustained tones and silence used as texture. Designed to loop. The kind of obscure record that sounds dangerous when chopped and pitched.
+W:88% SI:70%
+
+**P03 — PSYCH SOUL GHOST**
+Late 1960s psychedelic soul recording, extreme tape degradation, heavy vinyl surface noise and random crackle pops. Sparse harpsichord in a diminished scale, dissonant tremolo strings, and faint ghostly wordless female vocal buried deep in the mix — not a lead, just a haunting texture. Dry upright bass, no drums. Tempo 63–72 BPM, dragging and hypnotic. Dark, hallucinatory mood — melancholy without resolution. Feels like a forgotten record pressed in small quantities that never got distributed. Loopable and deeply sampleable when pitched up.
+W:92% SI:65%
+
+**P04 — MIDDLE EAST MENACE**
+Early 1970s Middle Eastern orchestral recording, analog tape saturation with heavy wow-flutter and vinyl degradation. Oud or sitar melody in a Hijaz scale, dark cello section low in the mix, minimal upright bass. No drums, no vocals. Tempo 72–80 BPM, swaying and hypnotic. Cinematic dread — the kind of music that plays before something terrible happens in a film. Unresolved harmonic tension throughout, no cathartic release. Sparse arrangement with long held tones and deep silences. Sounds like it was recorded in Cairo or Istanbul in 1971 and never released outside its region. Built to loop endlessly.
+W:86% SI:72%
+
+**P05 — HYBRID BRIDGE**
+1970s rare soul recording, heavy analog tape saturation and vinyl crackle. Slow Rhodes piano melody in Dorian mode, sparse cold strings and minimal upright bass. No drums. Tempo 74–82 BPM. Single ghostly female vocal hum buried under the instruments — not a performance, just an atmosphere. Dark, contemplative mood with no harmonic resolution. Imperfect human timing and tape artifacts throughout. Lush enough to feel emotional, menacing enough to feel dangerous. Loopable, designed to be chopped, pitched, and flipped into something brutal.
+W:86% SI:75%
+
+**P06 — BLACK CHURCH**
+Late 1960s Black church recording, warm analog tape saturation and subtle vinyl surface noise. Full Hammond B3 organ lead, thick gospel choir harmonies rising and falling in waves, strong live bass walking underneath. No drums except occasional hand claps buried deep in the mix. Tempo 72–82 BPM. Deep spiritual yearning — voices stacking on top of each other, call and response between organ and choir. Feels like it was recorded live in a small church on a Sunday morning. Raw, emotional, unrehearsed human feel. The kind of sacred music that becomes transcendent when chopped, pitched up, and placed underneath something hard.
+W:80% SI:76%
+
+**P07 — LATE NIGHT JAZZ SESSION**
+Early 1970s small ensemble jazz recording, dry room acoustics, analog tape hiss and subtle vinyl surface noise. Upright bass walking line as the anchor, brushed snare and ride cymbal swinging loosely, muted trumpet or tenor saxophone carrying the melody. Tempo 84–96 BPM, light and swinging but melancholic underneath. Imperfect human timing, musicians responding to each other in real time. Sounds like a late-night session pressed in small quantities for a regional label. The kind of warm, dusty live jazz record producers have been digging for, looping two bars, and building entire worlds around.
+W:82% SI:78%
+
+**P08 — ACHING SOUL VOCAL**
+Mid 1970s dramatic soul recording, heavy analog tape saturation and deep vinyl crackle throughout. Wailing female lead vocal — emotive, strained, gospel-drenched — singing a slow aching minor key melody. Voice cracking and straining at the edges, raw and completely unrestrained. Lush string arrangement underneath, warm piano chords, live bass with no drums. Tempo 65–76 BPM, slow and weighted with grief. The kind of devastating soul performance built to be chopped into a two-bar loop, pitched up several semitones, and transformed into something completely unrecognizable but emotionally overwhelming.
+W:84% SI:80%
+
+**P09 — 45 FLIP READY**
+Upbeat early 1960s girl group soul recording, bright analog tape, light vinyl surface noise. Call and response female vocal harmonies over a lively minor key chord progression with a bouncy swing feel. Piano, rhythm guitar, walking bass, and a loose live drum groove. Crisp punchy horn stabs punctuating the vocal phrases. Tempo 108–120 BPM, energetic and driving. Feels like a regional 45 single that got local airplay but never crossed over nationally. Designed to be pitched up several semitones and transformed into a buoyant, chipmunked sample flip that still retains the original warmth and swing.
+W:78% SI:82%
+
+**P10 — THE BREAK**
+1970s live funk drum performance recorded to analog tape with moderate vinyl surface noise. No melody, no harmony, no bass — a single drummer in an empty room. Structure in three acts: opens with a tight locked-in groove — deep punchy kick, cracking snare, syncopated hi-hats. Mid-section breaks into a full extended drum solo breakdown — the drummer cuts loose completely, trading between snare rolls, tom fills, open hi-hat splashes, rim shots, and rapid kick doubles for eight to sixteen bars. Final section snaps back to the locked groove, tighter and harder than before. Tempo 95–108 BPM with natural human rushing and dragging throughout.
+W:76% SI:74%
+
+**P11 — LIBRARY CUE**
+Early 1970s production library cue recording — functional broadcast music, analog tape, light vinyl degradation. Short self-contained piece with a deliberate mood arc: tense sparse introduction, slowly building middle section, unresolved hanging ending. Solo flute or vibraphone over cold sparse strings and a dry upright bass. No vocals, no drums. Tempo 76–88 BPM. Pressed in a quantity of 300 copies for broadcaster licensing, never heard outside a television studio. Deeply loopable, harmonically restless, completely undiscovered — the definition of untouched sample material sitting in a library crate.
+W:88% SI:66%
+
+**P12 — TOKYO DEEP**
+Late 1970s Japanese soul recording, warm analog tape with a slightly muffled, intimate room sound. Mid-tempo groove around 76–86 BPM. Soft muffled Rhodes keys carrying a gentle, dreamy minor key melody — delicate, slightly distant. Clean natural upright bass walking slowly underneath. Minimal brushed drums — sparse kick, quiet snare, hi-hat barely there. Bright distant female vocal singing a melancholic Japanese pop melody, reverb-soaked and floating above the mix. Subtle flute or vibraphone accents weaving between vocal phrases. The kind of obscure Japanese soul pressing from a small regional label never distributed outside Japan, loopable and deeply sampleable when pitched up and slowed.
+W:83% SI:77%
+
+**P13 — CINEMASCOPE NERO**
+Early 1970s Italian crime film soundtrack recording, analog tape with a slightly hollow studio sound. Mid-tempo groove around 80–92 BPM. Funky wah-wah rhythm guitar chopping on the upbeats, deep walking electric bass with a slightly overdriven tone. Lead instrument alternating between a haunting solo flute and a tense tremolo string section — the two trading off, never resolving harmonic tension. Sparse Hammond organ stabs punctuating dramatic moments. No vocals. Slightly eerie, slightly funky. Pressed in small quantities for film distribution only, never commercially released.
+W:87% SI:71%
+
+**P14 — MIDNIGHT SANCTUARY**
+Early 1990s New York underground soulful house music recording, warm analog mixing board saturation. Four-on-the-floor kick drum at 122 BPM, crisp snare on the two and four, shimmering open hi-hat. Deep warm analog bass line in a gospel-influenced minor chord progression. Live gospel piano chords stabbing on the upbeats — full rich voicings with extended harmonies. A full-throated Black female lead vocal — powerful, church-trained, deeply emotional. Background choir harmonies swelling in call and response. Congas and shakers woven into the percussion bed. The feeling of a late-night underground club where the music is spiritual, not just physical.
+W:75% SI:82%
+
+**P15 — FILTERED GOLD**
+Late 1990s French-influenced disco house production, warm heavily filtered analog processing throughout. Four-on-the-floor kick at 124 BPM, tight punchy snare, closed hi-hats with occasional open hat flares. A deeply funky filtered bass line — the low-pass filter slowly sweeping open and closed over the eight bar cycle. Lush 1970s disco string section looped and filtered. Tight funky rhythm guitar chopping on the upbeats, wah-wah processing giving it a rubbery elastic feel. Brass stabs accenting off-beats. Single short vocal phrase chopped into a two bar loop, pitched and effected until it functions as an instrument. Designed to loop for eight minutes without losing momentum.
+W:76% SI:84%
+
+**P16 — BARRIO NOCTURNO**
+Late 1960s New York Latin soul orchestral recording, warm analog tape with deep vinyl surface noise. Mid-tempo groove around 74–84 BPM. Dramatic dark string section playing a slow moody minor key melody with cinematic tension. Upright bass walking a deep slow groove, congas and timbales playing a restrained rhythmic pattern. Dark piano or organ chords voicing the harmony in the lower register. Female vocal texture floating above — not singing words, just wordless humming, reverb-soaked, almost ghostly. The feeling of a deserted Latin neighborhood at midnight. Pressed on a small New York indie label in 1969. The kind of orchestral Latin soul recording that loops and transforms into something devastating.
+W:82% SI:76%
+
+**P17 — GIALLO NERO**
+Mid 1970s Italian horror film score recording, analog tape with a slightly hollow studio sound. A pulsing electric bass line locked into a hypnotic minor key ostinato, and above it a cold analog synthesizer playing a slow repeating arpeggio that spirals and refuses to resolve. Harpsichord interjecting sharp stabbing phrases between the synth lines. No drums except a slow plodding kick — one hit every two beats, deliberate and funeral. Distant tremolo strings swelling in and out like something breathing in a dark room. A ghostly whispering female voice buried deep in the reverb — not words, just a barely-audible tonal hum. Church organ drone underneath everything. Tempo 68–80 BPM. Pressed for Italian cinema distribution only.
+W:92% SI:63%
+
+**P18 — MURDA MUZIK SOURCE**
+Late 1960s dark orchestral recording, heavy analog tape degradation and deep vinyl surface noise throughout. A single repeating minor piano figure in harmonic minor — cold, mechanical, four to six notes cycling obsessively with no resolution. Not a melody, a motif. Sparse mournful string section underneath, violins playing long sustained tones in the lowest register, bowing slowly and without warmth. No drums, no bass. Tempo 68–80 BPM, slow and deliberate, heavy with dread. Occasional dissonant cello swell entering from silence and retreating back into it. Pressed on a small European label in 1967. Designed to be the foundation under the most menacing rap ever recorded.
+W:91% SI:64%
+
+**P19 — LATE NIGHT BROADCAST**
+Early 1970s American television crime drama score cue, analog tape with a slightly dry studio sound. Three distinct sections that loop back naturally. Opening: tense and sparse — lone electric piano playing a short repeating minor key figure, upright bass walking slowly. Middle: the groove drops in — punchy wah-wah rhythm guitar, tight snare, walking bass, muted trumpet playing a short bluesy phrase. Final: everything strips back to just the electric piano motif. Tempo 82–96 BPM. The feeling of a surveillance scene — a detective watching someone from a car at 2am. Composed as functional background music for a gritty weekly crime drama, 1972.
+W:82% SI:76%
+
+**P20 — SÃO PAULO BASEMENT**
+Late 1970s Brazilian jazz-funk fusion recording from São Paulo, warm analog tape with a slightly humid room sound. Electric Rhodes piano carrying a bright hypnotic minor key melody with a distinctly Brazilian harmonic sensibility — the chord voicings more circular, more resolved into sadness than tension. Deep locked electric bass groove. Surdo and pandeiro percussion weaving through with congas. A breathy flute doubling the Rhodes melody in a higher register. Short wordless female vocal hum floating through the bridge sections. Tempo 88–100 BPM. Pressed on a small regional Brazilian label in 1978, never exported outside Brazil.
+W:85% SI:73%
+
+**P21 — THUNDER SOUL**
+Early 1970s live high school stage band funk recording, raw and unpolished analog tape with natural room reverb. A large ensemble of teenage musicians playing with more feeling than technical precision — slightly imperfect intonation, tempos that breathe because the drummer is seventeen and full of adrenaline. Locked funky groove driven by a tight two-bar horn riff over a deep rhythm section. Mid-section: a young female flute soloist steps out over a stripped-back groove, the flute slightly breathy and raw. Then the drummer breaks into a full extended solo before the full ensemble crashes back in. Tempo 92–108 BPM. Recorded live in a high school gymnasium in 1972.
+W:85% SI:79%
+
+**P22 — STADIUM BRASS**
+Early 1970s college marching band live stadium recording, warm and slightly distorted from the outdoor field microphones, crowd noise audible. A massive brass section — sixty to eighty horns — performing a slow triumphant minor-to-major chord progression that swells and retreats like a tide. The horns begin sparse, just low brass laying foundation. Then the full section erupts. Mid-section: the brass drops to silence except for a single trumpet soloist playing a soaring gospel-influenced melodic phrase — raw, slightly sharp, deeply emotional. Then the full section crashes back at full volume. Percussion thundering underneath. Tempo 68–80 BPM. The kind of single horn stab that, isolated and filtered, becomes the foundation of a stadium rap anthem.
+W:79% SI:81%
+
+**P23 — DARK CINEMATIC LOOP**
+Late 1980s to early 1990s cinematic orchestral recording, slightly degraded analog tape with subtle warmth and soft vinyl texture. A haunting minimal piano melody in a natural minor scale — four to eight notes, simple and devastating. Long slow string pads sustaining behind the piano like a held breath — not dramatic swells, just patient presence. Deep resonant cello line moving in slow half notes underneath. No drums, no percussion. Tempo 65–80 BPM, slow and weighted. Silence used as much as sound. The emotional register is cinematic grief. Reverb on everything, long tails, sounds bleeding into each other. Designed to work equally well under introspective verses and euphoric drops.
+W:80% SI:74%
+
+---
+
+## GENRE MODULE PATTERN
+
+```typescript
+// v2/lib/genres/[genre].ts
+
+export const [GENRE]_ANALYSIS_PROMPT = `
+  [Instructions for Gemini: what to listen for in this genre's audio]
+`.trim();
+
+export function build[Genre]Prompt(analysisText: string): string {
+  return `
+    [Server-side prompt to Claude/Gemini using analysisText to generate the Suno prompt]
+    Apply all 10 Prompt Lab DNA rules.
+    Output one paragraph, max 1000 characters, no real names, no drum mentions.
+  `.trim();
+}
+```
+
+### Adding a new genre — full checklist:
+1. Create `v2/lib/genres/[genre-slug].ts` with both exports
+2. Import in `v2/app/api/analyze/route.ts`
+3. Add to `Genre` type union in `route.ts`
+4. Add to `VALID_GENRES` array in `route.ts`
+5. Add case to `getGenrePrompts()` switch in `route.ts`
+6. Add to `GENRES` array in `v2/components/GenreSelector.tsx`
+7. Run `cd v2 && npm run build` — fix all TypeScript errors
+8. Commit and push
+
+---
+
+## SUNO SLIDER REFERENCE
+
+| Genre | Weirdness | Style Influence |
+|---|---|---|
+| Boom Bap | 84–90% | 68–76% |
+| Dark Underground | 88–92% | 64–70% |
+| Soul/Gospel | 80% | 76% |
+| Jazz Soul | 82% | 78% |
+| Latin Soul | 82% | 76% |
+| Japanese Soul | 83% | 77% |
+| Brazilian | 85% | 73% |
+| Italian Film/Giallo | 87–92% | 63–71% |
+| Soulful House | 75% | 82% |
+| Disco House | 76% | 84% |
+| TV Score | 82% | 76% |
+| Dark Cinematic | 88% | 70% |
+| Drum Break | 76% | 74% |
+| 45 Flip/Chipmunk | 78% | 82% |
+| Marching Band | 79% | 81% |
+| Modern Trap | 80% | 74% |
+
+---
+
+## COST RULES
+
+- Vibe generator default: `claude-haiku-4-5-20251001` — ~$0.002/call
+- Only upgrade to Sonnet if explicitly asked
+- Never add paid external services without asking Grant first
+- `MONTHLY_HARD_CAP` env var is the ceiling — do not raise it without asking
