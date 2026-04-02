@@ -20,7 +20,7 @@ export default function RootLayout({
       >
         <HotelProvider>
           <Sidebar />
-          <main className="min-h-screen md:ml-64 pt-16 md:pt-0">
+          <main className="min-h-screen md:ml-64 pt-16 md:pt-0 px-4 py-6 md:px-6 md:py-8">
             {children}
           </main>
         </HotelProvider>
