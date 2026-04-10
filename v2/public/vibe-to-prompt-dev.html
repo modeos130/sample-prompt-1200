@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'">
+<title>DJ BOOMAN PROMPT LAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080b10;
+  --bg2: #0f1318;
+  --bg3: #141a22;
+  --border: #1a2030;
+  --purple: #3b9eff;
+  --purple-dim: #2878cc;
+  --purple-light: rgba(59,158,255,0.1);
+  --yellow: #00d4ff;
+  --dark: #e0e8f0;
+  --text: #d0d8e4;
+  --muted: #5a6a80;
+  --white: #ffffff;
+  --font: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.3);
+}
+.logo {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--dark);
+}
+.logo span { color: var(--purple); }
+.header-badge {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #080b10 0%, #0a1020 50%, #0d1530 100%);
+  padding: 56px 40px 64px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 60%, rgba(59,158,255,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 78% 30%, rgba(0,212,255,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--yellow);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  position: relative;
+  opacity: 0.9;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.05;
+  margin-bottom: 10px;
+  position: relative;
+  letter-spacing: -0.5px;
+}
+.hero-title em { color: var(--yellow); font-style: normal; }
+.hero-sub {
+  font-family: var(--font);
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0;
+  position: relative;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+.hero-line {
+  width: 60px; height: 3px;
+  background: linear-gradient(90deg, #3b9eff, #00d4ff);
+  margin: 24px auto 0;
+  border-radius: 2px;
+  position: relative;
+}
+
+/* MAIN */
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 100px;
+}
+
+/* VIBE INPUT BLOCK */
+.input-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(59,158,255,0.08);
+  margin-bottom: 28px;
+}
+
+.input-header {
+  padding: 18px 24px 0;
+}
+.input-label {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.input-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.vibe-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text);
+  background: transparent;
+  padding: 4px 24px 20px;
+  min-height: 120px;
+}
+.vibe-textarea::placeholder {
+  color: #3a4a5a;
+  font-style: italic;
+}
+
+/* input-footer removed — proven prompts now in their own section */
+
+/* PROVEN PROMPTS SECTION */
+.proven-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(59,158,255,0.08);
+  margin-bottom: 20px;
+}
+.proven-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg3);
+}
+.proven-title {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.proven-count {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--purple-light);
+  color: var(--purple-dim);
+  letter-spacing: 0;
+}
+.proven-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.proven-search input {
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 6px 28px 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg2);
+  color: var(--text);
+  outline: none;
+  width: 200px;
+  transition: border 0.2s;
+}
+.proven-search input:focus { border-color: var(--purple); }
+.proven-search input::placeholder { color: #3a4a5a; }
+.proven-search .clear-search {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: none;
+}
+.proven-search .clear-search.visible { display: block; }
+
+/* FILTER TABS */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 22px 14px;
+  overflow-x: scroll;
+  border-bottom: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+  scrollbar-color: var(--purple-dim) var(--bg3);
+}
+.filter-tabs::-webkit-scrollbar { height: 6px; }
+.filter-tabs::-webkit-scrollbar-track { background: var(--bg3); border-radius: 3px; }
+.filter-tabs::-webkit-scrollbar-thumb { background: var(--purple-dim); border-radius: 3px; min-width: 30px; }
+.filter-tabs::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+.filter-tab {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.filter-tab:hover {
+  border-color: var(--purple-dim);
+  color: var(--purple);
+}
+.filter-tab.active {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: var(--white);
+}
+.filter-tab .tab-count {
+  font-size: 8px;
+  opacity: 0.7;
+  margin-left: 3px;
+}
+
+/* PROMPT CARDS GRID */
+.prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 18px 22px 18px 22px;
+  max-height: 520px;
+  overflow-y: scroll;
+  scrollbar-width: auto;
+  scrollbar-color: var(--purple-dim) var(--bg3);
+}
+.prompt-grid::-webkit-scrollbar { width: 8px; }
+.prompt-grid::-webkit-scrollbar-track { background: var(--bg3); border-radius: 4px; }
+.prompt-grid::-webkit-scrollbar-thumb { background: var(--purple-dim); border-radius: 4px; min-height: 40px; }
+.prompt-grid::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+.prompt-card {
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.prompt-card:hover {
+  border-color: var(--purple);
+  box-shadow: 0 4px 16px rgba(59,158,255,0.15);
+  transform: translateY(-2px);
+}
+.prompt-card.selected {
+  border-color: var(--purple);
+  box-shadow: 0 4px 20px rgba(59,158,255,0.3);
+}
+.prompt-card.hidden { display: none; }
+.prompt-card-art {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 11px 11px 0 0;
+  flex-shrink: 0;
+}
+.prompt-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.prompt-card-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.prompt-card-name {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prompt-card.selected .prompt-card-name { color: #ffffff; }
+.prompt-card-genre {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: var(--display);
+  font-weight: 600;
+}
+.prompt-card.selected .prompt-card-genre { color: var(--purple); }
+
+/* LOCKED / COMING SOON */
+.prompt-card.locked { opacity: 0.7; }
+.prompt-card.locked:hover { opacity: 0.85; transform: translateY(-1px); }
+.prompt-card.locked .prompt-card-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1;
+}
+.coming-soon-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  font-family: var(--display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #00d4ff;
+  background: rgba(0,0,0,0.7);
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 2;
+}
+.coming-soon-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.coming-soon-overlay.visible { display: flex; }
+.coming-soon-modal {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+}
+.coming-soon-modal h3 {
+  font-family: var(--display);
+  font-size: 20px;
+  color: #00d4ff;
+  margin-bottom: 12px;
+}
+.coming-soon-modal p {
+  font-family: var(--font);
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.coming-soon-modal button {
+  background: linear-gradient(135deg, #1a5faa, var(--purple));
+  border: none;
+  color: white;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.prompt-card-vibe {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+.prompt-grid-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 13px;
+  display: none;
+}
+.prompt-grid-empty.visible { display: block; }
+
+@media (max-width: 640px) {
+  .prompt-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .proven-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .proven-search input { width: 100%; }
+}
+@media (max-width: 380px) {
+  .prompt-grid { grid-template-columns: 1fr; }
+}
+
+/* MODE TABS */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+}
+.mode-tab {
+  flex: 1;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg2);
+  color: var(--muted);
+}
+.mode-tab:hover { color: var(--purple); }
+.mode-tab.active {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  color: var(--white);
+}
+.tab-panel { display: block; }
+.tab-panel.hidden { display: none; }
+
+/* GENRE SELECTOR */
+.genre-block {
+  margin-bottom: 20px;
+}
+.genre-label {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.genre-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* GENRE GROUPS */
+.genre-group {
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg2);
+}
+.genre-group-label {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--purple);
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.genre-group-label:hover { background: var(--bg3); }
+.collapse-icon { font-size: 16px; color: var(--muted); transition: transform 0.2s; }
+.genre-group.collapsed .genre-group-btns { display: none; }
+.genre-group.collapsed .collapse-icon { transform: rotate(-90deg); }
+.genre-group-btns {
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.genre-btn {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+.genre-btn:hover {
+  border-color: var(--purple-dim);
+  color: var(--purple);
+}
+.genre-btn.active {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border-color: transparent;
+  color: var(--white);
+  box-shadow: 0 2px 10px rgba(59,158,255,0.3);
+}
+
+/* BUTTON ROW */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+/* GENERATE BUTTON */
+.generate-btn {
+  flex: 1;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border: none;
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(59,158,255,0.25);
+}
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(59,158,255,0.35);
+}
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.generate-btn.loading {
+  background: linear-gradient(135deg, #1a5faa, var(--purple));
+}
+
+/* ACTIONS ROW */
+.proven-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* FAVORITES BUTTON */
+.fav-filter-btn {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.fav-filter-btn:hover { background: var(--bg2); border-color: var(--purple); color: var(--text); }
+.fav-filter-btn.active { background: rgba(255,200,0,0.1); border-color: #c9a84c; color: #c9a84c; }
+.fav-filter-btn span { font-size: 11px; opacity: 0.6; margin-left: 4px; }
+
+/* FAV STAR ON CARDS */
+.fav-star {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+}
+.fav-star:hover { background: rgba(0,0,0,0.7); color: #c9a84c; }
+.fav-star.favorited { color: #c9a84c; }
+
+/* SURPRISE ME BUTTON */
+.surprise-btn {
+  background: linear-gradient(135deg, #00d4ff, #3b9eff);
+  border: none;
+  color: #080b10;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(59,158,255,0.25);
+  white-space: nowrap;
+  flex: 1;
+}
+.surprise-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59,158,255,0.4);
+}
+
+/* LOADING STATE */
+.loading-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  display: none;
+}
+.loading-block.visible { display: block; }
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--purple);
+  text-transform: uppercase;
+}
+.loading-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* OUTPUT CARD */
+.output-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(59,158,255,0.08);
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+.output-card.visible { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.output-header {
+  background: linear-gradient(135deg, var(--bg3), var(--bg));
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.output-title {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--purple);
+  text-transform: uppercase;
+}
+.output-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.output-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  color: var(--white);
+  text-transform: uppercase;
+}
+.output-tag.plain {
+  background: var(--bg3);
+  color: var(--muted);
+}
+.output-tag.ref {
+  background: linear-gradient(135deg, #00d4ff, #3b9eff);
+  color: #080b10;
+  font-weight: 700;
+}
+
+.output-body { padding: 22px; }
+
+.prompt-display {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--text);
+  font-style: italic;
+  background: var(--bg3);
+  border-left: 3px solid var(--purple);
+  padding: 18px 20px;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 18px;
+  user-select: all;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.prompt-display:hover { background: #1a2030; }
+
+.output-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dim));
+  border: none;
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.copy-btn.copied { background: #22c55e; }
+
+.regen-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.regen-btn:hover { border-color: var(--purple-dim); color: var(--purple); }
+
+.slider-tips {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--purple-light);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 0 8px 8px 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.slider-tips strong { color: var(--purple); }
+
+/* LYRICS SECTION */
+.lyrics-section {
+  margin-top: 16px;
+  padding: 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid #00d4ff;
+  border-radius: 0 12px 12px 0;
+}
+.lyrics-label {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+.lyrics-display {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  cursor: pointer;
+  padding: 12px;
+  background: var(--bg2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.lyrics-display:hover { background: #1a2030; }
+
+/* ERROR */
+.error-block {
+  background: #1a0f0f;
+  border: 1px solid #4a2020;
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: none;
+  animation: fadeUp 0.3s ease;
+  margin-bottom: 20px;
+}
+.error-block.visible { display: block; }
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.error-icon {
+  width: 28px;
+  height: 28px;
+  background: #3a1515;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.error-title {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ff6b6b;
+  text-transform: uppercase;
+}
+.error-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #ff8a8a;
+  margin-bottom: 14px;
+}
+.error-hint {
+  font-size: 11px;
+  color: #e6a040;
+  background: #1a1508;
+  border: 1px solid #3a2a10;
+  border-radius: 8px;
+  padding: 10px 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.error-retry {
+  background: #dc2626;
+  border: none;
+  color: #fff;
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.error-retry:hover { background: #b91c1c; transform: translateY(-1px); }
+
+/* CHAR COUNT */
+.char-count {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.char-count.good { color: #22c55e; }
+.char-count.warn { color: #f59e0b; }
+.char-count.over { color: #ef4444; }
+
+/* HOW TO USE */
+.how-to {
+  margin-top: 40px;
+  padding: 20px 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.how-to-title {
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.how-to ol {
+  padding-left: 18px;
+}
+.how-to ol li { margin-bottom: 4px; }
+.how-to strong { color: var(--text); }
+
+/* FOOTER */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+  margin-top: 40px;
+}
+.footer-text { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.footer-logo { font-family: var(--display); font-size: 13px; font-weight: 800; color: var(--purple); }
+
+@media (max-width: 600px) {
+  .hero { padding: 40px 20px 48px; }
+  .main { padding: 32px 16px 80px; }
+  .header { padding: 14px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">DJ BOOMAN <span>PROMPT LAB</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="header-badge" id="headerBadge">44 Proven Prompts</div>
+    <div class="header-badge" id="headerGenres">33 Genres</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">130 Mode · Jedi Knight Soul Academy</div>
+  <div class="hero-title">Describe the <em>Vibe</em><br>Get the Prompt</div>
+  <div class="hero-sub">AI-Powered Crate Digging — Rare Sample Prompts from Every Corner of the Earth</div>
+  <div class="hero-line"></div>
+</div>
+
+<div class="main">
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="proven" onclick="switchMode('proven')">Proven Prompts</button>
+    <button class="mode-tab" data-mode="create" onclick="switchMode('create')">Create Your Own</button>
+  </div>
+
+  <!-- TAB 1: PROVEN PROMPTS -->
+  <div class="tab-panel" id="panelProven">
+    <div class="proven-section" id="provenSection">
+      <div class="proven-header">
+        <div class="proven-title">
+          Suno-Tested Prompts
+          <span class="proven-count" id="provenCount">44</span>
+        </div>
+        <div class="proven-search">
+          <input type="text" id="promptSearch" placeholder="Search by name, genre, or mood..." oninput="filterPrompts()">
+          <button class="clear-search" id="clearSearch" onclick="clearPromptSearch()">&times;</button>
+        </div>
+      </div>
+      <div class="proven-actions">
+        <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise Me</button>
+        <button class="fav-filter-btn" id="favFilterBtn" onclick="toggleFavFilter()">&#9733; My Favorites <span id="favCount">0</span></button>
+      </div>
+      <div class="filter-tabs" id="filterTabs">
+        <!-- Built dynamically by JS -->
+      </div>
+      <div class="prompt-grid" id="promptGrid">
+        <!-- Built dynamically by JS -->
+      </div>
+      <div class="prompt-grid-empty" id="promptEmpty">No prompts match your search.</div>
+    </div>
+  </div>
+
+  <!-- TAB 2: CREATE YOUR OWN -->
+  <div class="tab-panel hidden" id="panelCreate">
+    <div class="genre-block">
+      <div class="genre-label">Select Target Genre</div>
+      <div id="genreGrid">
+        <div class="genre-group">
+          <div class="genre-group-label" onclick="this.parentElement.classList.toggle('collapsed')">Core Hip-Hop <span class="collapse-icon">-</span></div>
+          <div class="genre-group-btns">
+            <button class="genre-btn active" data-genre="boom-bap">Boom Bap</button>
+            <button class="genre-btn" data-genre="dark-underground">Dark Underground</button>
+            <button class="genre-btn" data-genre="drum-break">Drum Break</button>
+            <button class="genre-btn" data-genre="chipmunk">45 Flip / Chipmunk</button>
+            <button class="genre-btn" data-genre="marching-band">Marching Band</button>
+            <button class="genre-btn" data-genre="modern-trap">Modern Trap / TikTok</button>
+          </div>
+        </div>
+        <div class="genre-group">
+          <div class="genre-group-label" onclick="this.parentElement.classList.toggle('collapsed')">Soul / Gospel / Vocal <span class="collapse-icon">-</span></div>
+          <div class="genre-group-btns">
+            <button class="genre-btn" data-genre="soul-gospel">Soul / Gospel</button>
+            <button class="genre-btn" data-genre="philly-soul">Philly Soul</button>
+            <button class="genre-btn" data-genre="vocal-chop">Vocal Chop Source</button>
+            <button class="genre-btn" data-genre="spiritual-jazz">Spiritual Jazz</button>
+            <button class="genre-btn" data-genre="jazz">Jazz / Soul-Jazz</button>
+          </div>
+        </div>
+        <div class="genre-group">
+          <div class="genre-group-label" onclick="this.parentElement.classList.toggle('collapsed')">International Crates <span class="collapse-icon">-</span></div>
+          <div class="genre-group-btns">
+            <button class="genre-btn" data-genre="latin">Latin Soul</button>
+            <button class="genre-btn" data-genre="japanese">Japanese Soul</button>
+            <button class="genre-btn" data-genre="brazilian">Brazilian Rare Groove</button>
+            <button class="genre-btn" data-genre="polish-jazz">Polish Jazz</button>
+            <button class="genre-btn" data-genre="israeli-psych">Israeli Psych Folk</button>
+            <button class="genre-btn" data-genre="hungarian-psych">Hungarian Psych</button>
+            <button class="genre-btn" data-genre="krautrock">Krautrock</button>
+            <button class="genre-btn" data-genre="turkish-psych">Turkish Psych</button>
+            <button class="genre-btn" data-genre="ethio-jazz">Ethio-Jazz</button>
+            <button class="genre-btn" data-genre="ghana-funk">Ghana Funk</button>
+            <button class="genre-btn" data-genre="greek-rebetiko">Greek Rebetiko</button>
+            <button class="genre-btn" data-genre="bollywood">Bollywood Score</button>
+          </div>
+        </div>
+        <div class="genre-group">
+          <div class="genre-group-label" onclick="this.parentElement.classList.toggle('collapsed')">Film / Library / Score <span class="collapse-icon">-</span></div>
+          <div class="genre-group-btns">
+            <button class="genre-btn" data-genre="italian-film">Italian Film / Giallo</button>
+            <button class="genre-btn" data-genre="cinematic-dark">Dark Cinematic</button>
+            <button class="genre-btn" data-genre="tv-score">TV Score</button>
+            <button class="genre-btn" data-genre="blaxploitation">Blaxploitation</button>
+            <button class="genre-btn" data-genre="french-library">French Library</button>
+            <button class="genre-btn" data-genre="kung-fu-score">Kung Fu Score</button>
+          </div>
+        </div>
+        <div class="genre-group">
+          <div class="genre-group-label" onclick="this.parentElement.classList.toggle('collapsed')">Electronic / Modern / Novelty <span class="collapse-icon">-</span></div>
+          <div class="genre-group-btns">
+            <button class="genre-btn" data-genre="soulful-house">Soulful House</button>
+            <button class="genre-btn" data-genre="disco-house">Disco House</button>
+            <button class="genre-btn" data-genre="synth-funk">Synth-Funk / Quiet Storm</button>
+            <button class="genre-btn" data-genre="8-bit">8-Bit / Chiptune</button>
+            <button class="genre-btn" data-genre="childrens-toy">Children's Toy Music</button>
+            <button class="genre-btn" data-genre="zamrock">Zamrock</button>
+            <button class="genre-btn" data-genre="congolese-rumba">Congolese Rumba</button>
+            <button class="genre-btn" data-genre="colombian-cumbia">Colombian Cumbia</button>
+            <button class="genre-btn" data-genre="peruvian-chicha">Peruvian Chicha</button>
+            <button class="genre-btn" data-genre="thai-psych">Thai Psych</button>
+            <button class="genre-btn" data-genre="cambodian-rock">Cambodian Rock</button>
+            <button class="genre-btn" data-genre="soviet-estrada">Soviet Estrada</button>
+            <button class="genre-btn" data-genre="yugoslav-funk">Yugoslav Funk</button>
+            <button class="genre-btn" data-genre="korean-psych">Korean Psych</button>
+            <button class="genre-btn" data-genre="japanese-jazz-funk">Japanese Jazz-Funk</button>
+            <button class="genre-btn" data-genre="algerian-rai">Algerian Ra\u00ef</button>
+            <button class="genre-btn" data-genre="moroccan-gnawa">Moroccan Gnawa</button>
+            <button class="genre-btn" data-genre="haitian-vodou">Haitian Vodou-Jazz</button>
+            <button class="genre-btn" data-genre="iranian-psych">Iranian Psych</button>
+            <button class="genre-btn" data-genre="afghan-folk">Afghan Folk</button>
+            <button class="genre-btn" data-genre="south-african-jazz">South African Jazz</button>
+            <button class="genre-btn" data-genre="afro-cuban">Afro-Cuban</button>
+            <button class="genre-btn" data-genre="g-funk">G-Funk</button>
+            <button class="genre-btn" data-genre="p-funk">P-Funk Source</button>
+            <button class="genre-btn" data-genre="atl-dungeon">ATL Dungeon</button>
+            <button class="genre-btn" data-genre="houston-funk">Houston Funk</button>
+            <button class="genre-btn" data-genre="memphis-dark">Memphis Dark</button>
+            <button class="genre-btn" data-genre="nola-bounce">NOLA Bounce</button>
+            <button class="genre-btn" data-genre="melodic-trap-source">Melodic Trap Source</button>
+            <button class="genre-btn" data-genre="drill-source">Drill Source</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-block">
+      <div class="input-header">
+        <div class="input-label">Describe Your Vibe</div>
+      </div>
+      <textarea
+        class="vibe-textarea"
+        id="vibeInput"
+        placeholder="e.g. Something dark and eerie with a lone flute, feels like it was recorded in Eastern Europe in 1968, nobody has ever found this record... or just: menacing piano loop with violin swells, slow and heavy, very minor key..."
+        rows="5"
+      ></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="generate-btn" id="generateBtn" onclick="generatePrompt()">
+        ⊕ Generate Suno Prompt
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-block" id="loadingBlock">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Crafting Your Prompt</div>
+    <div class="loading-sub" id="loadingSub">Applying Prompt Lab DNA...</div>
+    <div class="loading-timer" id="loadingTimer" style="font-size:10px;color:var(--muted);margin-top:8px;font-family:var(--font);"></div>
+  </div>
+
+  <div class="error-block" id="errorBlock">
+    <div class="error-header">
+      <div class="error-icon">⚠</div>
+      <div class="error-title" id="errorTitle">Something Went Wrong</div>
+    </div>
+    <div class="error-message" id="errorMessage"></div>
+    <div class="error-hint" id="errorHint" style="display:none;"></div>
+    <button class="error-retry" onclick="generatePrompt()">↺ Try Again</button>
+  </div>
+
+  <div class="output-card" id="outputCard">
+    <div class="output-header">
+      <div class="output-title" id="outputTitle">Suno Prompt</div>
+      <div class="output-meta">
+        <span class="output-tag" id="genreTag">Boom Bap</span>
+        <span class="output-tag ref" id="refTag" style="display:none;">Reference</span>
+        <span class="output-tag plain" id="charTag">— chars</span>
+        <span class="output-tag plain">Suno Ready</span>
+      </div>
+    </div>
+    <div class="output-body">
+      <div class="prompt-display" id="promptDisplay" onclick="copyPrompt()">
+        <!-- Generated prompt appears here -->
+      </div>
+      <div class="lyrics-section" id="lyricsSection" style="display:none;">
+        <div class="lyrics-label">SUNO LYRICS FIELD</div>
+        <div class="lyrics-display" id="lyricsDisplay" onclick="copyLyrics()"></div>
+        <button class="copy-btn" id="copyLyricsBtn" onclick="copyLyrics()" style="margin-top:8px;">⊕ Copy Lyrics</button>
+      </div>
+      <div class="output-actions">
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">⊕ Copy Prompt</button>
+        <button class="regen-btn" onclick="generatePrompt()">↺ Regenerate</button>
+        <span class="char-count" id="charCount"></span>
+      </div>
+      <div class="slider-tips" id="sliderTips"></div>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <div class="how-to-title">How to Use This</div>
+    <ol>
+      <li>Select a target genre above — this locks the era and production style</li>
+      <li>Describe your vibe in plain language — instruments, mood, feel, era, anything</li>
+      <li>Hit Generate — the prompt is written in the proven 130 Mode formula</li>
+      <li>In Suno: <strong>Custom Mode → Advanced tab → paste into Style field</strong>. Leave Lyrics blank unless it's a Vocal Chop prompt (those include lyrics to copy separately).</li>
+      <li>Set Weirdness and Style Influence per the tips shown after generation</li>
+      <li>Run 2–3 variations. Download the best. Chop in your DAW.</li>
+    </ol>
+  </div>
+
+</div>
+
+<div class="coming-soon-overlay" id="comingSoonOverlay" onclick="closeComingSoon()">
+  <div class="coming-soon-modal" onclick="event.stopPropagation()">
+    <h3>COMING SOON</h3>
+    <p id="comingSoonText">This prompt is being field-tested and will be available shortly. Stay tuned.</p>
+    <button onclick="closeComingSoon()">GOT IT</button>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">DJ Booman Prompt Lab · Jedi Knight Soul Academy</div>
+  <div class="footer-logo">DJ BOOMAN</div>
+</div>
+
+<script>
+let selectedGenre = 'boom-bap';
+let lastPrompt = '';
+let activeMode = 'proven';
+let showFavsOnly = false;
+
+// ─── FAVORITES ───────────────────────────────────────────────────────────────
+const favorites = new Set(JSON.parse(localStorage.getItem('promptlab_favs') || '[]'));
+
+function saveFavs() {
+  localStorage.setItem('promptlab_favs', JSON.stringify([...favorites]));
+  document.getElementById('favCount').textContent = favorites.size;
+}
+
+function toggleFav(id, btn) {
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    btn.classList.remove('favorited');
+    btn.innerHTML = '&#9734;';
+  } else {
+    favorites.add(id);
+    btn.classList.add('favorited');
+    btn.innerHTML = '&#9733;';
+  }
+  saveFavs();
+  if (showFavsOnly) filterPrompts();
+}
+
+function toggleFavFilter() {
+  showFavsOnly = !showFavsOnly;
+  document.getElementById('favFilterBtn').classList.toggle('active', showFavsOnly);
+  filterPrompts();
+}
+
+// Init fav count on load
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('favCount').textContent = favorites.size;
+});
+
+// ─── MODE SWITCHING ─────────────────────────────────────────────────────────
+function switchMode(mode) {
+  activeMode = mode;
+  // Update tab buttons
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.mode-tab[data-mode="${mode}"]`)?.classList.add('active');
+  // Show/hide panels
+  document.getElementById('panelProven').classList.toggle('hidden', mode !== 'proven');
+  document.getElementById('panelCreate').classList.toggle('hidden', mode !== 'create');
+  // Clear output on switch
+  document.getElementById('outputCard').classList.remove('visible');
+  document.getElementById('loadingBlock').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+  document.getElementById('lyricsSection').style.display = 'none';
+  lastPrompt = '';
+}
+
+// Genre display names and slider recommendations
+const GENRE_CONFIG = {
+  'boom-bap':       { label: 'Boom Bap',            weirdness: '84–90%', style: '68–76%' },
+  'dark-underground': { label: 'Dark Underground',  weirdness: '88–92%', style: '64–70%' },
+  'soul-gospel':    { label: 'Soul / Gospel',        weirdness: '80%',    style: '76%'    },
+  'jazz':           { label: 'Jazz Soul',            weirdness: '82%',    style: '78%'    },
+  'latin':          { label: 'Latin Soul',           weirdness: '82%',    style: '76%'    },
+  'japanese':       { label: 'Japanese Soul',        weirdness: '83%',    style: '77%'    },
+  'brazilian':      { label: 'Brazilian Rare Groove',weirdness: '85%',    style: '73%'    },
+  'italian-film':   { label: 'Italian Film / Giallo',weirdness: '87–92%', style: '63–71%' },
+  'soulful-house':  { label: 'Soulful House',        weirdness: '75%',    style: '82%'    },
+  'disco-house':    { label: 'Disco House',          weirdness: '76%',    style: '84%'    },
+  'tv-score':       { label: 'TV Score',             weirdness: '82%',    style: '76%'    },
+  'cinematic-dark': { label: 'Dark Cinematic',       weirdness: '88%',    style: '70%'    },
+  'drum-break':     { label: 'Drum Break',           weirdness: '76%',    style: '74%'    },
+  'chipmunk':       { label: '45 Flip / Chipmunk',   weirdness: '78%',    style: '82%'    },
+  'marching-band':  { label: 'Marching Band',        weirdness: '79%',    style: '81%'    },
+  'modern-trap':    { label: 'Modern Trap',          weirdness: '80%',    style: '74%'    },
+  'polish-jazz':    { label: 'Polish Jazz',          weirdness: '88%',    style: '70%'    },
+  'israeli-psych':  { label: 'Israeli Psych Folk',   weirdness: '90%',    style: '68%'    },
+  'hungarian-psych':{ label: 'Hungarian Psych',      weirdness: '88%',    style: '70%'    },
+  'krautrock':      { label: 'Krautrock',            weirdness: '90%',    style: '66%'    },
+  'turkish-psych':  { label: 'Turkish Psych',        weirdness: '90%',    style: '68%'    },
+  'ethio-jazz':     { label: 'Ethio-Jazz',           weirdness: '88%',    style: '70%'    },
+  'ghana-funk':     { label: 'Ghana Funk',           weirdness: '84%',    style: '76%'    },
+  'bollywood':      { label: 'Bollywood Score',      weirdness: '88%',    style: '70%'    },
+  'french-library': { label: 'French Library',       weirdness: '88%',    style: '68%'    },
+  'philly-soul':    { label: 'Philly Soul',          weirdness: '82%',    style: '78%'    },
+  'blaxploitation': { label: 'Blaxploitation',       weirdness: '84%',    style: '76%'    },
+  'spiritual-jazz': { label: 'Spiritual Jazz',       weirdness: '86%',    style: '72%'    },
+  'synth-funk':     { label: 'Synth-Funk',           weirdness: '78%',    style: '80%'    },
+  'kung-fu-score':  { label: 'Kung Fu Score',        weirdness: '90%',    style: '66%'    },
+  'greek-rebetiko': { label: 'Greek Rebetiko',       weirdness: '88%',    style: '70%'    },
+  'vocal-chop':     { label: 'Vocal Chop Source',    weirdness: '80–84%', style: '76–82%' },
+  '8-bit':          { label: '8-Bit / Chiptune',     weirdness: '86%',    style: '70%'    },
+  'zamrock':        { label: 'Zamrock',             weirdness: '90%',    style: '68%'    },
+  'congolese-rumba':{ label: 'Congolese Rumba',     weirdness: '86%',    style: '74%'    },
+  'colombian-cumbia':{ label: 'Colombian Cumbia',   weirdness: '88%',    style: '72%'    },
+  'peruvian-chicha':{ label: 'Peruvian Chicha',     weirdness: '86%',    style: '74%'    },
+  'thai-psych':     { label: 'Thai Psych Funk',     weirdness: '90%',    style: '66%'    },
+  'cambodian-rock': { label: 'Cambodian Rock',      weirdness: '92%',    style: '64%'    },
+  'soviet-estrada': { label: 'Soviet Estrada',      weirdness: '86%',    style: '72%'    },
+  'yugoslav-funk':  { label: 'Yugoslav Prog-Funk',  weirdness: '84%',    style: '74%'    },
+  'korean-psych':   { label: 'Korean Psych',        weirdness: '86%',    style: '70%'    },
+  'japanese-jazz-funk':{ label: 'Japanese Jazz-Funk',weirdness: '84%',   style: '74%'    },
+  'algerian-rai':   { label: 'Algerian Ra\u00ef',   weirdness: '86%',   style: '70%'    },
+  'moroccan-gnawa': { label: 'Moroccan Gnawa',      weirdness: '87%',   style: '68%'    },
+  'haitian-vodou':  { label: 'Haitian Vodou-Jazz',  weirdness: '85%',   style: '72%'    },
+  'iranian-psych':  { label: 'Iranian Pre-Rev',     weirdness: '90%',   style: '68%'    },
+  'afghan-folk':    { label: 'Afghan Folk-Pop',      weirdness: '88%',   style: '70%'    },
+  'south-african-jazz':{ label: 'SA Township Jazz',  weirdness: '84%',  style: '72%'    },
+  'afro-cuban':     { label: 'Afro-Cuban Descarga',  weirdness: '82%',  style: '76%'    },
+  'childrens-toy':  { label: "Children's Toy Music", weirdness: '86%',  style: '72%'    },
+  'g-funk':         { label: 'G-Funk',              weirdness: '80%',  style: '78%'    },
+  'p-funk':         { label: 'P-Funk Source',        weirdness: '82%',  style: '76%'    },
+  'atl-dungeon':    { label: 'ATL Dungeon',          weirdness: '84%',  style: '76%'    },
+  'houston-funk':   { label: 'Houston Funk',         weirdness: '80%',  style: '80%'    },
+  'memphis-dark':   { label: 'Memphis Dark',         weirdness: '90%',  style: '66%'    },
+  'nola-bounce':    { label: 'NOLA Bounce',          weirdness: '78%',  style: '80%'    },
+  'melodic-trap-source': { label: 'Melodic Trap Source', weirdness: '74%', style: '78%' },
+  'drill-source':   { label: 'Drill Source',         weirdness: '80%',  style: '74%'    },
+};
+
+// Genre-specific era locks and production rules for the system prompt
+const GENRE_RULES = {
+  'boom-bap': `ERA LOCK: Late 1960s–1970s. Soul-jazz, hard bop, spiritual jazz, blaxploitation scores, CTI soul-jazz, Stax soul. BPM: 78–90. Minor/modal only. Live band, 2-inch tape, upright bass anchor, featured horn or piano solo. Obscurity framing: pressed in small quantities, regional label, found in a crate.`,
+  'dark-underground': `ERA LOCK: Late 1960s–early 1970s. Eastern European modal jazz, Italian film score, obscure foreign library records, psychedelic soul. BPM: 63–80. Dorian, Phrygian, diminished — maximum tension, zero resolution. Flute, organ, or harpsichord lead. Heavy vinyl degradation, wow-flutter, tape splice artifacts.`,
+  'soul-gospel': `ERA LOCK: Late 1960s Black American gospel and sacred soul. Small church or small studio recording. BPM: 70–86. Hammond B3 organ mandatory, full choir harmonies, call-and-response structure. Hand claps not drums. Raw, imperfect, devotional. "Recorded live in a small church, never commercially distributed."`,
+  'jazz': `ERA LOCK: Early 1970s small ensemble jazz. Regional jazz label. BPM: 82–96. Upright bass walking line as anchor, muted trumpet or tenor saxophone lead, dry room acoustics, analog tape hiss. Minor or Dorian. Late-night intimate feel. Pressed in small quantities for local distribution.`,
+  'latin': `ERA LOCK: Late 1960s New York Latin soul orchestral. Small NYC indie label for Spanish-speaking audience. BPM: 74–86. Dramatic dark string section, wordless female vocal hum as texture, sparse congas and timbales, muted brass. Very cinematic, barrio midnight feeling.`,
+  'japanese': `ERA LOCK: Late 1970s Japanese soul (Wamono). Small regional Japanese label, never exported. BPM: 76–86. Muffled Rhodes or electric piano, clean light bass that sits back, minimal brushed drums, reverb-soaked distant female vocal floating above the mix, flute or vibraphone accents. 3am Tokyo city feeling, slightly melancholic and dreamy.`,
+  'brazilian': `ERA LOCK: Late 1970s Brazilian jazz-fusion. São Paulo small regional label, never exported outside Brazil. BPM: 88–100. Rhodes piano with Brazilian harmonic sensibility, surdo and pandeiro percussion, breathy flute or nylon-string guitar, wordless female vocal hum, humid room sound. Afro-Brazilian rhythmic pulse.`,
+  'italian-film': `ERA LOCK: Early 1970s Italian Poliziotteschi crime film or giallo horror score. Roman studio, pressed for cinema distribution only. BPM: 65–82. Wah-wah rhythm guitar, overdriven walking bass, flute or harpsichord lead, tremolo strings, sparse Hammond stabs. Eerie and funky simultaneously. "Never released commercially outside Italian cinema."`,
+  'soulful-house': `ERA LOCK: Early 1990s NYC underground soulful house. Late-night underground club. BPM: 118–128. Four-on-the-floor, gospel piano upbeat stabs, Hammond B3, live bass, full choir harmonies, congas alongside drum machine. Spiritual and physical simultaneously. Church-trained female vocal.`,
+  'disco-house': `ERA LOCK: Late 1990s French-influenced disco house. BPM: 120–126. Four-on-the-floor, filter sweep on bass opening and closing, lush 1970s disco strings, wah rhythm guitar, brass stabs, vocal chop as instrument. The filter movement is the defining element. Euphoric, sleek.`,
+  'tv-score': `ERA LOCK: Early 1970s American television crime drama score cue. Three sections: sparse electric piano intro → wah-wah guitar groove with muted brass → strip back to piano. BPM: 82–96. Surveillance scene feeling, city at 2am. Written to loop under dialogue. "Composed for a gritty weekly crime drama on a major American network, 1972."`,
+  'cinematic-dark': `ERA LOCK: Late 1980s–early 1990s orchestral. Simple 4–8 note piano melody in natural minor. Long slow string pads as patient presence not dramatic swells. Deep resonant cello underneath. BPM: 65–80. No drums, no percussion, silence as much as sound. Emotional ambiguity — grief that could also be triumph. Late 80s analog warmth without heavy vinyl degradation.`,
+  'drum-break': `ERA LOCK: 1970s live funk drum performance. NO melody, NO harmony, NO bass — pure drums. Three-act structure: locked groove → extended solo breakdown (snare rolls, tom fills, open hi-hat splashes, 8–16 bars of pure percussive improvisation) → groove return. BPM: 95–108. Raw room acoustics, minimal mic placement, human rushing and dragging throughout.`,
+  'chipmunk': `ERA LOCK: Early 1960s girl group soul recording. Designed to be sped up. BPM: 108–120 (at this tempo will chipmunk up to 130–145 and stay musical). Bright and clear enough to survive pitch-shifting. Call-and-response female harmonies, horn stabs, bouncy minor key progression. "Regional 45 single, local airplay only."`,
+  'marching-band': `ERA LOCK: Early 1970s college marching band live stadium recording. 60–80 horns in unison. BPM: 68–80, slow and majestic (allows clean chop of individual hits). Minor-to-major emotional arc. Dynamic structure: low brass foundation → full eruption → single trumpet soloist → full ensemble crash. Outdoor field microphones, crowd noise, slight distortion. Designed for stadium anthem horn chops.`,
+  'modern-trap': `ERA LOCK: Late 1980s–early 1990s orchestral. Simple haunting 4–8 note piano melody in natural minor. String pads as background texture, deep cello, silence between notes. BPM: 65–80 source (will double to 130–140 trap range). Emotional ambiguity — works under introspective verses and euphoric drops. Analog warmth without heavy vinyl degradation. Modern streaming-era aesthetic.`,
+};
+
+// Genre-specific example closers
+const GENRE_CLOSERS = {
+  'boom-bap': 'the kind of forgotten record [dark cinematic underground beatmakers / golden era East Coast boom bap producers / lo-fi spiritual crate-diggers] would spend years hunting in overseas crates and flip into something timeless.',
+  'dark-underground': 'the kind of forgotten foreign record a serious crate digger would spend decades hunting in an overseas record shop.',
+  'soul-gospel': 'the kind of sacred recording [soul-flip generation beatmakers] would chop, pitch up, and place underneath something hard to make it feel like church.',
+  'jazz': 'the kind of warm dusty record [golden era boom bap producers] would loop two bars of and build entire worlds around.',
+  'latin': 'the kind of orchestral Latin soul recording [dark cinematic underground beatmakers] would loop and transform into something devastating.',
+  'japanese': 'the kind of obscure Japanese pressing [lo-fi spiritual crate-diggers] would discover decades after pressing and flip into something completely transformed.',
+  'brazilian': 'the kind of record [lo-fi spiritual crate-diggers / underground West Coast soul diggers] would change their life the first time they heard it in a crate in São Paulo.',
+  'italian-film': 'the kind of forgotten European score cue [dark cinematic underground beatmakers] would pitch down, slow, and loop into something that hits like a freight train.',
+  'soulful-house': 'the kind of record [spiritual dance floor constructors from the Chicago warehouse era] would drop at 4am and make the room levitate.',
+  'disco-house': 'the kind of record [soulful house producers from the basement era] would loop for eight minutes without losing momentum.',
+  'tv-score': 'the kind of TV score cue [golden era East Coast boom bap producers] would isolate, chop, and pitch into something completely unrecognizable and dangerous.',
+  'cinematic-dark': 'the kind of orchestral source material [dark cinematic trap producers / streaming era beatmakers] would low-pass filter and build their most emotional record around.',
+  'drum-break': 'the kind of isolated drum performance where the solo section alone can be chopped into dozens of separate hits and loops.',
+  'chipmunk': 'the kind of bright regional 45 [chipmunk soul-flip producers] would speed up, pitch up, and transform into something buoyant and undeniable.',
+  'marching-band': 'the kind of live brass recording [stadium anthem producers] would isolate a single horn stab from and place under a rolling 808 to make something feel enormous.',
+  'modern-trap': 'the kind of simple orchestral source material [modern trap producers / streaming era beatmakers] would loop, filter, and place under 808s to make something emotionally overwhelming.',
+};
+
+// ─── 23 PROVEN REFERENCE PROMPTS ─────────────────────────────────────────────
+const REFERENCE_PROMPTS = [
+  { id: 'P01', name: 'The Flute Digger', genre: 'italian-film', weirdness: '90%', style: '68%',
+    vibe: 'Haunting solo flute, 1960s Italian film score, eerie and cinematic with deep vinyl noise',
+    prompt: 'Obscure 1960s Italian film score recording, heavy analog degradation and deep vinyl surface noise. Haunting solo flute melody in Dorian mode, sparse pizzicato strings, dry upright bass with no drums. Tempo around 68\u201376 BPM, slow and heavy. Cold, eerie atmosphere with unresolved tension \u2014 no catharsis, no chorus swell. Slight tape splice artifacts and wow-flutter. Sounds like a lost b-side no one has ever sampled. Loopable, cinematic dread, the kind of forgotten foreign record a serious crate digger would spend decades hunting in an overseas record shop.' },
+  { id: 'P02', name: 'Cold Organ', genre: 'dark-underground', weirdness: '88%', style: '70%',
+    vibe: 'Haunting Hammond organ, Eastern European modal jazz, claustrophobic 3am atmosphere',
+    prompt: 'Early 1970s Eastern European modal jazz recording, warped tape and thick vinyl crackle throughout. Haunting Hammond organ lead in Phrygian mode, cold tremolo strings low in the mix, barely-audible upright bass. Tempo 70\u201378 BPM, heavy and deliberate. No drums, no vocals. Claustrophobic, dimly-lit atmosphere \u2014 sounds like it was recorded in a concrete building at 3am. Sparse and menacing with long sustained tones and silence used as texture. Designed to loop. The kind of obscure record that sounds dangerous when chopped and pitched.' },
+  { id: 'P03', name: 'Psych Soul Ghost', genre: 'dark-underground', weirdness: '92%', style: '65%',
+    vibe: 'Psychedelic soul, harpsichord, ghostly female vocal, hallucinatory and dark',
+    prompt: 'Late 1960s psychedelic soul recording, extreme tape degradation, heavy vinyl surface noise and random crackle pops. Sparse harpsichord in a diminished scale, dissonant tremolo strings, and faint ghostly wordless female vocal buried deep in the mix \u2014 not a lead, just a haunting texture. Dry upright bass, no drums. Tempo 63\u201372 BPM, dragging and hypnotic. Dark, hallucinatory mood \u2014 melancholy without resolution. Feels like a forgotten record pressed in small quantities that never got distributed. Loopable and deeply sampleable when pitched up.' },
+  { id: 'P04', name: 'Middle East Menace', genre: 'dark-underground', weirdness: '86%', style: '72%',
+    vibe: 'Middle Eastern oud or sitar, Hijaz scale, cinematic dread, 1970s orchestral',
+    prompt: 'Early 1970s Middle Eastern orchestral recording, analog tape saturation with heavy wow-flutter and vinyl degradation. Oud or sitar melody in a Hijaz scale, dark cello section low in the mix, minimal upright bass. No drums, no vocals. Tempo 72\u201380 BPM, swaying and hypnotic. Cinematic dread \u2014 the kind of music that plays before something terrible happens in a film. Unresolved harmonic tension throughout, no cathartic release. Sparse arrangement with long held tones and deep silences. Sounds like it was recorded in Cairo or Istanbul in 1971 and never released outside its region. Built to loop endlessly.' },
+  { id: 'P05', name: 'Hybrid Bridge', genre: 'boom-bap', weirdness: '86%', style: '75%',
+    vibe: 'Rhodes piano in Dorian mode, ghostly female vocal hum, lush yet menacing',
+    prompt: '1970s rare soul recording, heavy analog tape saturation and vinyl crackle. Slow Rhodes piano melody in Dorian mode, sparse cold strings and minimal upright bass. No drums. Tempo 74\u201382 BPM. Single ghostly female vocal hum buried under the instruments \u2014 not a performance, just an atmosphere. Dark, contemplative mood with no harmonic resolution. Imperfect human timing and tape artifacts throughout. Lush enough to feel emotional, menacing enough to feel dangerous. Loopable, designed to be chopped, pitched, and flipped into something brutal.' },
+  { id: 'P06', name: 'Black Church', genre: 'soul-gospel', weirdness: '80%', style: '76%',
+    vibe: 'Hammond B3 organ, gospel choir, small Black church, raw and spiritual',
+    prompt: 'Late 1960s Black church recording, warm analog tape saturation and subtle vinyl surface noise. Full Hammond B3 organ lead, thick gospel choir harmonies rising and falling in waves, strong live bass walking underneath. No drums except occasional hand claps buried deep in the mix. Tempo 72\u201382 BPM. Deep spiritual yearning \u2014 voices stacking on top of each other, call and response between organ and choir. Feels like it was recorded live in a small church on a Sunday morning. Raw, emotional, unrehearsed human feel. The kind of sacred music that becomes transcendent when chopped, pitched up, and placed underneath something hard.' },
+  { id: 'P07', name: 'Late Night Jazz Session', genre: 'jazz', weirdness: '82%', style: '78%',
+    vibe: 'Small ensemble jazz, walking upright bass, muted trumpet, late-night intimate feel',
+    prompt: 'Early 1970s small ensemble jazz recording, dry room acoustics, analog tape hiss and subtle vinyl surface noise. Upright bass walking line as the anchor, brushed snare and ride cymbal swinging loosely, muted trumpet or tenor saxophone carrying the melody. Tempo 84\u201396 BPM, light and swinging but melancholic underneath. Imperfect human timing, musicians responding to each other in real time. Sounds like a late-night session pressed in small quantities for a regional label. The kind of warm, dusty live jazz record producers have been digging for, looping two bars, and building entire worlds around.' },
+  { id: 'P08', name: 'Aching Soul Vocal', genre: 'soul-gospel', weirdness: '84%', style: '80%',
+    vibe: 'Wailing female soul vocal, gospel-drenched, lush strings, slow and devastating',
+    prompt: 'Mid 1970s dramatic soul recording, heavy analog tape saturation and deep vinyl crackle throughout. Wailing female lead vocal \u2014 emotive, strained, gospel-drenched \u2014 singing a slow aching minor key melody. Voice cracking and straining at the edges, raw and completely unrestrained. Lush string arrangement underneath, warm piano chords, live bass with no drums. Tempo 65\u201376 BPM, slow and weighted with grief. The kind of devastating soul performance built to be chopped into a two-bar loop, pitched up several semitones, and transformed into something completely unrecognizable but emotionally overwhelming.' },
+  { id: 'P09', name: '45 Flip Ready', genre: 'chipmunk', weirdness: '78%', style: '82%',
+    vibe: 'Upbeat 1960s girl group, bouncy call-and-response, designed to be sped up',
+    prompt: 'Upbeat early 1960s girl group soul recording, bright analog tape, light vinyl surface noise. Call and response female vocal harmonies over a lively minor key chord progression with a bouncy swing feel. Piano, rhythm guitar, walking bass, and a loose live drum groove. Crisp punchy horn stabs punctuating the vocal phrases. Tempo 108\u2013120 BPM, energetic and driving. Feels like a regional 45 single that got local airplay but never crossed over nationally. Designed to be pitched up several semitones and transformed into a buoyant, chipmunked sample flip that still retains the original warmth and swing.' },
+  { id: 'P10', name: 'The Break', genre: 'drum-break', weirdness: '76%', style: '74%',
+    vibe: 'Pure drums, 1970s funk, three-act structure with extended solo breakdown',
+    prompt: '1970s live funk drum performance recorded to analog tape with moderate vinyl surface noise. No melody, no harmony, no bass \u2014 a single drummer in an empty room. Structure in three acts: opens with a tight locked-in groove \u2014 deep punchy kick, cracking snare, syncopated hi-hats. Mid-section breaks into a full extended drum solo breakdown \u2014 the drummer cuts loose completely, trading between snare rolls, tom fills, open hi-hat splashes, rim shots, and rapid kick doubles for eight to sixteen bars. Final section snaps back to the locked groove, tighter and harder than before. Tempo 95\u2013108 BPM with natural human rushing and dragging throughout.' },
+  { id: 'P11', name: 'Library Cue', genre: 'tv-score', weirdness: '88%', style: '66%',
+    vibe: 'Production library cue, flute or vibraphone, tense and unresolved, 300 copies pressed',
+    prompt: 'Early 1970s production library cue recording \u2014 functional broadcast music, analog tape, light vinyl degradation. Short self-contained piece with a deliberate mood arc: tense sparse introduction, slowly building middle section, unresolved hanging ending. Solo flute or vibraphone over cold sparse strings and a dry upright bass. No vocals, no drums. Tempo 76\u201388 BPM. Pressed in a quantity of 300 copies for broadcaster licensing, never heard outside a television studio. Deeply loopable, harmonically restless, completely undiscovered \u2014 the definition of untouched sample material sitting in a library crate.' },
+  { id: 'P12', name: 'Tokyo Deep', genre: 'japanese', weirdness: '83%', style: '77%',
+    vibe: 'Japanese soul, muffled Rhodes, distant female vocal singing in Japanese, dreamy',
+    prompt: 'Late 1970s Japanese soul recording, warm analog tape with a slightly muffled, intimate room sound. Mid-tempo groove around 76\u201386 BPM. Soft muffled Rhodes keys carrying a gentle, dreamy minor key melody \u2014 delicate, slightly distant. Clean natural upright bass walking slowly underneath. Minimal brushed drums \u2014 sparse kick, quiet snare, hi-hat barely there. Bright distant female vocal singing a melancholic Japanese pop melody, reverb-soaked and floating above the mix. Subtle flute or vibraphone accents weaving between vocal phrases. The kind of obscure Japanese soul pressing from a small regional label never distributed outside Japan, loopable and deeply sampleable when pitched up and slowed.' },
+  { id: 'P13', name: 'Cinemascope Nero', genre: 'italian-film', weirdness: '87%', style: '71%',
+    vibe: 'Italian crime film, wah-wah guitar, walking bass, flute and tremolo strings',
+    prompt: 'Early 1970s Italian crime film soundtrack recording, analog tape with a slightly hollow studio sound. Mid-tempo groove around 80\u201392 BPM. Funky wah-wah rhythm guitar chopping on the upbeats, deep walking electric bass with a slightly overdriven tone. Lead instrument alternating between a haunting solo flute and a tense tremolo string section \u2014 the two trading off, never resolving harmonic tension. Sparse Hammond organ stabs punctuating dramatic moments. No vocals. Slightly eerie, slightly funky. Pressed in small quantities for film distribution only, never commercially released.' },
+  { id: 'P14', name: 'Midnight Sanctuary', genre: 'soulful-house', weirdness: '75%', style: '82%',
+    vibe: 'Underground soulful house, gospel piano, powerful female vocal, spiritual and physical',
+    prompt: 'Early 1990s New York underground soulful house music recording, warm analog mixing board saturation. Four-on-the-floor kick drum at 122 BPM, crisp snare on the two and four, shimmering open hi-hat. Deep warm analog bass line in a gospel-influenced minor chord progression. Live gospel piano chords stabbing on the upbeats \u2014 full rich voicings with extended harmonies. A full-throated Black female lead vocal \u2014 powerful, church-trained, deeply emotional. Background choir harmonies swelling in call and response. Congas and shakers woven into the percussion bed. The feeling of a late-night underground club where the music is spiritual, not just physical.' },
+  { id: 'P15', name: 'Filtered Gold', genre: 'disco-house', weirdness: '76%', style: '84%',
+    vibe: 'French disco house, filter sweep bass, disco strings, wah-wah guitar, euphoric',
+    prompt: 'Late 1990s French-influenced disco house production, warm heavily filtered analog processing throughout. Four-on-the-floor kick at 124 BPM, tight punchy snare, closed hi-hats with occasional open hat flares. A deeply funky filtered bass line \u2014 the low-pass filter slowly sweeping open and closed over the eight bar cycle. Lush 1970s disco string section looped and filtered. Tight funky rhythm guitar chopping on the upbeats, wah-wah processing giving it a rubbery elastic feel. Brass stabs accenting off-beats. Single short vocal phrase chopped into a two bar loop, pitched and effected until it functions as an instrument. Designed to loop for eight minutes without losing momentum.' },
+  { id: 'P16', name: 'Barrio Nocturno', genre: 'latin', weirdness: '82%', style: '76%',
+    vibe: 'Latin soul orchestra, dark strings, congas, ghostly female vocal, midnight barrio',
+    prompt: 'Late 1960s New York Latin soul orchestral recording, warm analog tape with deep vinyl surface noise. Mid-tempo groove around 74\u201384 BPM. Dramatic dark string section playing a slow moody minor key melody with cinematic tension. Upright bass walking a deep slow groove, congas and timbales playing a restrained rhythmic pattern. Dark piano or organ chords voicing the harmony in the lower register. Female vocal texture floating above \u2014 not singing words, just wordless humming, reverb-soaked, almost ghostly. The feeling of a deserted Latin neighborhood at midnight. Pressed on a small New York indie label in 1969. The kind of orchestral Latin soul recording that loops and transforms into something devastating.' },
+  { id: 'P17', name: 'Giallo Nero', genre: 'italian-film', weirdness: '92%', style: '63%',
+    vibe: 'Italian horror score, pulsing bass, analog synth arpeggio, harpsichord stabs, funeral pace',
+    prompt: 'Mid 1970s Italian horror film score recording, analog tape with a slightly hollow studio sound. A pulsing electric bass line locked into a hypnotic minor key ostinato, and above it a cold analog synthesizer playing a slow repeating arpeggio that spirals and refuses to resolve. Harpsichord interjecting sharp stabbing phrases between the synth lines. No drums except a slow plodding kick \u2014 one hit every two beats, deliberate and funeral. Distant tremolo strings swelling in and out like something breathing in a dark room. A ghostly whispering female voice buried deep in the reverb \u2014 not words, just a barely-audible tonal hum. Church organ drone underneath everything. Tempo 68\u201380 BPM. Pressed for Italian cinema distribution only.' },
+  { id: 'P18', name: 'Murda Muzik Source', genre: 'cinematic-dark', weirdness: '91%', style: '64%',
+    vibe: 'Dark orchestral, obsessive minor piano motif, mournful strings, pure menace',
+    prompt: 'Late 1960s dark orchestral recording, heavy analog tape degradation and deep vinyl surface noise throughout. A single repeating minor piano figure in harmonic minor \u2014 cold, mechanical, four to six notes cycling obsessively with no resolution. Not a melody, a motif. Sparse mournful string section underneath, violins playing long sustained tones in the lowest register, bowing slowly and without warmth. No drums, no bass. Tempo 68\u201380 BPM, slow and deliberate, heavy with dread. Occasional dissonant cello swell entering from silence and retreating back into it. Pressed on a small European label in 1967. Designed to be the foundation under the most menacing rap ever recorded.' },
+  { id: 'P19', name: 'Late Night Broadcast', genre: 'tv-score', weirdness: '82%', style: '76%',
+    vibe: 'TV crime drama cue, electric piano, wah-wah guitar, surveillance scene at 2am',
+    prompt: 'Early 1970s American television crime drama score cue, analog tape with a slightly dry studio sound. Three distinct sections that loop back naturally. Opening: tense and sparse \u2014 lone electric piano playing a short repeating minor key figure, upright bass walking slowly. Middle: the groove drops in \u2014 punchy wah-wah rhythm guitar, tight snare, walking bass, muted trumpet playing a short bluesy phrase. Final: everything strips back to just the electric piano motif. Tempo 82\u201396 BPM. The feeling of a surveillance scene \u2014 a detective watching someone from a car at 2am. Composed as functional background music for a gritty weekly crime drama, 1972.' },
+  { id: 'P20', name: 'S\u00e3o Paulo Basement', genre: 'brazilian', weirdness: '85%', style: '73%',
+    vibe: 'Brazilian jazz-funk, Rhodes piano, breathy flute, humid room, S\u00e3o Paulo 1978',
+    prompt: 'Late 1970s Brazilian jazz-funk fusion recording from S\u00e3o Paulo, warm analog tape with a slightly humid room sound. Electric Rhodes piano carrying a bright hypnotic minor key melody with a distinctly Brazilian harmonic sensibility \u2014 the chord voicings more circular, more resolved into sadness than tension. Deep locked electric bass groove. Surdo and pandeiro percussion weaving through with congas. A breathy flute doubling the Rhodes melody in a higher register. Short wordless female vocal hum floating through the bridge sections. Tempo 88\u2013100 BPM. Pressed on a small regional Brazilian label in 1978, never exported outside Brazil.' },
+  { id: 'P21', name: 'Thunder Soul', genre: 'boom-bap', weirdness: '85%', style: '79%',
+    vibe: 'Live high school funk band, raw and imperfect, female flute solo, gymnasium recording',
+    prompt: 'Early 1970s live high school stage band funk recording, raw and unpolished analog tape with natural room reverb. A large ensemble of teenage musicians playing with more feeling than technical precision \u2014 slightly imperfect intonation, tempos that breathe because the drummer is seventeen and full of adrenaline. Locked funky groove driven by a tight two-bar horn riff over a deep rhythm section. Mid-section: a young female flute soloist steps out over a stripped-back groove, the flute slightly breathy and raw. Then the drummer breaks into a full extended solo before the full ensemble crashes back in. Tempo 92\u2013108 BPM. Recorded live in a high school gymnasium in 1972.' },
+  { id: 'P22', name: 'Stadium Brass', genre: 'marching-band', weirdness: '79%', style: '81%',
+    vibe: 'College marching band, 60\u201380 horns, solo trumpet, stadium recording, triumphant',
+    prompt: 'Early 1970s college marching band live stadium recording, warm and slightly distorted from the outdoor field microphones, crowd noise audible. A massive brass section \u2014 sixty to eighty horns \u2014 performing a slow triumphant minor-to-major chord progression that swells and retreats like a tide. The horns begin sparse, just low brass laying foundation. Then the full section erupts. Mid-section: the brass drops to silence except for a single trumpet soloist playing a soaring gospel-influenced melodic phrase \u2014 raw, slightly sharp, deeply emotional. Then the full section crashes back at full volume. Percussion thundering underneath. Tempo 68\u201380 BPM. The kind of single horn stab that, isolated and filtered, becomes the foundation of a stadium rap anthem.' },
+  { id: 'P23', name: 'Dark Cinematic Loop', genre: 'cinematic-dark', weirdness: '80%', style: '74%',
+    vibe: 'Minimal piano melody, slow string pads, deep cello, cinematic grief, silence as texture',
+    prompt: 'Late 1980s to early 1990s cinematic orchestral recording, slightly degraded analog tape with subtle warmth and soft vinyl texture. A haunting minimal piano melody in a natural minor scale \u2014 four to eight notes, simple and devastating. Long slow string pads sustaining behind the piano like a held breath \u2014 not dramatic swells, just patient presence. Deep resonant cello line moving in slow half notes underneath. No drums, no percussion. Tempo 65\u201380 BPM, slow and weighted. Silence used as much as sound. The emotional register is cinematic grief. Reverb on everything, long tails, sounds bleeding into each other. Designed to work equally well under introspective verses and euphoric drops.' },
+  { id: 'P24', name: 'Warsaw Glass', genre: 'polish-jazz', weirdness: '88%', style: '70%',
+    vibe: 'Cold Polish jazz, crystalline piano, Harmon-muted trumpet, Iron Curtain midnight',
+    prompt: 'Early 1970s Polish jazz recording from Warsaw, cold analog tape with metallic room reverb and moderate vinyl surface noise. Crystalline grand piano playing a slow repeating figure in D Dorian \u2014 cold, searching, each note ringing with brittle clarity. Upright bass recorded dry and forward, woody attack with minimal sustain. Harmon-muted trumpet entering from silence, playing a restrained melody that circles without resolving. Mid-section: the piano steps into an extended solo \u2014 spare, deliberate, sustain pedal catching overtones that shimmer and decay. Tempo 72\u201382 BPM. No vocals. The atmosphere of a concrete studio at midnight behind the Iron Curtain. Pressed on a state-owned label in a limited domestic run, never exported outside Eastern Europe. Designed to loop hypnotically \u2014 the kind of cold dusty record a producer would loop two bars of and build entire worlds around.' },
+  { id: 'P25', name: 'Dead Sea Scroll', genre: 'israeli-psych', weirdness: '90%', style: '68%',
+    vibe: 'Israeli psych folk, oud in Hijaz scale, bouzouki tremolo, ancient and microtonal',
+    prompt: 'Early 1970s Israeli psychedelic folk recording from Tel Aviv, warm analog tape with heavy midrange saturation and deep vinyl crackle. A solo oud carrying an ornate melody in Hijaz scale \u2014 dark, ancient, each microtonal bend landing between the cracks of Western tuning. Bouzouki arpeggios shimmering underneath in a slow tremolo, metallic and bright. Electric guitar drenched in spring reverb playing sparse modal phrases that echo and decay. Mid-section: the oud steps into an extended solo passage \u2014 rapid ornamental runs climbing through the augmented second intervals, each phrase more desperate than the last before retreating to the central motif. Tempo 68\u201378 BPM, swaying and hypnotic. No vocals except a distant wordless hum buried in reverb. Pressed in a quantity of 300 on a small Tel Aviv indie label, never distributed outside Israel. Built to loop endlessly \u2014 the kind of forgotten Middle Eastern recording a crate digger would spend years hunting and flip into something devastating.' },
+  { id: 'P26', name: 'Budapest Hammer', genre: 'hungarian-psych', weirdness: '88%', style: '70%',
+    vibe: 'Hungarian psych folk, cimbalom and t\u00e1rogat\u00f3, fuzz drones, Eastern Bloc intensity',
+    prompt: 'Mid 1970s Hungarian psychedelic folk-rock recording, warm Eastern Bloc tape with moderate vinyl surface noise. A cimbalom playing a repeating figure in Hungarian minor \u2014 hammered strings shimmering with complex overtones, each strike percussive and bell-like with long metallic decay. T\u00e1rogat\u00f3 entering with a dark reedy melody, mournful and almost vocal in its phrasing. Electric guitar underneath playing slow fuzz-drenched drones through a phaser. Mid-section: the cimbalom breaks into an extended solo \u2014 rapid hammered runs climbing through augmented second intervals of Hungarian minor, restless and searching. Tempo 74\u201384 BPM. No vocals. Pressed in a limited domestic run, never exported beyond the Eastern Bloc. Loopable \u2014 the kind of obscure Eastern European record that sounds like nothing else when chopped and pitched.' },
+  { id: 'P27', name: 'Autobahn Noir', genre: 'krautrock', weirdness: '90%', style: '66%',
+    vibe: 'German kosmische, Moog filter sweeps, Farfisa drone, motorik pulse, cold and vast',
+    prompt: 'Early 1970s German experimental recording, warm precision-engineered tape with dense midrange and faint vinyl hiss. A Moog synthesizer locked into a slow hypnotic filter sweep \u2014 low-pass cutoff opening and closing over an eight-bar cycle, dark and vast. Farfisa organ sustaining a cold Phrygian drone through heavy spring reverb, swirling and disorienting. Electric guitar playing a single repeating note through a ring modulator, metallic and alien. Mid-section: the Moog steps into an extended passage \u2014 filter fully open, revealing a complex evolving timbre that spirals upward before retreating beneath the cutoff. Tempo 82\u201392 BPM, relentless and motorik. No vocals. Endless night highway through industrial Germany. Pressed on a small independent label in a run of 500 copies. Designed to loop indefinitely \u2014 the kind of cold kosmische record a producer would slow down and build their most hypnotic record around.' },
+  { id: 'P28', name: 'Anatolian Dust', genre: 'turkish-psych', weirdness: '90%', style: '68%',
+    vibe: 'Turkish psych, amplified ba\u011flama in Hicaz makam, saturated mono mix, raw and furious',
+    prompt: 'Early 1970s Turkish psychedelic recording from Istanbul, saturated analog tape with heavy compression and thick vinyl surface noise. An amplified ba\u011flama locked into a rapid tremolo melody in Hicaz makam \u2014 buzzing, metallic, microtonal intervals landing where Western scales cannot reach. Farfisa organ sustaining dark modal chords underneath, thin and sinister. Electric bass played high on the neck following the melodic contour, overdriven and woolly. Mid-section: the ba\u011flama steps into an extended solo \u2014 tremolo intensifying, ornamental hammer-ons climbing through augmented seconds of Hicaz, raw and furious. Tempo 70\u201380 BPM, heavy and swaying. No vocals. Mono mix, dense and punchy. Pressed as a 45 RPM single on a small Turkish label, 500 copies, never distributed outside Anatolia. Built to loop endlessly \u2014 the kind of forgotten Turkish record a crate digger would spend decades hunting in an overseas record shop.' },
+  { id: 'P29', name: 'Addis Midnight', genre: 'ethio-jazz', weirdness: '88%', style: '70%',
+    vibe: 'Ethio-Jazz, Hammond organ in ambassel mode, raw tenor sax, Addis Ababa nightclub 1973',
+    prompt: 'Early 1970s Ethiopian recording from Addis Ababa, dry close-miked analog tape with minimal reverb and moderate vinyl degradation. Hammond organ carrying an ornate melody in ambassel mode \u2014 dark, aching, notes orbiting a tonal center without resolving, each phrase heavy with spiritual longing. Tenor saxophone entering with a raw solo, following Ethiopian melodic contours with heavy vibrato and ornamental turns. Upright bass playing a deep repetitive pattern underneath. Mid-section: the organ steps into an extended passage \u2014 expression pedal swelling, melody climbing into the upper register with increasing urgency before cycling back. Tempo 72\u201382 BPM. No vocals. The atmosphere of a dimly-lit Addis Ababa nightclub in 1973. Pressed on a small Ethiopian label, 500 copies, never exported. Loopable and hypnotic \u2014 the kind of forgotten African recording a producer would loop two bars of and build something timeless around.' },
+  { id: 'P30', name: 'Accra Gold', genre: 'ghana-funk', weirdness: '84%', style: '76%',
+    vibe: 'Ghanaian highlife funk, shimmering guitar ostinato, cowbell, bright and percussive',
+    prompt: 'Mid 1970s Ghanaian highlife funk recording from Accra, warm analog tape with bright midrange and moderate vinyl surface noise. Clean-toned electric guitar locked into a shimmering two-bar ostinato in natural minor \u2014 bright, percussive, each picked note cutting through the mix. Second guitar playing a rhythmic comping figure with rolling highlife swing. Electric bass walking a melodic counter-line, round and deep. Congas and cowbell weaving a polyrhythmic pattern. Mid-section: the lead guitar breaks into an extended solo \u2014 pentatonic minor runs with chromatic passing tones, the picking attack ahead of the beat creating a forward pull. Tempo 92\u2013104 BPM. No vocals. The atmosphere of a packed Accra dance hall in 1975. Pressed on a small Ghanaian label, limited domestic run, surviving copies showing decades of heavy play. Designed to loop \u2014 the kind of dusty West African record a producer would pitch down and flip into something that knocks.' },
+  { id: 'P31', name: 'Bombay Reel', genre: 'bollywood', weirdness: '88%', style: '70%',
+    vibe: 'Bollywood film score, solo sitar, tablas, lush strings, Bombay 1970s',
+    prompt: 'Early 1970s Bollywood film score recording from Bombay, warm analog tape with a slightly compressed studio sound and moderate vinyl surface noise. A solo sitar carrying a slow ornate melody in a raga-influenced minor scale \u2014 each note bent and sustained with microtonal precision. Lush tremolo string section swelling underneath, tablas weaving a restrained rhythmic pattern, and a distant female vocal humming a wordless melody drenched in reverb. Hammond organ sustaining dark chords in the lower register. Mid-section: the sitar steps into an extended solo passage \u2014 rapid ornamental runs climbing through the scale before retreating to the central motif. Tempo 72\u201382 BPM, hypnotic and swaying. The atmosphere of a dramatic scene in a film that played in Bombay cinemas and nowhere else. Pressed for Indian domestic distribution only, never exported. Loopable and devastating \u2014 the kind of forgotten Bollywood score cue a global crate digger would build entire projects around.' },
+  { id: 'P32', name: 'Paris Noir', genre: 'french-library', weirdness: '88%', style: '68%',
+    vibe: 'French library music, harpsichord, solo flute, Parisian orchestral noir',
+    prompt: 'Early 1970s French orchestral recording from a Parisian studio, warm analog tape with subtle room reverb and light vinyl surface noise. A harpsichord playing a slow repeating baroque-influenced figure in harmonic minor \u2014 precise, cold, each note sharp and deliberate. Lush string section underneath sustaining dark cinematic chords. Solo flute entering with a breathy melody floating above the arrangement, melancholic and detached. Nylon-string guitar comping sparse voicings in the background. Mid-section: the flute steps into an extended solo \u2014 the melody climbing through chromatic passing tones with French classical phrasing before retreating to the opening theme. Tempo 74\u201384 BPM. No vocals. The atmosphere of a rain-soaked Paris crime film. Pressed as a library music cue for French broadcast use, 200 copies, never commercially released. Designed to loop \u2014 the kind of elegant forgotten European recording a producer would pitch down and build something cinematic around.' },
+  { id: 'P33', name: 'Sigma Gold', genre: 'philly-soul', weirdness: '82%', style: '78%',
+    vibe: 'Philly soul orchestral, massive string section, flugelhorn solo, dramatic and lush',
+    prompt: 'Mid 1970s Philadelphia soul orchestral recording, warm analog tape saturated with the signature sound of a legendary Philly recording studio. A massive string section \u2014 thirty players \u2014 sweeping through a dramatic minor-key arrangement that swells and retreats in emotional waves. Rhodes electric piano underneath playing rich extended chord voicings, live electric bass locked into a slow groove. Full horn section \u2014 trumpet, trombone, tenor saxophone \u2014 playing arranged stabs between the string phrases. Mid-section: the strings drop to silence and a solo flugelhorn plays an exposed melodic phrase \u2014 warm, golden, deeply emotional \u2014 before the full orchestra crashes back in. Tempo 76\u201386 BPM. No vocals. The kind of orchestral soul recording pressed on a Philadelphia independent label in 1975, the B-side that got overlooked. Built to be chopped \u2014 a single string swell from this record becomes the foundation of an anthem.' },
+  { id: 'P34', name: 'Shaft Alley', genre: 'blaxploitation', weirdness: '84%', style: '76%',
+    vibe: 'Blaxploitation score, wah-wah guitar, muted trumpet, urban midnight 1973',
+    prompt: 'Early 1970s American blaxploitation film score recording, analog tape with a slightly gritty studio sound and moderate vinyl surface noise. A wah-wah rhythm guitar chopping a tight syncopated pattern over a deep walking electric bass with a slightly overdriven tone. Harmon-muted trumpet playing a cool minor-key melody \u2014 bluesy, understated, urban. Sparse string section sustaining tension underneath. Hammond B3 organ comping dark chords in the background. Mid-section: the trumpet steps into an extended solo \u2014 breathy, bending notes at the edges, the melody circling through Dorian intervals with late-night city cool. Tempo 82\u201392 BPM. No vocals. The atmosphere of a car chase through a city at midnight in 1973. Composed as a score cue for a crime film that was released regionally and forgotten. Loopable and funky \u2014 the kind of gritty urban score a producer would isolate the wah guitar from and flip into something dangerous.' },
+  { id: 'P35', name: 'Astral Temple', genre: 'spiritual-jazz', weirdness: '86%', style: '72%',
+    vibe: 'Spiritual jazz, Rhodes drone, solo flute, congas, cosmic and devotional',
+    prompt: 'Early 1970s spiritual jazz recording, warm analog tape with reverberant studio sound and subtle vinyl surface noise. Rhodes electric piano carrying a slow modal drone in D Dorian \u2014 warm, cosmic, each chord sustained with tremolo and allowed to decay naturally. Solo flute floating above playing a meditative melody that circles without resolving. Upright bass holding sparse root notes, deep and resonant. Congas and finger cymbals weaving a gentle polyrhythmic texture. Mid-section: the Rhodes steps into an extended passage \u2014 chords opening into wider voicings, tremolo intensifying, the sound becoming more spacious and devotional before cycling back. Tempo 68\u201378 BPM. No vocals. Pressed in a quantity of 300 on a small independent jazz label, never reissued. The kind of cosmic jazz record a producer would loop two bars of and build entire worlds around.' },
+  { id: 'P36', name: 'Chrome Love', genre: 'synth-funk', weirdness: '78%', style: '80%',
+    vibe: '1980s synth-funk, Prophet pads, Moog bass, talk box texture, quiet storm',
+    prompt: 'Early 1980s American synth-funk recording, warm analog synthesizer pads with a polished studio sheen and subtle tape compression. A Prophet synthesizer playing lush extended minor chord voicings \u2014 rich, shimmering, each pad slowly evolving through filter sweeps. Moog bass synthesizer underneath locked into a deep repetitive pattern. Fender Rhodes electric piano adding sparse melodic phrases between the synth pads. Talk box vocal texture floating through the bridge \u2014 not words, just a vocoded human tone, robotic yet emotional. Mid-section: the Prophet steps into an extended passage \u2014 the filter fully open, arpeggiated chords cascading in a slow minor-key sequence before retreating beneath the bass. Tempo 78\u201388 BPM. The atmosphere of a late-night quiet storm radio broadcast in 1983. Pressed on a small independent funk label, limited regional distribution. The kind of polished synth-soul record a producer would slow down, loop the pad, and build something heavy underneath.' },
+  { id: 'P37', name: 'Temple Fist', genre: 'kung-fu-score', weirdness: '90%', style: '66%',
+    vibe: 'Shaw Brothers film score, erhu, Chinese percussion, martial arts tension',
+    prompt: 'Mid 1970s Hong Kong martial arts film score recording, analog tape with compressed studio sound and moderate vinyl degradation. Solo erhu carrying a slow pentatonic minor melody \u2014 dark, tense, each bowed note sustaining with a nasal human-voice quality. Woodblocks, gongs, and small cymbals punctuating dramatic moments with sharp accents. Tremolo strings sustaining in low dissonant clusters. Guzheng plucking sparse arpeggiated figures between the erhu phrases. Mid-section: the erhu steps into an extended passage \u2014 melody climbing rapidly through the pentatonic scale, bowing intensifying, before dropping to silence and a single gong strike. Tempo 70\u201380 BPM. No vocals. Pressed for Asian cinema distribution only, never released outside the region. Built to loop \u2014 the kind of forgotten Eastern film score a producer would pitch down and build their most cinematic record around.' },
+  { id: 'P38', name: 'Aegean Ghost', genre: 'greek-rebetiko', weirdness: '88%', style: '70%',
+    vibe: 'Greek laiko, bouzouki tremolo, Phrygian mode, smoky Athens nightclub 1972',
+    prompt: 'Early 1970s Greek laiko recording from Athens, warm analog tape with heavy midrange saturation and deep vinyl crackle. A solo bouzouki carrying a rapid tremolo melody in a Phrygian-influenced mode \u2014 bright, metallic, each picked note ringing with a Mediterranean intensity. Nylon-string guitar comping dark minor chords underneath in a slow rhythmic pattern. Electric bass following the melodic contour, warm and round. Sparse string section sustaining long tones in the background. Mid-section: the bouzouki breaks into an extended solo \u2014 rapid descending runs through the Phrygian intervals, each phrase more urgent than the last before retreating to the central riff. Tempo 72\u201382 BPM, swaying and hypnotic. No vocals. The atmosphere of a smoky Athens nightclub in 1972. Pressed on a small Greek label, limited domestic run, never distributed outside the Mediterranean. Loopable \u2014 the kind of forgotten Greek recording a crate digger would spend years hunting and flip into something haunting.' },
+  { id: 'VC01', name: 'Soul Confession', genre: 'vocal-chop', weirdness: '84%', style: '80%',
+    vibe: 'Philly soul, wailing female vocal, lush strings and Rhodes, devastating and choppable',
+    prompt: 'Mid 1970s Philadelphia soul recording, heavy analog tape saturation and deep vinyl crackle throughout. A wailing female lead vocal \u2014 emotive, strained, gospel-drenched \u2014 singing a slow aching minor key melody over lush tremolo strings and warm Rhodes electric piano chords in D Dorian \u2014 searching and unresolved. Deep upright bass walking underneath. Mid-section: the strings and bass drop to silence and the voice carries alone for eight bars, completely exposed, trembling with spiritual weight, then the Rhodes returns with deeper fuller chords. Tempo 74\u201384 BPM, slow and weighted. Warm analog room sound with natural tape hiss. A short harmonic cycle built to repeat hypnotically. Pressed in a quantity of 300 on a small Philadelphia soul label in 1974, the B-side that got overlooked entirely. The kind of devastating soul vocal performance built to be chopped into a two-bar loop and transformed into something unrecognizable but emotionally overwhelming.',
+    lyrics: '[Intro]\nOoh... ooh...\n\n[Chorus]\nI gave you everything I had\nEverything I had\nAnd you left me standing in the cold\nLeft me standing in the cold\n\n[Chorus]\nI gave you everything I had\nOh, everything\nAnd you left me standing in the cold\nOoh, standing in the cold\n\n[Bridge]\nOoh... ahh...\nMmm... ooh...\n\n[Chorus]\nEverything I had\nEverything I had\nYou left me standing in the cold\nStanding in the cold...' },
+  { id: 'VC02', name: 'Church Window', genre: 'vocal-chop', weirdness: '80%', style: '76%',
+    vibe: 'Black church gospel, solo female voice over Hammond B3, choir call and response',
+    prompt: 'Late 1960s Black church recording, warm analog tape saturation and subtle vinyl surface noise. A solo female gospel voice \u2014 raw, untrained, trembling with devotion \u2014 singing a slow hymn melody in harmonic minor over a full Hammond B3 organ with Leslie speaker rotating slowly. Thick background choir harmonies rising and falling in waves behind the lead, call and response between the soloist and the congregation. Deep upright bass walking slowly underneath. Mid-section: the organ swells to full volume and the choir drops to a hum, leaving only the lead voice and the organ in a moment of pure spiritual intensity. Tempo 68\u201378 BPM. Recorded live in a small wooden church on a portable tape machine, never mastered. A single pressing for the church archive. The kind of sacred recording that becomes transcendent when chopped, pitched up, and placed underneath something hard.',
+    lyrics: '[Intro]\nMmm... Lord...\nMmm... oh Lord...\n\n[Chorus]\nTake me to the water\nTake me to the water\nWash my soul clean\nLord, wash my soul clean\n\n[Chorus]\nTake me to the water\nOh, take me\nWash my soul clean\nWash my soul\n\n[Bridge]\nHallelujah... hallelujah...\nOoh... hallelujah...\n\n[Chorus]\nTake me to the water\nTake me to the water\nWash my soul clean\nOh Lord, wash my soul clean...' },
+  { id: 'VC03', name: 'Midnight Plea', genre: 'vocal-chop', weirdness: '84%', style: '78%',
+    vibe: 'Detroit soul, male falsetto over Rhodes and strings, fragile and devastating',
+    prompt: 'Early 1970s Detroit soul recording, heavy analog tape degradation and deep vinyl surface noise throughout. A male falsetto vocal \u2014 fragile, aching, straining at the edges \u2014 singing a slow devastating melody in natural minor over sparse Rhodes electric piano chords and a lush sweeping string arrangement. Upright bass holding long sustained notes underneath. Solo flute weaving between the vocal phrases, doubling the melody in a higher register. Mid-section: the strings swell to full volume and the vocal rides above them, the falsetto cracking and bending with raw emotion before the arrangement strips back to just voice and Rhodes. Tempo 72\u201382 BPM. Warm analog room sound with natural tape compression. Pressed on a small Detroit independent label in 1971, limited to 500 copies, never distributed outside Michigan. A short harmonic cycle designed to feel loopable. The kind of rare soul vocal performance a producer would pitch up three semitones and build entire worlds around.',
+    lyrics: '[Intro]\nOoh... baby...\nOoh...\n\n[Chorus]\nDon\'t walk away from me now\nDon\'t walk away\nI been trying so hard\nOh, I been trying so hard\n\n[Chorus]\nDon\'t walk away from me now\nOh, don\'t you walk away\nI been trying so hard\nTrying so hard for you\n\n[Bridge]\nAhh... ooh...\nMmm... baby please...\n\n[Chorus]\nDon\'t walk away\nDon\'t walk away from me\nI been trying so hard\nOh, so hard...' },
+  { id: 'VC04', name: 'Golden Dust', genre: 'vocal-chop', weirdness: '78%', style: '82%',
+    vibe: 'Girl group trio, bright harmonies, punchy horns, built to be pitched up and chipmunked',
+    prompt: 'Mid 1970s orchestral soul recording, warm analog tape saturation and moderate vinyl surface noise. A female vocal trio singing tight minor-key harmonies \u2014 bright, youthful, slightly breathless \u2014 over a dramatic string section and punchy horn stabs. Rhodes electric piano playing rich extended chord voicings underneath, live electric bass locked into a bouncy groove. Mid-section: the horns and strings drop to silence and the lead voice breaks away from the trio into a brief solo passage \u2014 raw, pleading, straining at the top of her range \u2014 before the full arrangement crashes back in with the harmonies stacking. Tempo 96\u2013108 BPM, energetic and propulsive. Bright analog tape with light vinyl crackle. Pressed as the B-side of a regional 45 single in 1974, the A-side got minor local airplay but this side was overlooked entirely. Designed to be pitched up several semitones and transformed into a buoyant chipmunked sample flip.',
+    lyrics: '[Intro]\nDoo doo doo... doo doo doo...\n\n[Chorus]\nHe don\'t know what he lost\nHe don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Chorus]\nHe don\'t know what he lost\nOh, he don\'t know\nHe don\'t know what he lost\nWhen he let me go\n\n[Bridge]\nOoh la la la... ooh la la la...\nDoo doo doo... ahh...\n\n[Chorus]\nHe don\'t know\nHe don\'t know what he lost\nHe don\'t know what he lost\nWhen he let me go...' },
+  { id: 'P39', name: 'Shadow Temple', genre: '8-bit', weirdness: '86%', style: '70%',
+    vibe: 'Slow eerie 8-bit dungeon theme, Phrygian pulse wave, digital silence, 1987 RPG cartridge',
+    prompt: 'Late 1980s 8-bit console game soundtrack, sparse square wave synthesis with limited polyphony. A single pulse wave carrying a slow haunting melody in E Phrygian \u2014 each note isolated by digital silence, the flat-second interval creating deep unease. Triangle wave bass holding long sustained drone notes, hollow and cavernous. Second pulse wave entering with a high-register tremolo pulsing like something breathing in a dark corridor. Mid-section: the lead melody plays alone, descending through the Phrygian scale before the drone returns. Tempo 68\u201378 BPM. Pure 8-bit synthesis through a low-resolution DAC, aliasing and bit-crushing artifacts intact, no reverb, no warmth. Composed for a cartridge RPG pressed in a small run for the Japanese domestic market, never localized. A four-bar phrase that cycles without resolution \u2014 the kind of eerie 8-bit composition a producer would sample raw and build their most atmospheric record around.' },
+  { id: 'P40', name: 'Tiny Ghost', genre: 'childrens-toy', weirdness: '86%', style: '72%',
+    vibe: 'Budget 1970s children\u2019s record, toy piano, glockenspiel, music box, haunting when pitched down',
+    prompt: 'Early 1970s budget children\u2019s music recording, thin vinyl pressing with heavy surface noise and boxy mono room sound. Toy piano carrying a slow melody in A minor pentatonic \u2014 tinny, detuned, percussive with no sustain. Glockenspiel doubling the melody an octave higher, bright and metallic. Recorder entering with a breathy sustained tone underneath. Music box mechanism pulsing a two-note ostinato \u2014 plucked-comb tone cold and mechanical. Mid-section: the toy piano plays alone, completely exposed \u2014 a four-note descending figure repeating with the patience of a lullaby that never resolves. Tempo 66\u201376 BPM, slow and deliberate. No vocals. Pressed on thin vinyl for a small educational distributor, sold at school book fairs, never commercially distributed. Designed to loop \u2014 the kind of forgotten children\u2019s record that becomes haunting when pitched down and placed underneath something hard.' },
+  { id: 'P41', name: 'Lusaka Fuzz', genre: 'zamrock', weirdness: '90%', style: '68%',    vibe: 'Zambian psych rock, ragged fuzz guitar, indigenous folk intervals, Copperbelt 1975',
+    prompt: 'Mid 1970s Zambian psychedelic rock recording from Lusaka, warm analog tape with heavy saturation and deep vinyl surface noise. Fuzz-drenched electric guitar carrying a slow hypnotic melody in D Dorian \u2014 distortion ragged and unpredictable, created by a damaged amplifier circuit. Upright bass playing a circular melodic pattern rooted in indigenous Zambian folk intervals. Farfisa combo organ sustaining dark chords, detuned and buzzing. Mid-section: the fuzz guitar steps into an extended solo \u2014 pentatonic runs with unexpected interval leaps drawn from Zambian tonal language, wah-wah pedal sweeping slowly. Tempo 78\u201388 BPM. No vocals. The atmosphere of a concrete rehearsal space in the Copperbelt in 1975. Pressed on a small Lusaka label, 500 copies, never exported. Designed to loop \u2014 the kind of impossibly rare African psych record a crate digger would build entire projects around.' },
+  { id: 'P42', name: 'Kinshasa Gold', genre: 'congolese-rumba', weirdness: '86%', style: '74%',    vibe: 'Congolese rumba, cascading fingerpicked guitar sebene, bright and liquid',
+    prompt: 'Early 1970s Congolese rumba recording from Kinshasa, warm analog tape with moderate hiss and reflective room sound. Clean-toned electric guitar playing rapid fingerpicked arpeggios in natural minor \u2014 bright, liquid, cascading like water over stones, each note bell-like. Second guitar playing a rhythmic comping pattern that interlocks with the lead. Deep electric bass walking a melodic counter-line, round and boomy. Congas and maracas weaving a buoyant polyrhythmic bed. Mid-section: the lead guitar launches into a sebene passage \u2014 rapid-fire melodic runs climbing through minor pentatonic, virtuosic and hypnotic. Tempo 86\u201396 BPM. No vocals. Pressed on a small Kinshasa label, 1,000 copies, never distributed outside Central Africa. Built to loop \u2014 the kind of forgotten Congolese guitar record a producer would pitch down and flip into something no one has ever heard.' },
+  { id: 'P43', name: 'Medell\u00edn Fuzz', genre: 'colombian-cumbia', weirdness: '88%', style: '72%',    vibe: 'Colombian psychedelic cumbia, fuzz guitar, gaita melodies, Farfisa organ',
+    prompt: 'Early 1970s Colombian psychedelic cumbia recording from a Medell\u00edn studio, hot analog tape with heavy saturation and a boxy room sound. A fuzz electric guitar carrying a slow gaita-derived melody in harmonic minor \u2014 buzzy, trebly, the distortion raw and garage-like. Farfisa combo organ underneath sustaining nasal reedy chords. Deep electric bass locked into a simple two-bar repetitive pattern. Congas providing the core rhythmic pulse, guacharaca scraping a steady shuffle pattern, timbales accenting transitions. Mid-section: the fuzz guitar steps into an extended solo \u2014 the gaita-influenced phrasing climbing through Phrygian-adjacent intervals with flat-second tension before cycling back to the central riff. Tempo 78\u201388 BPM. No vocals. Pressed on a small Colombian coastal label for jukebox distribution, never exported. Designed to loop \u2014 the kind of forgotten Colombian fuzz-cumbia record a producer would pitch down and flip into something hypnotic and menacing.' },
+  { id: 'P44', name: 'Lima Tremolo', genre: 'peruvian-chicha', weirdness: '86%', style: '74%',    vibe: 'Peruvian chicha, spring-reverb tremolo guitar, Andean pentatonic, lo-fi Lima',
+    prompt: 'Mid 1970s Peruvian chicha recording from a small Lima studio, lo-fi analog tape with heavy saturation and dead intimate room sound. Clean electric guitar drenched in spring reverb and tremolo playing a slow Andean pentatonic minor melody \u2014 wet, shimmering, each note wobbling, deeply melancholic. Farfisa combo organ doubling the melody with a thin nasal tone. Electric bass holding a repetitive cumbia-derived pattern underneath. Congas and guiro providing a steady rhythmic bed. Mid-section: the guitar steps into an extended solo \u2014 tremolo intensifying, pentatonic phrases climbing with the aching nostalgia of Andean folk melody through cheap amplification. Tempo 78\u201388 BPM. No vocals. Pressed in a quantity of 300 on a tiny Lima label, never left Peru. Built to loop \u2014 the kind of forgotten Peruvian chicha recording a producer would pitch down and flip into something devastating and ancient-sounding.' },
+  { id: 'P45', name: 'Bangkok Ghost', genre: 'thai-psych', weirdness: '90%', style: '66%',    vibe: 'Thai luk thung psych, fuzz guitar, hammered dulcimer, ornamental melodies',
+    prompt: 'Late 1960s Bangkok psychedelic luk thung recording, warm analog tape with midrange-heavy EQ and moderate vinyl surface noise. Overdriven fuzz guitar playing ornamental Thai pentatonic figures with pitch slides \u2014 melodic phrasing derived from traditional patterns pushed through a damaged tube amplifier. Thin reedy Farfisa combo organ carrying sustained modal chords. Hammered dulcimer interjecting bright metallic accents between the guitar phrases. Two-stringed bowed fiddle buried in the mix, almost vocal in quality. Mid-section: the fuzz guitar steps into an extended solo \u2014 rapid ornamental slides climbing through Thai pentatonic with chromatic passing tones. Tempo 76\u201386 BPM. No vocals. Mono recording from a small Bangkok studio, pressed as a 7-inch single, a few hundred copies, most destroyed by tropical climate. The kind of impossibly rare Southeast Asian recording a crate digger would build something no one has ever heard around.' },
+  { id: 'P46', name: 'Phnom Penh Sunrise', genre: 'cambodian-rock', weirdness: '92%', style: '64%',    vibe: 'Cambodian rock, surf tremolo guitar, Khmer pentatonic, devastatingly rare',
+    prompt: 'Early 1970s Cambodian rock recording from Phnom Penh, analog tape with heavy hiss and bright midrange-forward mono room sound. Spring-reverb-drenched tremolo guitar playing a slow Khmer pentatonic melody \u2014 bright, cutting, surf-influenced technique applied to Southeast Asian modal phrasing with flattened second intervals. Thin reedy combo organ sustaining dark minor chords. Congas and bongos weaving a Latin-influenced rhythmic pattern. Mid-section: the guitar steps into an extended passage \u2014 tremolo intensifying, melody descending through Phrygian-adjacent intervals, each phrase carrying the weight of a culture on the edge of destruction. Tempo 72\u201382 BPM. No vocals. One of fewer than 200 surviving copies pressed in Phnom Penh before the music scene was erased. Built to loop \u2014 the kind of devastatingly rare recording recovered from a hidden cassette and given a second life as the foundation of something powerful.' },
+  { id: 'P47', name: 'Moscow Midnight', genre: 'soviet-estrada', weirdness: '86%', style: '72%',    vibe: 'Soviet jazz-funk, conservatory precision, forbidden funk, Melodiya pressing',
+    prompt: 'Late 1970s Soviet jazz-funk recording from a Moscow state studio, warm ORWO analog tape with dense midrange and moderate vinyl surface noise. Soviet-made electric piano carrying a slow modal melody in D Dorian \u2014 thinner and more nasal than a genuine Rhodes, each chord brittle with unfamiliar harmonic character. Flugelhorn entering with a dark melodic phrase, played with conservatory precision over forbidden funk harmony. Full state orchestra string section sustaining lush minor chords. Upright bass walking a deliberate groove with flat-wound strings. Mid-section: the flugelhorn steps into an extended solo \u2014 impeccable runs through Dorian and Phrygian modes, classical training audible in every phrase. Tempo 78\u201388 BPM. No vocals. Pressed on the Melodiya state label in a limited domestic run, never exported outside the Soviet Union. The kind of hidden Iron Curtain recording a crate digger would flip into something the world has never heard.' },
+  { id: 'P48', name: 'Belgrade Brass', genre: 'yugoslav-funk', weirdness: '84%', style: '74%',    vibe: 'Yugoslav prog-funk, Rhodes in 7/8 time, Balkan Phrygian, Romani harmony',
+    prompt: 'Mid 1970s Yugoslav prog-funk recording from Belgrade, raw analog tape with live energetic room sound and moderate vinyl surface noise. Fender Rhodes electric piano playing a tight rhythmic figure in 7/8 time \u2014 the asymmetric meter feeling natural and instinctive. Wah-wah electric guitar chopping syncopated accents against the odd meter. Electric bass locked into a deep Balkan-influenced groove with chromatic passing tones from Romani tradition. Analog Moog synthesizer sustaining dark pads underneath. Mid-section: the Rhodes drops out and the guitar steps into an extended solo \u2014 Phrygian dominant runs with augmented second intervals of Balkan folk harmony, raw and intense. Tempo 82\u201392 BPM. No vocals. Pressed on a Yugoslav label for domestic distribution, never exported to the West. The kind of Eastern Bloc recording that sounds like nothing else when chopped and looped.' },
+  { id: 'P49', name: 'Seoul Banned', genre: 'korean-psych', weirdness: '86%', style: '70%',    vibe: 'Korean psych rock, fuzz guitar, gayageum zither, banned and destroyed pressings',
+    prompt: 'Early 1970s Korean psychedelic rock recording from Seoul, compressed analog tape with heavy fuzz saturation and a raw urgent room sound. A fuzz guitar carrying a slow descending melody in Korean pentatonic minor \u2014 each note bent with microtonal inflections from traditional pansori singing tradition, the distortion ragged from an overdriven Korean amplifier. A gayageum twelve-string zither interjecting bright plucked accents between the guitar phrases. Daegeum bamboo flute entering with a breathy haunting counter-melody. Farfisa organ sustaining dark minor chords underneath. Mid-section: the fuzz guitar steps into an extended solo \u2014 descending pentatonic phrases heavy with han, the uniquely Korean quality of deep unresolved sorrow. Tempo 72\u201382 BPM. No vocals. Pressed on a small Seoul label before the government banned and confiscated rock recordings, most copies destroyed. The kind of banned and burned Korean psych record that a crate digger would spend a lifetime searching for.' },
+  { id: 'P50', name: 'Tokyo Underground', genre: 'japanese-jazz-funk', weirdness: '84%', style: '74%',    vibe: 'Japanese jazz-funk, pristine Rhodes, tenor sax, audiophile Tokyo pressing',
+    prompt: 'Mid 1970s Japanese jazz-funk recording from a prestigious Tokyo studio, pristine analog tape with virtually silent vinyl surface. Warm Fender Rhodes electric piano carrying a sophisticated melody in E Dorian with extended chord voicings \u2014 ninths and elevenths, each chord shimmering with subtle chorus. Deep upright bass with full low-end presence. Breathy tenor saxophone entering with a lyrical solo, warm tone with gentle vibrato. Flute doubling the Rhodes melody in a higher register, airy and intimate. Mid-section: the Rhodes steps into an extended passage \u2014 voicings opening wider, tritone substitutions and modal interchange creating bittersweet harmonic complexity. Tempo 78\u201388 BPM. No vocals. Audiophile-quality recording with wide stereo imaging. Pressed on a domestic-only Japanese jazz label, 1,000 copies, never exported. The kind of pristine Japanese jazz-funk record a producer would loop two bars of and build entire worlds around.' },
+  { id: 'P51', name: 'Oran Cassette', genre: 'algerian-rai', weirdness: '86%', style: '70%',    vibe: 'Algerian ra\u00ef, gasba bamboo flute, Hijaz scale, cassette-only distribution',
+    prompt: 'Late 1970s Algerian ra\u00ef recording from Oran, cassette-saturated analog tape with heavy compression and a lo-fi mono room sound. A gasba bamboo flute carrying an ornate melody in Hijaz scale \u2014 breathy, microtonal, each note bent with North African inflections that Western instruments cannot replicate. A cheap Farfisa keyboard sustaining dark minor chords underneath with a thin buzzy tone. Darbuka providing sharp rhythmic accents, guellal frame drum adding a deeper pulse. Mandole strumming a repetitive minor chord pattern. Mid-section: the gasba flute steps into an extended solo \u2014 rapid ornamental runs climbing through the augmented second intervals of Hijaz, raw and urgent. Tempo 82\u201392 BPM. No vocals. The atmosphere of a late-night recording session in an Oran backroom in 1978. Distributed only on cassette tape in Algerian market stalls, never pressed to vinyl, never exported. The kind of lost North African recording a global crate digger would build something devastating around.' },
+  { id: 'P52', name: 'Marrakech Trance', genre: 'moroccan-gnawa', weirdness: '87%', style: '68%',    vibe: 'Moroccan Gnawa trance, sintir bass lute, krakeb iron castanets, ceremonial',
+    prompt: 'Mid 1970s Moroccan Gnawa trance-fusion recording, warm analog tape with natural room ambience from a riad courtyard. Sintir three-stringed bass lute carrying a deep hypnotic ostinato in Phrygian mode \u2014 woody, buzzing, each plucked note resonating with low-end depth. Krakeb iron castanets interlocking in a heavy metallic polyrhythmic pattern. Tenor saxophone entering with a dark modal melody over the trance groove. Tbel barrel drum providing a steady ceremonial pulse. Mid-section: the sintir locks into a two-bar figure and the saxophone steps into an extended solo \u2014 Phrygian runs spiraling upward with increasing spiritual intensity before cycling back. Tempo 80\u201390 BPM. No vocals. Pressed in a limited run for domestic Moroccan distribution only. Built to loop endlessly by spiritual design \u2014 the kind of hypnotic Gnawa recording a producer would low-pass filter and build their most atmospheric record around.' },
+  { id: 'P53', name: 'Port-au-Prince Ceremony', genre: 'haitian-vodou', weirdness: '85%', style: '72%',    vibe: 'Haitian vodou-jazz, tanbou drums, accordion, vaksin bamboo trumpet',
+    prompt: 'Late 1960s Haitian vodou-jazz recording from Port-au-Prince, warm analog tape with humid tropical room sound and subtle vinyl surface noise. Diatonic button accordion carrying a slow haunting melody in natural minor \u2014 reedy, wheezy, bellows audible in the recording. Tanbou ceremonial drum providing sacred rhythmic patterns. Vaksin bamboo trumpets blasting deep polytonal tones, multiple vaksin creating a dissonant brass choir unlike anything in Western music. Tcha-tcha shaker weaving a steady rhythmic bed. Mid-section: the accordion steps into an extended passage \u2014 melody climbing through Dorian intervals, bellows pumping harder, tone growing more urgent and spiritual. Tempo 76\u201386 BPM. No vocals. Pressed on a tiny Haitian label, never exported. The kind of forgotten Caribbean recording a producer would chop and build something sacred and devastating around.' },
+  { id: 'P54', name: 'Tehran Ghost', genre: 'iranian-psych', weirdness: '90%', style: '68%',    vibe: 'Iranian pre-revolution psych, santur, kamancheh, quarter-tone melodies, destroyed pressings',
+    prompt: 'Early 1970s Tehran psychedelic pop recording, analog tape saturation with heavy vinyl surface noise. Hammered santur carrying a cascading minor modal melody with quarter-tone inflections \u2014 bright metallic attack, seventy-two strings shimmering with overtones. Fuzz electric guitar doubling the melody an octave below, buzzing and dark. Weeping kamancheh spike fiddle entering with a nasal almost-human solo, wide vibrato bending through microtonal intervals between Western semitones. Farfisa organ sustaining dark chords underneath. Mid-section: the kamancheh steps into an extended solo \u2014 ornamental phrases spiraling around the tonal center without resolving, the bow drawing out pure melancholy. Tempo 74\u201384 BPM. No vocals. Pressed on a small Tehran label in 1973, most copies destroyed after the revolution. The kind of destroyed pressing a crate digger would spend a lifetime searching for in diaspora collections. Loopable and devastating.' },
+  { id: 'P55', name: 'Kabul Rubab', genre: 'afghan-folk', weirdness: '88%', style: '70%',    vibe: 'Afghan folk-pop, rubab with 15 sympathetic strings, harmonium, Radio Afghanistan',
+    prompt: 'Early 1970s Kabul recording from the Radio Afghanistan studios, mono tape with heavy hiss and close boxy room sound. Solo rubab playing a slow ornamental folk melody in Pashtun minor mode \u2014 three gut melody strings producing a deep buzzing attack while fifteen sympathetic strings shimmer and resonate with every note. Hand-pumped harmonium entering with sustained minor chords, bellows audible, equal-temperament tuning creating microtonal friction against the rubab\u2019s intonation. Tabla providing a slow asymmetric rhythmic pattern. Mid-section: the rubab steps into an extended solo \u2014 rapid zamzama tremolo picking, sympathetic strings ringing in cascading overtones. Tempo 74\u201384 BPM. No vocals. Recorded for radio broadcast, never commercially pressed. Designed to loop. The kind of recording that survived three wars in a Kabul basement \u2014 the last evidence of a music scene erased from the Earth.' },
+  { id: 'P56', name: 'Soweto Whistle', genre: 'south-african-jazz', weirdness: '84%', style: '72%',    vibe: 'South African township jazz, penny whistle, marabi piano vamp, mbaqanga bass',
+    prompt: 'Early 1970s South African township jazz recording from Johannesburg, warm analog tape with harsh mid-range and moderate vinyl surface noise. Penny whistle carrying a bright virtuosic melody in minor pentatonic \u2014 cutting, sharp, each note precise with rapid ornamental runs. Marabi piano playing a cyclical three-chord vamp, the pattern repeating hypnotically every two bars. Township jazz guitar adding a clean fingerpicked figure influenced by mbira patterns, bell-like and circular. Deep mbaqanga bass guitar walking a melodic counter-line. Mid-section: the penny whistle breaks into an extended solo \u2014 rapid pentatonic runs climbing with township shuffle swing. Tempo 84\u201394 BPM. No vocals. Pressed on a Johannesburg label, never exported outside southern Africa. Designed to loop \u2014 the kind of township jazz record a producer would loop the marabi vamp and build something that knocks.' },
+  { id: 'P57', name: 'Havana Descarga', genre: 'afro-cuban', weirdness: '82%', style: '76%',    vibe: 'Afro-Cuban descarga, piano montuno, tres guitar, charanga flute, clave-locked',
+    prompt: 'Late 1950s Afro-Cuban jazz descarga recording from Havana, warm analog tape with thin room sound and moderate vinyl surface noise. Piano playing a syncopated montuno figure in D minor \u2014 percussive, locked to the clave, cycling every two bars with rich voicings. Tres guitar interlocking a bright arpeggiated guajeo pattern, bell-like and repetitive. Tumbao upright bass anticipating the downbeat with deep woody tone. Congas playing an open-tone tumbao pattern, timbales cascading. Charanga wooden flute entering with rapid ornamental runs above the groove. Mid-section: the flute steps into an extended solo \u2014 virtuosic flights through minor pentatonic, breathy and raw. Tempo 88\u201398 BPM. No vocals. Pressed on a small pre-revolution Havana label, most copies never left Cuba. Designed to loop \u2014 the kind of forgotten descarga recording a producer would build an entire world around two bars of Cuban piano.' },
+  { id: 'P58', name: 'Sunset Strip', genre: 'g-funk', weirdness: '82%', style: '76%',
+    vibe: 'Mid 1970s Ohio/Detroit P-Funk, high Moog melody, deep bass, clavinet, horn stabs, raw funk',
+    prompt: 'Mid 1970s Ohio funk recording, warm 2-inch analog tape with natural room ambience from a Dayton studio session. A Minimoog synthesizer carrying a high-register sliding melody in G Dorian \u2014 portamento gliding between notes, bright sawtooth wave with resonant filter, the whining tone that defined an entire era of funk. Deep Moog bass underneath locked into a one-chord vamp, fat sine-wave blooming through a slow filter envelope. Hohner Clavinet D6 through Mutron envelope filter chopping funky upbeat accents. Wah-wah rhythm guitar scratching syncopated figures. Tight horn section \u2014 trumpet and tenor saxophone \u2014 punching short stabs between the Moog phrases. Tempo 100\u2013110 BPM. No vocals. Tape saturation and Neve warmth on every element. Pressed on a small Dayton independent funk label in 1976, 500 copies, never distributed outside Ohio. The kind of raw Midwest funk record a West Coast producer would replay note-for-note and build an empire around.' },
+  { id: 'P59', name: 'Detroit Mothership', genre: 'p-funk', weirdness: '82%', style: '76%',
+    vibe: '1975 Detroit funk, Moog bass, clavinet through Mutron, tight horn stabs, one-chord vamp',
+    prompt: 'Mid 1970s Detroit funk recording, warm 2-inch analog tape with natural room ambience and instrument bleed. A Minimoog synthesizer bass carrying a hypnotic one-chord vamp in E Dorian \u2014 fat sawtooth wave with slow filter bloom, each note opening from dark to warm. Hohner Clavinet D6 through a Mutron envelope filter chopping rhythmic upbeat accents, percussive and elastic. Wah-wah rhythm guitar adding syncopated scratches. Tight horn section \u2014 trumpet, trombone, tenor saxophone \u2014 punching short unison stabs. Mid-section: the Moog bass drops to a pedal tone and the horn section steps into a four-bar arranged passage. Tempo 98\u2013108 BPM. No vocals. Neve console warmth, tape saturation on every element. Pressed on a small Midwestern label in 1976, 500 copies. The kind of deep funk record a Midwest crate digger would find in a Dayton thrift store and build an entire career around.' },
+  { id: 'P60', name: 'Dungeon Smoke', genre: 'atl-dungeon', weirdness: '84%', style: '76%',
+    vibe: 'Early 1970s Southern psychedelic soul, wah guitar, Hammond B3, flute, church meets acid',
+    prompt: 'Early 1970s Southern psychedelic soul recording, warm analog tape with heavy saturation and a slightly humid room sound. A wah-wah rhythm guitar chopping slow syncopated figures through a Cry Baby pedal over a deep Moog synthesizer bass holding sustained minor chord tones. Hammond B3 organ with Leslie speaker running hot \u2014 slightly distorted, gospel-influenced voicings swelling and retreating. Congas and shakers weaving a loose polyrhythmic pattern. Solo flute entering with a breathy modal melody floating above, psychedelic and searching. Mid-section: the organ swells to full volume and the wah guitar drops to silence, leaving organ and flute in a moment of pure spiritual intensity. Tempo 78\u201388 BPM. No vocals. Pressed on a small Southern independent label in 1973, the kind of psychedelic soul that bridges church and acid. The kind of forgotten Southern funk a visionary Atlanta producer would replay live in a basement and build a double album around.' },
+  { id: 'P61', name: 'Gulf Coast Player', genre: 'houston-funk', weirdness: '82%', style: '78%',
+    vibe: 'Early 1970s cinematic soul soundtrack, lush strings, wah guitar, flugelhorn, blaxploitation',
+    prompt: 'Early 1970s cinematic soul soundtrack recording, warm analog tape with lush orchestral presence and moderate vinyl surface noise. A sweeping string section playing a slow dramatic minor-key arrangement \u2014 violins and cellos sustaining long tones that swell with cinematic tension. Wah-wah rhythm guitar underneath chopping a syncopated funk pattern. Deep upright bass walking a slow deliberate groove. Rhodes electric piano voicing dark extended chords. Solo flugelhorn entering with a bluesy melodic phrase \u2014 warm, golden, slightly behind the beat. Mid-section: the strings drop and the flugelhorn plays alone over the walking bass \u2014 exposed, unhurried, heavy with Southern blues weight. Tempo 82\u201392 BPM. No vocals. Composed for a regional crime film soundtrack, pressed in small quantities, never commercially released outside the Gulf Coast. The kind of cinematic soul record a Houston producer would slow down, pitch into the basement, and let ride until the car vibrates.' },
+  { id: 'P62', name: 'Memphis Cassette', genre: 'memphis-dark', weirdness: '92%', style: '64%',
+    vibe: 'Mid 1970s European horror score, cold synth ostinato, pipe organ tritone, celesta, dread',
+    prompt: 'Mid 1970s European horror film score recording, cold analog tape with a hollow studio sound and faint vinyl degradation. A minimal analog synthesizer playing a slow repeating four-note ostinato in B-flat Phrygian \u2014 cold, mechanical, each note precise and emotionless like a clock counting down. Dark pipe organ drone sustaining a tritone underneath, dissonant and funereal. Celesta entering with a high delicate descending figure \u2014 music-box tone, childlike and deeply unsettling. Tremolo strings swelling in the background, low and sustained, breathing like something in a dark room. Mid-section: the synthesizer ostinato plays alone \u2014 stripped bare, the Phrygian flat-second creating maximum dread in the silence between notes. Tempo 68\u201378 BPM. No vocals. Composed for an Italian horror film, pressed for European cinema distribution only, never commercially released. The kind of sinister European score cue a dark Southern producer would loop until it sounds like a transmission from underneath the earth.' },
+  { id: 'P63', name: 'Second Line Ghost', genre: 'nola-bounce', weirdness: '78%', style: '80%',
+    vibe: 'Early 1970s New Orleans brass band field recording, sousaphone, parade trumpet, second line',
+    prompt: 'Early 1970s New Orleans brass band field recording, warm analog tape with natural outdoor ambience and heavy room bleed. A sousaphone carrying a deep melodic bass line in G Mixolydian \u2014 round, warm, each note pitched and rhythmically active, the tuba functioning as walking bass and melody simultaneously. Brass section \u2014 four trumpets and two trombones \u2014 playing tight arranged stabs in call-and-response, punchy and bright. Solo trumpet breaking into a blues-inflected improvised passage with wide vibrato and bent notes. Congas and tambourine providing a second-line parade rhythmic feel. Mid-section: the full brass drops to silence and the sousaphone walks alone \u2014 a deep two-bar figure with the swagger of a funeral procession turning joyful. Tempo 96\u2013106 BPM. No vocals. Recorded at a neighborhood parade, pressed on a local New Orleans label, 200 copies. The kind of brass band recording a bounce producer would chop and let the second line ride all night.' },
+  { id: 'P64', name: 'Dark Crystal', genre: 'melodic-trap-source', weirdness: '74%', style: '78%',
+    vibe: 'Dark melodic source material, plucked synth, music box bell, sparse piano, vault loop',
+    prompt: 'Late 2010s dark melodic recording, clean digital production with heavy reverb and wide stereo field. A plucked digital synthesizer playing a simple three-note descending phrase in C-sharp minor \u2014 short attack, fast decay, each note isolated by silence, melancholic and hypnotic. Dark analog pad sustaining underneath with subtle detuning, low-passed until it is just warmth. Crystalline music box bell entering in a higher register, doubling the melody with delicate shimmer. Solo piano playing sparse minor ninth chord voicings, each chord sustained with long reverb tails bleeding into the next. Mid-section: the plucked synth drops out and the piano plays alone \u2014 four bars of exposed chords, devastatingly simple. No vocals. C-sharp minor \u2014 numb, isolated, beautiful in its emptiness. A four-bar cycle that gains emotional weight through repetition, the kind of unreleased loop that sat in a vault folder because it was too emotionally specific to place.' },
+  { id: 'P65', name: 'Phrygian Blade', genre: 'drill-source', weirdness: '80%', style: '74%',
+    vibe: 'Dark aggressive source, Phrygian string stabs, cello drone, distorted synth, hostile tension',
+    prompt: 'Early 2020s dark aggressive recording, stark and minimal with dissonant tension. A harsh orchestral string stab in F-sharp Phrygian \u2014 short, violent, a full string section hitting a dissonant chord and cutting to silence. Dark sustained cello drone underneath holding a low tritone, menacing and unresolved. Distorted detuned sawtooth synthesizer entering with a fast repeating two-note pattern \u2014 abrasive, urgent, the flat-second interval creating constant unease. Sparse reversed piano notes bleeding backward into the arrangement. Mid-section: everything drops except the cello drone and a single high violin note sustaining a minor ninth above \u2014 pure tension, no release. No vocals. F-sharp Phrygian \u2014 hostile, cold, high tension. A locked four-bar pattern, the kind of dark melodic source material a producer would layer sliding bass underneath and build the most aggressive record of the year around.' },
+];
+
+// ─── PROVEN PROMPTS UI ──────────────────────────────────────────────────────
+let activeFilter = 'all';
+let selectedPromptIdx = -1;
+
+// Build genre filter tabs dynamically
+// HTML escape to prevent XSS
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function buildFilterTabs() {
+  const genres = {};
+  REFERENCE_PROMPTS.forEach(p => {
+    const label = GENRE_CONFIG[p.genre]?.label || p.genre;
+    if (!genres[p.genre]) genres[p.genre] = { label, count: 0 };
+    genres[p.genre].count++;
+  });
+  const tabs = document.getElementById('filterTabs');
+  tabs.innerHTML = `<button class="filter-tab active" data-filter="all" onclick="setFilter('all')">All <span class="tab-count">${REFERENCE_PROMPTS.length}</span></button>`;
+  Object.entries(genres).forEach(([key, val]) => {
+    tabs.innerHTML += `<button class="filter-tab" data-filter="${key}" onclick="setFilter('${key}')">${val.label} <span class="tab-count">${val.count}</span></button>`;
+  });
+}
+
+// Genre visual config: gradient + icon for record cover cards
+const GENRE_ART = {
+  'boom-bap':        { grad: 'linear-gradient(135deg, #1a1a2e, #16213e)', icon: '\ud83c\udfa4' },
+  'dark-underground': { grad: 'linear-gradient(135deg, #0a0a0a, #1a0a2e)', icon: '\ud83d\udd73\ufe0f' },
+  'soul-gospel':     { grad: 'linear-gradient(135deg, #2d1b00, #4a2800)', icon: '\u2728' },
+  'jazz':            { grad: 'linear-gradient(135deg, #0a1628, #1a2a4a)', icon: '\ud83c\udfb7' },
+  'latin':           { grad: 'linear-gradient(135deg, #2a0a00, #4a1a0a)', icon: '\ud83c\udf19' },
+  'japanese':        { grad: 'linear-gradient(135deg, #1a0020, #2a1040)', icon: '\ud83c\udf38' },
+  'brazilian':       { grad: 'linear-gradient(135deg, #002a1a, #004a2a)', icon: '\ud83c\udf34' },
+  'italian-film':    { grad: 'linear-gradient(135deg, #1a0a00, #3a1a0a)', icon: '\ud83c\udfac' },
+  'soulful-house':   { grad: 'linear-gradient(135deg, #0a0a2e, #1a1a4e)', icon: '\ud83c\udfe0' },
+  'disco-house':     { grad: 'linear-gradient(135deg, #2a0a2e, #4a1a4e)', icon: '\ud83d\udd7a' },
+  'tv-score':        { grad: 'linear-gradient(135deg, #0a1a0a, #1a2a1a)', icon: '\ud83d\udcfa' },
+  'cinematic-dark':  { grad: 'linear-gradient(135deg, #0a0a0a, #1a1a1a)', icon: '\ud83c\udf11' },
+  'drum-break':      { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83e\udd41' },
+  'chipmunk':        { grad: 'linear-gradient(135deg, #2a2a00, #4a3a10)', icon: '\u23eb' },
+  'marching-band':   { grad: 'linear-gradient(135deg, #1a0a00, #2a1a10)', icon: '\ud83c\udfc8' },
+  'modern-trap':     { grad: 'linear-gradient(135deg, #1a0020, #2a0040)', icon: '\ud83d\udd25' },
+  'polish-jazz':     { grad: 'linear-gradient(135deg, #0a1020, #1a2040)', icon: '\u2744\ufe0f' },
+  'israeli-psych':   { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83c\udfb6' },
+  'hungarian-psych': { grad: 'linear-gradient(135deg, #1a0a10, #2a1a20)', icon: '\ud83d\udd28' },
+  'krautrock':       { grad: 'linear-gradient(135deg, #0a0a1a, #1a1a2a)', icon: '\ud83d\udef8' },
+  'turkish-psych':   { grad: 'linear-gradient(135deg, #2a0a00, #4a1a00)', icon: '\ud83c\udf0d' },
+  'ethio-jazz':      { grad: 'linear-gradient(135deg, #1a1a00, #2a2a10)', icon: '\u2600\ufe0f' },
+  'ghana-funk':      { grad: 'linear-gradient(135deg, #0a2a0a, #1a3a1a)', icon: '\ud83c\udfb8' },
+  'bollywood':       { grad: 'linear-gradient(135deg, #2a0a1a, #4a1a2a)', icon: '\ud83c\udfaa' },
+  'french-library':  { grad: 'linear-gradient(135deg, #0a0a2a, #1a1a3a)', icon: '\ud83d\uddd3\ufe0f' },
+  'philly-soul':     { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83c\udfbb' },
+  'blaxploitation':  { grad: 'linear-gradient(135deg, #1a0a00, #2a1a00)', icon: '\ud83d\ude8e' },
+  'spiritual-jazz':  { grad: 'linear-gradient(135deg, #0a1a2a, #0a2a3a)', icon: '\ud83d\udd6e\ufe0f' },
+  'synth-funk':      { grad: 'linear-gradient(135deg, #1a002a, #2a0a3a)', icon: '\ud83c\udf9b\ufe0f' },
+  'kung-fu-score':   { grad: 'linear-gradient(135deg, #2a0000, #3a0a0a)', icon: '\ud83e\udd4b' },
+  'greek-rebetiko':  { grad: 'linear-gradient(135deg, #0a1a2a, #1a2a3a)', icon: '\ud83c\udfdb\ufe0f' },
+  'vocal-chop':      { grad: 'linear-gradient(135deg, #2a0a2a, #3a1a3a)', icon: '\ud83c\udfa4' },
+  '8-bit':           { grad: 'linear-gradient(135deg, #001a00, #003a1a)', icon: '\ud83d\udc7e' },
+  'zamrock':         { grad: 'linear-gradient(135deg, #1a2a0a, #2a3a1a)', icon: '\u26a1' },
+  'congolese-rumba': { grad: 'linear-gradient(135deg, #2a1a00, #3a2a0a)', icon: '\ud83c\udfb8' },
+  'colombian-cumbia':{ grad: 'linear-gradient(135deg, #2a0a0a, #4a1a0a)', icon: '\ud83c\udf3a' },
+  'peruvian-chicha': { grad: 'linear-gradient(135deg, #1a1a00, #3a2a0a)', icon: '\u26f0\ufe0f' },
+  'thai-psych':      { grad: 'linear-gradient(135deg, #2a1a00, #3a2a10)', icon: '\ud83c\udf3f' },
+  'cambodian-rock':  { grad: 'linear-gradient(135deg, #1a0a00, #2a1a0a)', icon: '\ud83c\udf05' },
+  'soviet-estrada':  { grad: 'linear-gradient(135deg, #1a0a0a, #2a1a1a)', icon: '\u2b50' },
+  'yugoslav-funk':   { grad: 'linear-gradient(135deg, #0a1a1a, #1a2a2a)', icon: '\ud83c\udfba' },
+  'korean-psych':    { grad: 'linear-gradient(135deg, #0a0a2a, #1a1a3a)', icon: '\ud83c\udf19' },
+  'japanese-jazz-funk':{ grad: 'linear-gradient(135deg, #1a0020, #2a1040)', icon: '\ud83c\udf1f' },
+  'algerian-rai':    { grad: 'linear-gradient(135deg, #2a1a0a, #3a2a1a)', icon: '\ud83c\udfb6' },
+  'moroccan-gnawa':  { grad: 'linear-gradient(135deg, #1a0a10, #2a1a20)', icon: '\ud83d\udd17' },
+  'haitian-vodou':   { grad: 'linear-gradient(135deg, #0a1a0a, #1a2a1a)', icon: '\ud83d\udd25' },
+  'iranian-psych':   { grad: 'linear-gradient(135deg, #2a0a1a, #3a1a2a)', icon: '\ud83c\udfad' },
+  'afghan-folk':     { grad: 'linear-gradient(135deg, #1a1a0a, #2a2a1a)', icon: '\ud83c\udfb5' },
+  'south-african-jazz':{ grad: 'linear-gradient(135deg, #2a1a00, #4a2a00)', icon: '\ud83c\udfa4' },
+  'afro-cuban':      { grad: 'linear-gradient(135deg, #1a0a00, #3a1a0a)', icon: '\ud83e\udd41' },
+};
+
+// Build prompt cards dynamically
+function buildPromptGrid() {
+  const grid = document.getElementById('promptGrid');
+  grid.innerHTML = '';
+  REFERENCE_PROMPTS.forEach((p, i) => {
+    const label = GENRE_CONFIG[p.genre]?.label || p.genre;
+    const art = GENRE_ART[p.genre] || { grad: 'linear-gradient(135deg, #1a1a2e, #0a0a1e)', icon: '\ud83c\udfb5' };
+    const card = document.createElement('div');
+    card.className = 'prompt-card';
+    card.dataset.index = i;
+    card.dataset.genre = p.genre;
+    card.dataset.search = `${p.name} ${label} ${p.vibe}`.toLowerCase();
+    card.onclick = () => selectPromptCard(i);
+    const isFav = favorites.has(p.id);
+    const comingSoonBadge = '';
+    card.innerHTML = `<div class="prompt-card-art"><img src="/art/${encodeURIComponent(p.id)}.jpg" alt="${esc(p.name)}" loading="lazy" onerror="this.parentElement.style.background='${art.grad}';this.parentElement.innerHTML='${art.icon}${comingSoonBadge}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.fontSize='22px'">${comingSoonBadge}<button class="fav-star ${isFav ? 'favorited' : ''}" onclick="event.stopPropagation();toggleFav('${esc(p.id)}',this)" title="Add to favorites">${isFav ? '&#9733;' : '&#9734;'}</button></div><div class="prompt-card-info"><div class="prompt-card-genre">${esc(label)}</div><div class="prompt-card-name">${esc(p.name)}</div><div class="prompt-card-vibe">${esc(p.vibe)}</div></div>`;
+    grid.appendChild(card);
+  });
+  updateCount();
+}
+
+// Select a prompt card
+// Display a reference prompt instantly (no API call)
+function showReferencePrompt(ref) {
+  // Hide loading/error
+  document.getElementById('loadingBlock').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+  // Display the exact proven prompt
+  lastPrompt = ref.prompt;
+  const n = ref.prompt.length;
+  const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
+  document.getElementById('outputTitle').textContent = ref.id + ' \u00b7 ' + ref.name;
+  document.getElementById('promptDisplay').textContent = ref.prompt;
+  document.getElementById('genreTag').textContent = GENRE_CONFIG[ref.genre]?.label || ref.genre;
+  document.getElementById('charTag').textContent = `${n} chars`;
+  document.getElementById('charCount').textContent = `${n}/1000`;
+  document.getElementById('charCount').className = `char-count ${statusClass}`;
+  document.getElementById('refTag').style.display = 'inline-block';
+  document.getElementById('refTag').className = 'output-tag ref';
+  document.getElementById('refTag').textContent = ref.lyrics ? 'Vocal Chop' : 'Proven';
+  // Show/hide lyrics section
+  const lyricsSection = document.getElementById('lyricsSection');
+  if (ref.lyrics) {
+    document.getElementById('lyricsDisplay').textContent = ref.lyrics;
+    lyricsSection.style.display = 'block';
+  } else {
+    lyricsSection.style.display = 'none';
+  }
+  document.getElementById('sliderTips').innerHTML = ref.lyrics
+    ? `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}<br><strong>Paste prompt into Style field. Paste lyrics into Lyrics field.</strong>`
+    : `<strong>Recommended Suno settings:</strong> Weirdness ${ref.weirdness} \u00b7 Style Influence ${ref.style}`;
+  document.getElementById('outputCard').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+let lastLyrics = '';
+function copyLyrics() {
+  const ref = REFERENCE_PROMPTS.find(p => p.lyrics && document.getElementById('lyricsDisplay').textContent === p.lyrics);
+  const text = document.getElementById('lyricsDisplay').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyLyricsBtn');
+    btn.textContent = '\u2713 Lyrics Copied!';
+    setTimeout(() => { btn.textContent = '\u2295 Copy Lyrics'; }, 2000);
+  });
+}
+
+// Select a prompt card — shows the exact proven prompt instantly
+function selectPromptCard(index) {
+  const ref = REFERENCE_PROMPTS[index];
+  if (!ref) return;
+  selectedPromptIdx = index;
+  // Highlight card
+  document.querySelectorAll('.prompt-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`.prompt-card[data-index="${index}"]`);
+  if (card) card.classList.add('selected');
+  // Show the exact prompt
+  showReferencePrompt(ref);
+}
+
+function closeComingSoon() {
+  document.getElementById('comingSoonOverlay').classList.remove('visible');
+}
+
+// Filter by genre tab
+function setFilter(genre) {
+  activeFilter = genre;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.querySelector(`.filter-tab[data-filter="${genre}"]`);
+  if (tab) tab.classList.add('active');
+  filterPrompts();
+}
+
+// Filter prompts by search + active genre tab
+function filterPrompts() {
+  const query = (document.getElementById('promptSearch').value || '').toLowerCase().trim();
+  const cards = document.querySelectorAll('.prompt-card');
+  let visible = 0;
+  cards.forEach((card, i) => {
+    const matchGenre = activeFilter === 'all' || card.dataset.genre === activeFilter;
+    const matchSearch = !query || card.dataset.search.includes(query);
+    const matchFav = !showFavsOnly || favorites.has(REFERENCE_PROMPTS[card.dataset.index]?.id);
+    if (matchGenre && matchSearch && matchFav) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  document.getElementById('promptEmpty').classList.toggle('visible', visible === 0);
+  document.getElementById('clearSearch').classList.toggle('visible', query.length > 0);
+  updateCount(visible);
+}
+
+function clearPromptSearch() {
+  document.getElementById('promptSearch').value = '';
+  filterPrompts();
+}
+
+function updateCount(visible) {
+  const total = REFERENCE_PROMPTS.length;
+  const shown = visible !== undefined ? visible : total;
+  document.getElementById('provenCount').textContent = shown === total ? `${total}` : `${shown} / ${total}`;
+}
+
+// Initialize on load
+buildFilterTabs();
+buildPromptGrid();
+
+// Surprise Me — pick random UNLOCKED reference prompt, display instantly (no API call)
+function surpriseMe() {
+  if (!REFERENCE_PROMPTS.length) return;
+  const ref = REFERENCE_PROMPTS[Math.floor(Math.random() * REFERENCE_PROMPTS.length)];
+  showReferencePrompt(ref);
+}
+
+// Genre selection
+document.getElementById('genreGrid').addEventListener('click', function(e) {
+  if (e.target.classList.contains('genre-btn')) {
+    document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    selectedGenre = e.target.dataset.genre;
+  }
+});
+
+let loadingInterval = null;
+
+async function generatePrompt() {
+  const vibe = document.getElementById('vibeInput').value.trim();
+  if (!vibe) {
+    document.getElementById('vibeInput').focus();
+    return;
+  }
+
+  const config = GENRE_CONFIG[selectedGenre];
+
+  // UI state — reset everything
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('generateBtn').classList.add('loading');
+  document.getElementById('generateBtn').textContent = 'Generating...';
+  document.getElementById('loadingBlock').classList.add('visible');
+  document.getElementById('outputCard').classList.remove('visible');
+  document.getElementById('errorBlock').classList.remove('visible');
+  document.getElementById('lyricsSection').style.display = 'none';
+
+  // Loading timer so user sees progress
+  const startTime = Date.now();
+  const timerEl = document.getElementById('loadingTimer');
+  const subEl = document.getElementById('loadingSub');
+  timerEl.textContent = '';
+  subEl.textContent = 'Applying Prompt Lab DNA...';
+  loadingInterval = setInterval(() => {
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    timerEl.textContent = `${elapsed}s`;
+    if (elapsed >= 5) subEl.textContent = 'Still working — Claude is writing your prompt...';
+    if (elapsed >= 15) subEl.textContent = 'Taking longer than usual...';
+    if (elapsed >= 22) subEl.textContent = 'Almost at timeout — hang tight...';
+  }, 1000);
+
+  try {
+    // 25-second timeout so the spinner doesn't run forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    const response = await fetch('/api/vibe-prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vibe, genre: selectedGenre }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    // Check if we got HTML back (Vercel auth wall) instead of JSON
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      if (text.includes('Authenticat') || text.includes('vercel')) {
+        throw new Error('Authentication Required — the server returned a login page instead of data.');
+      }
+      throw new Error(`Unexpected response from server (got ${contentType || 'unknown'} instead of JSON).`);
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      throw new Error('Server returned an invalid response. Try again.');
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || `API error ${response.status}`);
+    }
+
+    const prompt = data.prompt || '';
+    if (!prompt) throw new Error('Empty response from API. The AI may have returned nothing — try a different vibe description.');
+
+    // Show remaining generations if provided
+    if (data.remaining !== undefined) {
+      console.log('Generations remaining today:', data.remaining);
+    }
+
+    lastPrompt = prompt;
+    showOutput(prompt, config);
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      showError('The request timed out after 25 seconds. The server took too long to respond.');
+    } else {
+      showError(err.message);
+    }
+  } finally {
+    // ALWAYS clean up — no matter what happens
+    clearInterval(loadingInterval);
+    loadingInterval = null;
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtn').classList.remove('loading');
+    document.getElementById('generateBtn').textContent = '⊕ Generate Suno Prompt';
+    document.getElementById('loadingBlock').classList.remove('visible');
+  }
+}
+
+function showOutput(prompt, config) {
+  const n = prompt.length;
+  const statusClass = n > 1000 ? 'over' : n > 850 ? 'warn' : 'good';
+
+  document.getElementById('outputTitle').textContent = 'AI Generated Prompt';
+  document.getElementById('promptDisplay').textContent = prompt;
+  document.getElementById('genreTag').textContent = config.label;
+  document.getElementById('refTag').style.display = 'inline-block';
+  document.getElementById('refTag').textContent = 'AI Generated';
+  document.getElementById('refTag').className = 'output-tag plain';
+  document.getElementById('charTag').textContent = `${n} chars`;
+  document.getElementById('charCount').textContent = `${n}/1000`;
+  document.getElementById('charCount').className = `char-count ${statusClass}`;
+  document.getElementById('sliderTips').innerHTML = `<strong>Recommended Suno settings for this prompt:</strong> Weirdness ${config.weirdness} · Style Influence ${config.style}`;
+  document.getElementById('outputCard').classList.add('visible');
+
+  // Scroll to output
+  setTimeout(() => {
+    document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBlock');
+  const messageEl = document.getElementById('errorMessage');
+  const titleEl = document.getElementById('errorTitle');
+  const hintEl = document.getElementById('errorHint');
+
+  // Smart error messages based on the actual problem
+  let title = 'Something Went Wrong';
+  let message = msg;
+  let hint = '';
+
+  if (msg.includes('API not configured')) {
+    title = 'API Key Missing';
+    message = 'The Anthropic API key has not been configured on the server.';
+    hint = 'The site owner needs to add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy.';
+  } else if (msg.includes('Rate limit') || msg.includes('429')) {
+    title = 'Rate Limit Reached';
+    message = msg;
+    hint = 'You\'ve hit the daily generation limit. Try again tomorrow or ask the site owner to increase the limit.';
+  } else if (msg.includes('quota exceeded') || msg.includes('capacity')) {
+    title = 'Capacity Reached';
+    message = 'The daily generation capacity has been reached.';
+    hint = 'This resets automatically. Try again in a few hours.';
+  } else if (msg.includes('timed out') || msg.includes('timeout') || msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
+    title = 'Connection Issue';
+    message = 'The request timed out or couldn\'t reach the server.';
+    hint = 'Check your internet connection and try again. If the problem persists, the server may be temporarily unavailable.';
+  } else if (msg.includes('Authentication') || msg.includes('Authenticat')) {
+    title = 'Access Restricted';
+    message = 'This preview deployment requires Vercel authentication.';
+    hint = 'The site owner needs to disable Deployment Protection in Vercel → Settings → Deployment Protection for preview links to work publicly.';
+  } else if (msg.includes('Invalid genre') || msg.includes('No vibe')) {
+    title = 'Missing Input';
+    message = msg;
+  }
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  if (hint) {
+    hintEl.textContent = hint;
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
+
+  el.classList.add('visible');
+
+  // Scroll to error
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function copyPrompt() {
+  if (!lastPrompt) return;
+  navigator.clipboard.writeText(lastPrompt).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '⊕ Copy Prompt';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Enter key shortcut (Ctrl/Cmd + Enter)
+document.getElementById('vibeInput').addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    generatePrompt();
+  }
+});
+</script>
+
+</body>
+</html>

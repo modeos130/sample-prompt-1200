@@ -47,38 +47,55 @@ function parseAnalysis(raw: string): { fields: Field[]; flipBlock: string } {
 }
 
 export default function AnalysisOutput({ raw }: { raw: string }) {
-  const { fields } = parseAnalysis(raw);
+  const { fields, flipBlock } = parseAnalysis(raw);
 
   if (!fields.length) {
     return (
-      <div className="rounded-[10px] border border-[#1e2530] border-l-[3px] border-l-[#c9a84c] bg-[#141820] p-4">
-        <pre className="font-mono text-[11px] text-[#7e8fa0] whitespace-pre-wrap">{raw}</pre>
+      <div className="rounded-2xl border border-[#141c28] bg-[#0d1118] p-6 border-l-[3px] border-l-[#c9a84c]">
+        <pre className="font-mono text-[11px] text-[#8a9bb0] whitespace-pre-wrap leading-[1.9]">{raw}</pre>
       </div>
     );
   }
 
   return (
-    <div className="rounded-[10px] border border-[#1e2530] border-l-[3px] border-l-[#c9a84c] bg-[#141820] overflow-hidden">
-      {fields.map(({ key, value }, i) => (
-        <div
-          key={key}
-          className={[
-            "flex",
-            i < fields.length - 1 ? "border-b border-[#1e2530]" : "",
-          ].join(" ")}
-        >
-          <div className="w-[130px] min-w-[130px] px-4 py-3 border-r border-[#1e2530] bg-[rgba(201,168,76,0.02)] flex items-start pt-[13px]">
-            <span className="font-['Syne',sans-serif] font-bold text-[8px] tracking-[1.5px] uppercase text-[#c9a84c]">
-              {key}
-            </span>
+    <div className="space-y-4">
+      {/* Main table */}
+      <div className="rounded-2xl border border-[#141c28] bg-[#0d1118] overflow-hidden">
+        {fields.map(({ key, value }, i) => (
+          <div
+            key={key}
+            className={[
+              "block sm:flex group transition-colors duration-150 hover:bg-[rgba(201,168,76,0.025)]",
+              i < fields.length - 1 ? "border-b border-[#111820]" : "",
+            ].join(" ")}
+          >
+            {/* Key */}
+            <div className="sm:w-[130px] sm:min-w-[130px] px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0d14] border-b sm:border-b-0 sm:border-r border-[#111820] flex items-start sm:pt-[17px] pt-3">
+              <span className="font-['Syne',sans-serif] font-bold text-[7.5px] tracking-[2px] uppercase text-[#c9a84c] leading-none">
+                {key}
+              </span>
+            </div>
+            {/* Value */}
+            <div className="flex-1 px-4 sm:px-5 py-3 sm:py-4">
+              <span className="font-mono text-[11.5px] text-[#8a9bb0] leading-[1.85] break-words">
+                {value}
+              </span>
+            </div>
           </div>
-          <div className="flex-1 px-4 py-3">
-            <span className="font-mono text-[11px] text-[#7e8fa0] leading-relaxed break-words">
-              {value}
-            </span>
-          </div>
+        ))}
+      </div>
+
+      {/* Flip Directions callout */}
+      {flipBlock && (
+        <div className="rounded-2xl border border-[rgba(201,168,76,0.22)] bg-[rgba(201,168,76,0.06)] px-5 py-5 animate-fade-in">
+          <p className="font-['Syne',sans-serif] font-bold text-[8px] tracking-[2.5px] uppercase text-[#c9a84c] mb-3">
+            Flip Directions
+          </p>
+          <p className="font-mono text-[11.5px] text-[#8a9bb0] leading-[1.85] whitespace-pre-wrap">
+            {flipBlock}
+          </p>
         </div>
-      ))}
+      )}
     </div>
   );
 }

@@ -1,6 +1,38 @@
 "use client";
 
-export type Genre = "boom-bap" | "house" | "trap";
+export type Genre =
+  | "boom-bap"
+  | "house"
+  | "trap"
+  | "baltimore-club"
+  | "gospel"
+  | "jazz-soul"
+  | "latin-soul"
+  | "cinematic-dark"
+  | "italian-film"
+  | "dark-underground"
+  | "psych-soul"
+  | "middle-east"
+  | "soul-vocal"
+  | "chipmunk-soul"
+  | "drum-break"
+  | "tv-score"
+  | "japanese-soul"
+  | "afrobeat"
+  | "reggae-dub"
+  | "brazilian"
+  | "boom-bap-dark"
+  | "motown"
+  | "live-funk"
+  | "soviet-estrada"
+  | "yugoslav-funk"
+  | "south-african-jazz"
+  | "afro-cuban-jazz"
+  | "korean-psych"
+  | "japanese-jazz-funk"
+  | "algerian-rai"
+  | "moroccan-gnawa"
+  | "haitian-voodoo-jazz";
 
 interface GenreConfig {
   id: Genre;
@@ -9,6 +41,7 @@ interface GenreConfig {
   bpm: string;
   era: string;
   tags: string[];
+  num: string;
 }
 
 const GENRES: GenreConfig[] = [
@@ -19,43 +52,299 @@ const GENRES: GenreConfig[] = [
     bpm: "78–90 BPM",
     era: "Late 60s / 70s",
     tags: ["Soul-Jazz", "Hard Bop", "Crate Dig"],
+    num: "01",
   },
   {
-    id: "house",
-    label: "House",
-    sub: "Music",
-    bpm: "118–128 BPM",
-    era: "Late 70s / 80s",
-    tags: ["Deep House", "Gospel Soul", "Dance Floor"],
+    id: "jazz-soul",
+    label: "Jazz Soul",
+    sub: "Small Ensemble",
+    bpm: "82–96 BPM",
+    era: "Early 1970s",
+    tags: ["Regional Label", "Late Night", "Loop Dig"],
+    num: "02",
+  },
+  {
+    id: "gospel",
+    label: "Gospel",
+    sub: "Sacred Soul",
+    bpm: "70–86 BPM",
+    era: "Late 1960s",
+    tags: ["Hammond B3", "Choir", "Black Church"],
+    num: "03",
+  },
+  {
+    id: "latin-soul",
+    label: "Latin Soul",
+    sub: "Orchestral",
+    bpm: "74–86 BPM",
+    era: "Late 1960s NYC",
+    tags: ["Strings", "Barrio", "Cinematic"],
+    num: "04",
+  },
+  {
+    id: "cinematic-dark",
+    label: "Cinematic",
+    sub: "Dark European",
+    bpm: "65–82 BPM",
+    era: "Early 70s Europe",
+    tags: ["Giallo", "Library", "Film Score"],
+    num: "05",
   },
   {
     id: "trap",
     label: "Trap",
-    sub: "Music",
+    sub: "Dark Orchestral",
     bpm: "65–75 BPM",
-    era: "70s–90s Dark Cinematic",
-    tags: ["Gothic Orchestral", "Dark Ambient", "Cinematic"],
+    era: "70s–90s Cinematic",
+    tags: ["Gothic Orchestral", "Dark Ambient", "Half-Time"],
+    num: "06",
+  },
+  {
+    id: "house",
+    label: "House",
+    sub: "Soulful",
+    bpm: "118–128 BPM",
+    era: "Late 70s / 80s",
+    tags: ["Deep House", "Gospel Soul", "Dance Floor"],
+    num: "07",
+  },
+  {
+    id: "baltimore-club",
+    label: "Baltimore",
+    sub: "Club Music",
+    bpm: "130–145 BPM",
+    era: "Late 70s / Early 80s",
+    tags: ["Up-Tempo Funk", "Staccato Soul", "Party Floor"],
+    num: "08",
+  },
+  {
+    id: "italian-film",
+    label: "Italian Film",
+    sub: "Giallo Score",
+    bpm: "65–82 BPM",
+    era: "1960s Rome",
+    tags: ["Solo Flute", "Cinematic", "Eerie"],
+    num: "09",
+  },
+  {
+    id: "dark-underground",
+    label: "Dark UG",
+    sub: "Underground",
+    bpm: "65–80 BPM",
+    era: "Early 70s",
+    tags: ["Hammond Organ", "Menacing", "Cold"],
+    num: "10",
+  },
+  {
+    id: "psych-soul",
+    label: "Psych Soul",
+    sub: "Hallucinatory",
+    bpm: "68–82 BPM",
+    era: "Late 1960s",
+    tags: ["Harpsichord", "Woozy", "Dark"],
+    num: "11",
+  },
+  {
+    id: "middle-east",
+    label: "Middle East",
+    sub: "Orchestral",
+    bpm: "65–80 BPM",
+    era: "Early 70s",
+    tags: ["Oud", "Sitar", "Hypnotic"],
+    num: "12",
+  },
+  {
+    id: "soul-vocal",
+    label: "Soul Vocal",
+    sub: "Dramatic",
+    bpm: "65–80 BPM",
+    era: "Mid 1970s",
+    tags: ["Female Lead", "Grief", "Raw"],
+    num: "13",
+  },
+  {
+    id: "chipmunk-soul",
+    label: "Chipmunk",
+    sub: "Girl Group",
+    bpm: "95–115 BPM",
+    era: "Early 1960s",
+    tags: ["45 RPM", "Pitched Up", "Bouncy"],
+    num: "14",
+  },
+  {
+    id: "drum-break",
+    label: "Drum Break",
+    sub: "Live Funk",
+    bpm: "90–110 BPM",
+    era: "1970s",
+    tags: ["Solo Drums", "Raw", "Breakbeat"],
+    num: "15",
+  },
+  {
+    id: "tv-score",
+    label: "TV Score",
+    sub: "Library Music",
+    bpm: "70–90 BPM",
+    era: "Early 1970s",
+    tags: ["Flute", "Vibraphone", "Tense"],
+    num: "16",
+  },
+  {
+    id: "japanese-soul",
+    label: "Japanese",
+    sub: "Soul-Jazz",
+    bpm: "75–92 BPM",
+    era: "Mid 1970s Tokyo",
+    tags: ["Rhodes", "Dreamy", "Import"],
+    num: "17",
+  },
+  {
+    id: "afrobeat",
+    label: "Afrobeat",
+    sub: "Nigerian",
+    bpm: "100–120 BPM",
+    era: "Early 1970s Lagos",
+    tags: ["Baritone Sax", "Hypnotic", "Political"],
+    num: "18",
+  },
+  {
+    id: "reggae-dub",
+    label: "Dub",
+    sub: "Jamaican",
+    bpm: "65–80 BPM",
+    era: "Late 70s Kingston",
+    tags: ["Melodica", "Reverb", "Spacious"],
+    num: "19",
+  },
+  {
+    id: "brazilian",
+    label: "Brazilian",
+    sub: "Samba / MPB",
+    bpm: "80–100 BPM",
+    era: "Late 60s / 70s",
+    tags: ["Cavaquinho", "Nylon Guitar", "Warm"],
+    num: "20",
+  },
+  {
+    id: "boom-bap-dark",
+    label: "Dark Boom",
+    sub: "Menacing Soul",
+    bpm: "70–85 BPM",
+    era: "Late 60s / Mid 70s",
+    tags: ["Cold Piano", "Ominous", "Hard"],
+    num: "21",
+  },
+  {
+    id: "motown",
+    label: "Motown",
+    sub: "Detroit Soul",
+    bpm: "100–120 BPM",
+    era: "Late 1960s",
+    tags: ["Tambourine", "Strings", "Joy"],
+    num: "22",
+  },
+  {
+    id: "live-funk",
+    label: "Live Funk",
+    sub: "Stage Band",
+    bpm: "95–115 BPM",
+    era: "Early 1970s",
+    tags: ["Brass Section", "Raw", "Gymnasium"],
+    num: "23",
+  },
+  {
+    id: "soviet-estrada",
+    label: "Soviet",
+    sub: "Jazz-Funk / Estrada",
+    bpm: "78–96 BPM",
+    era: "Late 1970s USSR",
+    tags: ["Melodiya", "Conservatory Funk", "Iron Curtain"],
+    num: "24",
+  },
+  {
+    id: "yugoslav-funk",
+    label: "Yugoslav",
+    sub: "Prog-Funk / Rock",
+    bpm: "82–100 BPM",
+    era: "Mid-1970s Yugoslavia",
+    tags: ["Jugoton", "Balkan Modal", "Eastern Bloc"],
+    num: "25",
+  },
+  {
+    id: "south-african-jazz",
+    label: "S. African",
+    sub: "Township Jazz / Mbaqanga",
+    bpm: "88–118 BPM",
+    era: "Mid-1960s Johannesburg",
+    tags: ["Penny Whistle", "Marabi Piano", "Township Jive"],
+    num: "26",
+  },
+  {
+    id: "afro-cuban-jazz",
+    label: "Afro-Cuban",
+    sub: "Descarga / Jazz",
+    bpm: "95–130 BPM",
+    era: "Late 1950s Havana",
+    tags: ["Tres Guitar", "Piano Montuno", "Descarga"],
+    num: "27",
+  },
+  {
+    id: "algerian-rai",
+    label: "Algerian",
+    sub: "Electric Rai",
+    bpm: "88–110 BPM",
+    era: "Late 1970s Oran",
+    tags: ["Gasba Flute", "Casio", "North African"],
+    num: "28",
+  },
+  {
+    id: "moroccan-gnawa",
+    label: "Gnawa",
+    sub: "Trance Fusion",
+    bpm: "80–105 BPM",
+    era: "Mid-1970s Morocco",
+    tags: ["Sintir Lute", "Krakeb", "Spiritual Trance"],
+    num: "29",
+  },
+  {
+    id: "haitian-voodoo-jazz",
+    label: "Haitian",
+    sub: "Vodou-Jazz / Kompa",
+    bpm: "76–108 BPM",
+    era: "Mid-1960s Port-au-Prince",
+    tags: ["Tanbou Drum", "Accordion", "Caribbean"],
+    num: "30",
+  },
+  {
+    id: "korean-psych",
+    label: "Korean",
+    sub: "Psych-Rock / Folk",
+    bpm: "72–92 BPM",
+    era: "Late 1960s Seoul",
+    tags: ["Gayageum", "Fuzz Guitar", "Banned Records"],
+    num: "31",
+  },
+  {
+    id: "japanese-jazz-funk",
+    label: "Japanese",
+    sub: "Jazz-Funk / Spiritual",
+    bpm: "80–108 BPM",
+    era: "Mid-1970s Tokyo",
+    tags: ["Rhodes", "Audiophile Vinyl", "Domestic Only"],
+    num: "32",
   },
 ];
 
 interface Props {
   selected: Genre | null;
   onSelect: (genre: Genre) => void;
+  compact?: boolean;
 }
 
-export default function GenreSelector({ selected, onSelect }: Props) {
-  return (
-    <div className="w-full">
-      <div className="mb-5">
-        <p className="text-[9px] font-mono font-medium tracking-[3px] uppercase text-[#c9a84c] mb-1">
-          Select Your Mode
-        </p>
-        <p className="text-[11px] text-[#7e8fa0] font-mono">
-          Choose a genre — the analysis and prompt will be tailored to its producers and aesthetic.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3">
+export default function GenreSelector({ selected, onSelect, compact = false }: Props) {
+  if (compact) {
+    return (
+      <div className="flex flex-wrap gap-2">
         {GENRES.map((g) => {
           const isSelected = selected === g.id;
           return (
@@ -63,60 +352,116 @@ export default function GenreSelector({ selected, onSelect }: Props) {
               key={g.id}
               onClick={() => onSelect(g.id)}
               className={[
-                "relative flex flex-col items-start text-left p-4 rounded-[10px] border transition-all duration-200",
-                "focus:outline-none focus:ring-2 focus:ring-[#c9a84c] focus:ring-offset-0",
+                "flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all duration-150 focus:outline-none",
                 isSelected
-                  ? "bg-[rgba(201,168,76,0.08)] border-[#c9a84c] shadow-[0_0_0_1px_rgba(201,168,76,0.2)]"
-                  : "bg-[#141820] border-[#1e2530] hover:border-[#364452] hover:bg-[#1a1f28]",
+                  ? "border-[#c9a84c] bg-[rgba(201,168,76,0.08)] text-[#c9a84c]"
+                  : "border-[#1a2030] bg-[#0d1118] text-[#7e8fa0] hover:border-[#2a3a50] hover:text-[#a0b0c0]",
               ].join(" ")}
             >
-              {/* selected indicator */}
-              {isSelected && (
-                <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#c9a84c]" />
-              )}
+              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] flex-shrink-0" />}
+              <span className="font-['Syne',sans-serif] font-bold text-[12px] tracking-[0.5px]">{g.label}</span>
+              <span className="text-[9px] font-mono opacity-70">{g.bpm}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
-              {/* genre name */}
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+      {GENRES.map((g, i) => {
+        const isSelected = selected === g.id;
+        const staggerClass =
+          i === 0 ? "animate-stagger-1" :
+          i === 1 ? "animate-stagger-2" :
+          i === 2 ? "animate-stagger-3" :
+          "animate-stagger-3";
+        return (
+          <button
+            key={g.id}
+            onClick={() => onSelect(g.id)}
+            className={[
+              "relative flex flex-col text-left p-7 rounded-2xl border-2 transition-all duration-200 overflow-hidden",
+              "focus:outline-none focus:ring-2 focus:ring-[#c9a84c] focus:ring-offset-2 focus:ring-offset-[#080a0c]",
+              "min-h-[230px]",
+              staggerClass,
+              isSelected
+                ? "border-[#c9a84c] bg-[#0d1118] shadow-[0_0_80px_rgba(201,168,76,0.18),0_0_0_1px_rgba(201,168,76,0.1)_inset]"
+                : "border-[#141c28] bg-[#0a0d14] hover:border-[#1e2838] hover:bg-[#0f1420] hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "absolute -bottom-3 right-3 font-['Syne',sans-serif] font-extrabold leading-none select-none pointer-events-none transition-colors duration-200",
+                "text-[clamp(60px,10vw,100px)]",
+                isSelected ? "text-[rgba(201,168,76,0.07)]" : "text-[#0d1118]",
+              ].join(" ")}
+            >
+              {g.num}
+            </span>
+
+            {isSelected && (
+              <span className="absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-[#c9a84c] shadow-[0_0_10px_rgba(201,168,76,0.7)] animate-pulse-subtle" />
+            )}
+
+            <div className="relative flex flex-col h-full gap-0">
               <span
                 className={[
-                  "font-['Syne',sans-serif] font-bold text-[22px] leading-none tracking-tight",
-                  isSelected ? "text-[#c9a84c]" : "text-[#d8e2ec]",
+                  "font-['Syne',sans-serif] font-extrabold leading-none tracking-tight block transition-colors duration-200",
+                  g.label.length > 6 ? "text-[28px]" : "text-[40px]",
+                  isSelected ? "text-[#c9a84c]" : "text-[#eef2f7]",
                 ].join(" ")}
               >
                 {g.label}
               </span>
               <span
                 className={[
-                  "font-['Syne',sans-serif] font-bold text-[11px] leading-none mt-0.5 mb-3",
-                  isSelected ? "text-[#7a6230]" : "text-[#3d4d5c]",
+                  "font-['Syne',sans-serif] font-bold text-[11px] leading-none mt-1.5 mb-6 block transition-colors duration-200",
+                  isSelected ? "text-[#c9a84c]/60" : "text-[#2a3545]",
                 ].join(" ")}
               >
                 {g.sub}
               </span>
 
-              {/* meta */}
-              <span className="text-[9px] font-mono text-[#7e8fa0] mb-1">{g.bpm}</span>
-              <span className="text-[9px] font-mono text-[#3d4d5c] mb-3">{g.era}</span>
+              <div className="flex-1" />
 
-              {/* tags */}
-              <div className="flex flex-wrap gap-1">
+              <div
+                className={[
+                  "text-[12px] font-mono font-medium mb-1 transition-colors duration-200",
+                  isSelected ? "text-[#c9a84c]" : "text-[#4a5a70]",
+                ].join(" ")}
+              >
+                {g.bpm}
+              </div>
+              <div
+                className={[
+                  "text-[10px] font-mono mb-5 transition-colors duration-200",
+                  isSelected ? "text-[#7a6230]" : "text-[#2a3545]",
+                ].join(" ")}
+              >
+                {g.era}
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
                 {g.tags.map((t) => (
                   <span
                     key={t}
                     className={[
-                      "text-[7.5px] font-mono px-1.5 py-0.5 rounded border",
+                      "text-[8px] font-mono px-2.5 py-1 rounded-full border transition-all duration-200",
                       isSelected
-                        ? "text-[#c9a84c] border-[rgba(201,168,76,0.3)] bg-[rgba(201,168,76,0.06)]"
-                        : "text-[#3d4d5c] border-[#1e2530] bg-[#141820]",
+                        ? "text-[#c9a84c] border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.09)]"
+                        : "text-[#2a3545] border-[#141c28] bg-[#0a0d14]",
                     ].join(" ")}
                   >
                     {t}
                   </span>
                 ))}
               </div>
-            </button>
-          );
-        })}
-      </div>
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }

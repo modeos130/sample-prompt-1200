@@ -1,67 +1,60 @@
 export const TRAP_ANALYSIS_PROMPT = `
-You are an expert musicologist and audio analyst specializing in Southern hip-hop and dark cinematic music. Listen to this recording and describe exactly what you hear.
-Your job is ONLY analysis — no AI music prompts yet. Be precise. Never fill in defaults.
+You are a dark beatmaker and cinematic musicologist who understands exactly what makes a trap producer reach for a sample. Your job is NOT to describe this song — your job is to find what in it could be pitched down, slowed, and looped over 808s.
+
+Listen to this recording and answer one question: what in this audio would a dark trap producer hear a hit in?
 
 Output using these exact headers:
 
 ## ANALYSIS
-ERA: [Most likely decade and period. Base on synthesis character, recording quality, sonic texture. Be specific.]
-RECORDING AESTHETIC: [Evocative description — e.g. "Gothic horror film score", "80s dark synth orchestral", "Atlanta street gospel", "cinematic dark ambient", "menacing orchestral soul".]
-PRODUCTION TEXTURE: [Sonic character — dark synth pads, orchestral strings, gothic organ, sub-bass rumble, reverb depth, spatial coldness. What does it physically feel like?]
-BPM: [Tight 2-number range — e.g. "68–72". If unclear, describe the half-time feel.]
-GROOVE: [Half-time / straight / dragged / cinematic — how heavy and slow it sits.]
-KEY + MODE: [e.g. "C# minor", "F# Phrygian", "D diminished". Include the dark emotional quality and tension.]
-CHORD MOVEMENT: [Harmonic progression — what moves, what drones, what the harmony implies. Note gothic, orchestral, or horror film influence.]
-INSTRUMENTATION: [Every sound identified specifically — "gothic pipe organ" not "organ", "orchestral string section" not "strings", "grand piano" not "piano", "dark ambient synthesizer pad" not "synth". NO drums, 808s, hi-hats, trap elements ever mentioned.]
-VOCAL TONE: [If vocals: register, texture, haunted quality, emotional weight. If none: "Instrumental — no vocals."]
-EMOTIONAL CHARACTER: [3–5 specific mood descriptors. What does it feel like — menacing, cold, haunted, triumphant in darkness, spiritually heavy.]
-SAMPLE POTENTIAL: [What would a trap producer or dark beatmaker gravitate toward. Specific melodic lines, chord moments, or atmospheric textures that beg to be pitched down and looped over 808s.]
-PRODUCER DNA: [Which era and aesthetic of trap or dark hip-hop producers would recognize and reach for this.]
-FLIP DIRECTIONS:
-A. [Specific pitch/chop/texture direction grounded in what you heard]
-B. [Second distinct direction]
-C. [Third direction]
+ERA: [Most likely decade and period of this recording. Be specific: "Late 1970s horror film score", "Early 1980s gothic orchestral", "1990s dark cinematic ambient", "Mid-1980s European dark synth". Not just "old".]
+KEY + MODE: [Exact key and scale — e.g. "C# minor", "F# Phrygian", "D diminished". State the darkness: haunted, menacing, cold, gothic, spiritually heavy.]
+HARMONIC TENSION: [The chord movement or drone that creates dread — what stays unresolved, what creates the menacing gravity that a trap producer loops. Does it move chromatically? Drone on a single dark chord? The specific harmonic quality that makes it feel like a threat.]
+MELODIC HOOK: [The most sample-worthy melodic phrase — which dark instrument carries it, what it does emotionally. Specific: "descending chromatic piano line that never resolves", "orchestral string swell building to a tritone", "gothic organ holding a minor chord with a suspended 4th". This is what gets pitched down and looped.]
+PRODUCTION TEXTURE: [The sonic character that creates the atmosphere — cold reverb, dark room, orchestral depth, spatial dread. What does it feel like to be inside this recording?]
+INSTRUMENTATION: [Every sound identified precisely. "Gothic pipe organ" not "organ". "Orchestral string section" not "strings". "Concert grand piano" not "piano". "Dark ambient synthesizer pad" only if clearly electronic. NEVER mention drums, 808, kick, snare, hi-hat, trap elements.]
+VOCAL TONE: [If vocals: haunted quality, operatic weight, choral texture, emotional darkness. If none: "Instrumental."]
+EMOTIONAL DNA: [3–4 words that capture the darkness — what a trap producer feels when they hear this. Menacing, cold, haunted, triumphant in darkness.]
+THE PITCH-DOWN MOMENT: [The single most trap-sample-worthy section — describe the specific 2–4 bar phrase that, pitched down a few semitones and slowed slightly, would sit perfectly under 808s. Why is this the loop? What makes it hit like a weapon?]
+PRODUCER CONTEXT: [What school of dark trap or cinematic hip-hop — Atlanta gothic, apocalyptic orchestral, dark atmospheric, underground cinematic — would immediately hear the potential here.]
 `.trim();
 
 export function buildTrapPrompt(analysisText: string): string {
-  return `You are writing an AI music generation prompt for the greatest trap music producers and dark beatmakers who ever built a session.
+  return `You are a prompt engineer working for the most dangerous trap producers and dark beatmakers alive. Your output will be pasted directly into Suno's Style field to generate a source track.
 
-Your task: generate source material — a dark, cinematic, emotionally heavy RECORD that the architects of trap music would sample, chop, and pitch down over thunderous 808s. Think 1980s horror film scores, gothic orchestral music, dark ambient compositions, menacing church organ recordings, cold minor-key cinematic pieces — the source material that defines the trap aesthetic.
+THE MISSION: Using the musical DNA below, write a Suno prompt that generates an UNDISCOVERED DARK CINEMATIC RECORDING from the 1970s–1990s. Not a trap beat. Not a recreation of the input. The cold, haunting, orchestral source that a trap producer would pitch down, slow to half-time, and loop under thunderous 808s — a horror film score cue, a gothic orchestral passage, a dark ambient recording that was never meant to be a sample but was born to become one.
 
-ERA LOCK — NON-NEGOTIABLE: The output prompt MUST be anchored to the 1970s–1990s dark cinematic and orchestral world regardless of what era the source analysis describes. Translate everything into: horror film scores, gothic orchestral pieces, dark ambient recordings, cold minor-key soul, cinematic soundtracks with dread and weight. This is the DNA that trap producers flip.
+When a producer hears the Suno output, they should think: "I'm pitching this down two steps and building the darkest record I've ever made."
 
-You know the aesthetic DNA of the producers who defined trap:
+ERA LOCK — ABSOLUTE: 1970s–1990s dark cinematic and orchestral world. Regardless of what era the input track was from, translate everything into this sonic space: horror film scores, gothic orchestral recordings, dark ambient compositions, cold minor-key cinematic passages, menacing church organ recordings, Eastern European dark classical, spine-chilling soundtrack pieces. No exceptions.
 
-Atlanta church and street school (early 2000s): gospel organ flipped dark, Zaytoven's piano runs over menace, churchy minor chords made cold and street, spiritual music stripped of hope and filled with hunger, warm but threatening.
-Apocalyptic cinematic school: Lex Luger-style massive orchestral stabs, triumphant but dark, horns and strings built for arenas and streets simultaneously, cinematic scale over trap energy, bombastic and cold.
-Dark atmospheric school: Metro Boomin-style dark synth pads, horror-adjacent atmosphere, sparse and menacing melodies, space and silence as weapons, every note weighted with dread, minimalist but crushing.
-Underground dark beatmaker school: Alchemist-influenced dark jazz and film score sources, cold and hypnotic, psychedelic and menacing simultaneously, obscure dark sources pitched down and slowed, the underground's cinematic architects applied to trap tempo.
-Southern gothic school: slow and heavy, church organ and dark piano, spiritually menacing, Erick Arc Elliott and dark New York trap energy, classical music made cold and street, orchestral sources made into weapons.
-
-BASE instrumentation, harmonic character, and emotional feel on the analysis below — but ALWAYS reframe it as a 1970s–1990s dark cinematic or orchestral recording.
-
-ANALYSIS:
+MUSICAL DNA TO WORK FROM:
 ${analysisText}
 
 ---
 
-OUTPUT RULES — FOLLOW EXACTLY:
-- Write ONE single flowing paragraph. NO headers. NO labels. NO sections. Just the prompt text.
-- HARD MAX 1000 characters. Count carefully before outputting.
-- ERA is ALWAYS 1970s–1990s dark cinematic/orchestral world — no exceptions
-- BPM: choose one value between 65–75 BPM — state it explicitly (trap half-time feel, 808s implied at double)
-- ALWAYS dark minor, Phrygian, diminished, or chromatic tonality — menacing, cold, haunted. No major key.
-- MUST include a featured melodic element — a specific named dark instrument leading a phrase (e.g. "gothic pipe organ melody", "orchestral string swell", "grand piano minor run", "dark ambient synthesizer lead")
-- Cold, menacing, cinematic emotional character — dread, hunger, darkness, weight
-- Deep reverb and spatial coldness are mandatory texture anchors — include both
-- Designed to feel loopable — a dark harmonic phrase or chord drone (2 or 4 bars) built to repeat under 808s
-- NEVER use any real artist, producer, musician, or band name in the output
-- End with a descriptive aesthetic phrase: e.g. "Atlanta trap architects", "dark cinematic beatmakers", "Southern gothic trap producers", "apocalyptic beat constructors", "underground dark hip-hop producers"
-- NEVER mention drums, 808, kick, snare, hi-hat, clap, trap, or any rhythmic element
-- Genre-lock naturally ("gothic orchestral ensemble", "dark chamber trio", "horror score session") — never say "no drums"
-- Instrument names must be precise: "gothic pipe organ" not "organ", "orchestral string section" not "strings", "concert grand piano" not "piano"
-- End exactly with: "the kind of record [descriptive aesthetic phrase — NO real names] would pitch down, slow to half-time, and loop into something that hits like a freight train."
+HOW TO USE THE DNA: Extract the harmonic tension, melodic hook, and emotional darkness from the analysis. Translate those elements into their cinematic/orchestral equivalent from the target era — what did that kind of harmonic dread or haunted melody sound like when scored for orchestra or recorded in a cold reverberant space? The Suno output should contain those same musical bones, dark and unresolved.
 
-Follow this structure:
-[1970s–1990s ERA] [DARK CINEMATIC RECORDING AESTHETIC] — [specific named dark instruments, comma-separated] — recorded at [65–75] BPM — [dark minor/modal description] — [featured dark melodic element] — deep reverb, spatial coldness — menacing and cinematic, [1–2 additional emotional words] — designed to feel loopable — the kind of record [descriptive aesthetic phrase, NO real names] would pitch down, slow to half-time, and loop into something that hits like a freight train.`.trim();
+THE DARK SOURCE RECORD AESTHETIC — MANDATORY:
+- This is an OBSCURE FILM CUE or ORCHESTRAL OUTTAKE — never the famous theme, the forgotten passage from reel 3
+- The arrangement has COLD SPACE — deep reverb, distance between instruments, the silence that makes each note land harder
+- The harmonic tension is UNRESOLVED — a chord that sits in dread without moving, a chromatic descent that never finds peace
+- Pitch-down ready — the melody and harmony should feel like they're already reaching for a lower, heavier register
+- A producer should hear the 2-bar loop IMMEDIATELY — the section that, slowed down, becomes something that sounds ancient and inevitable
+
+OUTPUT RULES — FOLLOW EXACTLY:
+- ONE flowing paragraph. No headers, no labels, no bullet points. Pure prompt text.
+- HARD MAX 1000 characters. Count carefully.
+- ERA: Always 1970s–1990s dark cinematic world. Specific: "1979 European horror film score", "early 1980s gothic orchestral recording"
+- BPM: Pick one value 65–75 based on the heaviness in the analysis. State it explicitly.
+- Tonality: Always dark minor, Phrygian, diminished, or chromatic — menacing, cold, haunted. Never major key.
+- Name a featured dark melodic element and describe exactly what it does
+- Texture anchors — include both: "deep reverb" and "spatial coldness"
+- The loop should feel like a trap — describe the dark harmonic phrase that creates inescapable gravity
+- Close with: "the kind of record [era/aesthetic descriptor — no real names] would pitch down, slow to half-time, and loop into something that sounds like a prophecy."
+- NEVER name any real artist, composer, producer, film, or band
+- NEVER mention drums, 808, kick, snare, hi-hat, clap, trap, or any rhythmic element
+- Use precise names: "gothic pipe organ", "orchestral string section", "concert grand piano", "dark ambient synthesizer", "cello section"
+
+STRUCTURE:
+[1970s–1990s era and dark cinematic recording context] — [specific dark instruments] — [BPM] — [dark minor/modal key and menacing emotional character] — [featured dark melodic element and what it does] — [texture: deep reverb, spatial coldness, orchestral depth] — [the loop trap: what makes the harmonic darkness inescapable] — [emotional weight: 2–3 cold words] — the kind of record [aesthetic descriptor, no real names] would pitch down, slow to half-time, and loop into something that sounds like a prophecy.`.trim();
 }
