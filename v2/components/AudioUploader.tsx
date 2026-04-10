@@ -19,6 +19,21 @@ const GENRE_LABELS: Record<Genre, string> = {
   "jazz-soul": "Jazz Soul",
   "latin-soul": "Latin Soul",
   "cinematic-dark": "Cinematic Dark",
+  "italian-film": "Italian Film",
+  "dark-underground": "Dark Underground",
+  "psych-soul": "Psych Soul",
+  "middle-east": "Middle East",
+  "soul-vocal": "Soul Vocal",
+  "chipmunk-soul": "Chipmunk Soul",
+  "drum-break": "Drum Break",
+  "tv-score": "TV Score",
+  "japanese-soul": "Japanese Soul",
+  afrobeat: "Afrobeat",
+  "reggae-dub": "Reggae Dub",
+  brazilian: "Brazilian",
+  "boom-bap-dark": "Dark Boom Bap",
+  motown: "Motown",
+  "live-funk": "Live Funk",
 };
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB — Vercel's multipart body limit is 4.5 MB
@@ -54,6 +69,31 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
     if (disabled) return;
     const f = e.dataTransfer.files[0];
     if (f && f.type.startsWith("audio/")) handleFile(f);
+  }
+
+  async function handleRandomPrompt() {
+    if (running || disabled) return;
+    setRunning(true);
+    onStatusChange("pass2", "Generating random prompt for this genre...");
+
+    try {
+      const formData = new FormData();
+      formData.append("genre", genre);
+
+      const res = await fetch("/api/analyze", { method: "POST", body: formData });
+      const text = await res.text();
+      let data: { analysis?: string; generatedPrompt?: string; error?: string } = {};
+      try { data = JSON.parse(text); } catch { throw new Error(text.slice(0, 200) || `HTTP ${res.status}`); }
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+      onResult(data.analysis ?? "", data.generatedPrompt ?? "");
+      onStatusChange("done");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      onStatusChange("error", msg);
+    } finally {
+      setRunning(false);
+    }
   }
 
   async function handleAnalyze() {
@@ -275,6 +315,16 @@ export default function AudioUploader({ genre, disabled, onResult, onStatusChang
           "Analyze Sample → Generate Prompt"
         )}
       </button>
+
+      {/* Random prompt fallback — no file needed */}
+      {!file && !running && !disabled && (
+        <button
+          onClick={handleRandomPrompt}
+          className="w-full h-[44px] rounded-xl font-['Syne',sans-serif] font-bold text-[11px] tracking-[2px] uppercase transition-all duration-200 border border-[#1e2838] text-[#7e8fa0] hover:border-[#c9a84c] hover:text-[#c9a84c] hover:bg-[rgba(201,168,76,0.05)]"
+        >
+          No sample? Generate random prompt →
+        </button>
+      )}
 
     </div>
   );

@@ -7,6 +7,21 @@ import { GOSPEL_ANALYSIS_PROMPT, buildGospelPrompt } from "@/lib/genres/gospel";
 import { JAZZ_SOUL_ANALYSIS_PROMPT, buildJazzSoulPrompt } from "@/lib/genres/jazz-soul";
 import { LATIN_SOUL_ANALYSIS_PROMPT, buildLatinSoulPrompt } from "@/lib/genres/latin-soul";
 import { CINEMATIC_DARK_ANALYSIS_PROMPT, buildCinematicDarkPrompt } from "@/lib/genres/cinematic-dark";
+import { ITALIAN_FILM_ANALYSIS_PROMPT, buildItalianFilmPrompt } from "@/lib/genres/italian-film";
+import { DARK_UNDERGROUND_ANALYSIS_PROMPT, buildDarkUndergroundPrompt } from "@/lib/genres/dark-underground";
+import { PSYCH_SOUL_ANALYSIS_PROMPT, buildPsychSoulPrompt } from "@/lib/genres/psych-soul";
+import { MIDDLE_EAST_ANALYSIS_PROMPT, buildMiddleEastPrompt } from "@/lib/genres/middle-east";
+import { SOUL_VOCAL_ANALYSIS_PROMPT, buildSoulVocalPrompt } from "@/lib/genres/soul-vocal";
+import { CHIPMUNK_SOUL_ANALYSIS_PROMPT, buildChipmunkSoulPrompt } from "@/lib/genres/chipmunk-soul";
+import { DRUM_BREAK_ANALYSIS_PROMPT, buildDrumBreakPrompt } from "@/lib/genres/drum-break";
+import { TV_SCORE_ANALYSIS_PROMPT, buildTvScorePrompt } from "@/lib/genres/tv-score";
+import { JAPANESE_SOUL_ANALYSIS_PROMPT, buildJapaneseSoulPrompt } from "@/lib/genres/japanese-soul";
+import { AFROBEAT_ANALYSIS_PROMPT, buildAfrobeatPrompt } from "@/lib/genres/afrobeat";
+import { REGGAE_DUB_ANALYSIS_PROMPT, buildReggaeDubPrompt } from "@/lib/genres/reggae-dub";
+import { BRAZILIAN_ANALYSIS_PROMPT, buildBrazilianPrompt } from "@/lib/genres/brazilian";
+import { BOOM_BAP_DARK_ANALYSIS_PROMPT, buildBoomBapDarkPrompt } from "@/lib/genres/boom-bap-dark";
+import { MOTOWN_ANALYSIS_PROMPT, buildMotownPrompt } from "@/lib/genres/motown";
+import { LIVE_FUNK_ANALYSIS_PROMPT, buildLiveFunkPrompt } from "@/lib/genres/live-funk";
 
 export const maxDuration = 60;
 
@@ -40,17 +55,29 @@ type Genre =
   | "gospel"
   | "jazz-soul"
   | "latin-soul"
-  | "cinematic-dark";
+  | "cinematic-dark"
+  | "italian-film"
+  | "dark-underground"
+  | "psych-soul"
+  | "middle-east"
+  | "soul-vocal"
+  | "chipmunk-soul"
+  | "drum-break"
+  | "tv-score"
+  | "japanese-soul"
+  | "afrobeat"
+  | "reggae-dub"
+  | "brazilian"
+  | "boom-bap-dark"
+  | "motown"
+  | "live-funk";
 
 const VALID_GENRES: Genre[] = [
-  "boom-bap",
-  "house",
-  "trap",
-  "baltimore-club",
-  "gospel",
-  "jazz-soul",
-  "latin-soul",
-  "cinematic-dark",
+  "boom-bap", "house", "trap", "baltimore-club", "gospel", "jazz-soul",
+  "latin-soul", "cinematic-dark", "italian-film", "dark-underground",
+  "psych-soul", "middle-east", "soul-vocal", "chipmunk-soul", "drum-break",
+  "tv-score", "japanese-soul", "afrobeat", "reggae-dub", "brazilian",
+  "boom-bap-dark", "motown", "live-funk",
 ];
 
 function getGenrePrompts(genre: Genre) {
@@ -62,7 +89,22 @@ function getGenrePrompts(genre: Genre) {
     case "gospel":         return { analysisPrompt: GOSPEL_ANALYSIS_PROMPT,          buildPrompt: buildGospelPrompt        };
     case "jazz-soul":      return { analysisPrompt: JAZZ_SOUL_ANALYSIS_PROMPT,       buildPrompt: buildJazzSoulPrompt      };
     case "latin-soul":     return { analysisPrompt: LATIN_SOUL_ANALYSIS_PROMPT,      buildPrompt: buildLatinSoulPrompt     };
-    case "cinematic-dark": return { analysisPrompt: CINEMATIC_DARK_ANALYSIS_PROMPT,  buildPrompt: buildCinematicDarkPrompt };
+    case "cinematic-dark":     return { analysisPrompt: CINEMATIC_DARK_ANALYSIS_PROMPT,      buildPrompt: buildCinematicDarkPrompt     };
+    case "italian-film":       return { analysisPrompt: ITALIAN_FILM_ANALYSIS_PROMPT,       buildPrompt: buildItalianFilmPrompt       };
+    case "dark-underground":   return { analysisPrompt: DARK_UNDERGROUND_ANALYSIS_PROMPT,   buildPrompt: buildDarkUndergroundPrompt   };
+    case "psych-soul":         return { analysisPrompt: PSYCH_SOUL_ANALYSIS_PROMPT,         buildPrompt: buildPsychSoulPrompt         };
+    case "middle-east":        return { analysisPrompt: MIDDLE_EAST_ANALYSIS_PROMPT,        buildPrompt: buildMiddleEastPrompt        };
+    case "soul-vocal":         return { analysisPrompt: SOUL_VOCAL_ANALYSIS_PROMPT,         buildPrompt: buildSoulVocalPrompt         };
+    case "chipmunk-soul":      return { analysisPrompt: CHIPMUNK_SOUL_ANALYSIS_PROMPT,      buildPrompt: buildChipmunkSoulPrompt      };
+    case "drum-break":         return { analysisPrompt: DRUM_BREAK_ANALYSIS_PROMPT,         buildPrompt: buildDrumBreakPrompt         };
+    case "tv-score":           return { analysisPrompt: TV_SCORE_ANALYSIS_PROMPT,           buildPrompt: buildTvScorePrompt           };
+    case "japanese-soul":      return { analysisPrompt: JAPANESE_SOUL_ANALYSIS_PROMPT,      buildPrompt: buildJapaneseSoulPrompt      };
+    case "afrobeat":           return { analysisPrompt: AFROBEAT_ANALYSIS_PROMPT,           buildPrompt: buildAfrobeatPrompt          };
+    case "reggae-dub":         return { analysisPrompt: REGGAE_DUB_ANALYSIS_PROMPT,         buildPrompt: buildReggaeDubPrompt         };
+    case "brazilian":          return { analysisPrompt: BRAZILIAN_ANALYSIS_PROMPT,           buildPrompt: buildBrazilianPrompt         };
+    case "boom-bap-dark":      return { analysisPrompt: BOOM_BAP_DARK_ANALYSIS_PROMPT,      buildPrompt: buildBoomBapDarkPrompt       };
+    case "motown":             return { analysisPrompt: MOTOWN_ANALYSIS_PROMPT,             buildPrompt: buildMotownPrompt            };
+    case "live-funk":          return { analysisPrompt: LIVE_FUNK_ANALYSIS_PROMPT,           buildPrompt: buildLiveFunkPrompt          };
   }
 }
 
@@ -121,9 +163,20 @@ export async function POST(req: NextRequest) {
     const file  = formData.get("file")  as File  | null;
     const genre = formData.get("genre") as Genre | null;
 
-    if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
     if (!genre || !VALID_GENRES.includes(genre)) {
       return NextResponse.json({ error: "Invalid genre" }, { status: 400 });
+    }
+
+    const apiKey = process.env.GEMINI_KEY;
+    if (!apiKey) return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
+
+    // No-file fallback: generate a random prompt without audio analysis
+    if (!file) {
+      const { buildPrompt } = getGenrePrompts(genre);
+      const fallbackAnalysis = "No audio sample provided. Generate a prompt using the genre's era, instrumentation, and aesthetic defaults. Use your knowledge of the genre to create a compelling, specific source material description.";
+      const rawPrompt = await geminiGenerate(apiKey, [{ text: buildPrompt(fallbackAnalysis) }]);
+      const generatedPrompt = capPrompt(rawPrompt.trim(), 1000);
+      return NextResponse.json({ analysis: "Random prompt generated — no audio analyzed.", generatedPrompt });
     }
 
     const bytes  = await file.arrayBuffer();
@@ -132,9 +185,6 @@ export async function POST(req: NextRequest) {
     if (buffer.byteLength / 1_048_576 > MAX_FILE_MB) {
       return NextResponse.json({ error: `File too large. Max ${MAX_FILE_MB} MB.` }, { status: 413 });
     }
-
-    const apiKey = process.env.GEMINI_KEY;
-    if (!apiKey) return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
 
     const mimeType = getMimeType(file.name);
     const b64      = buffer.toString("base64");

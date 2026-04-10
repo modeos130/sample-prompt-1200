@@ -8,7 +8,22 @@ export type Genre =
   | "gospel"
   | "jazz-soul"
   | "latin-soul"
-  | "cinematic-dark";
+  | "cinematic-dark"
+  | "italian-film"
+  | "dark-underground"
+  | "psych-soul"
+  | "middle-east"
+  | "soul-vocal"
+  | "chipmunk-soul"
+  | "drum-break"
+  | "tv-score"
+  | "japanese-soul"
+  | "afrobeat"
+  | "reggae-dub"
+  | "brazilian"
+  | "boom-bap-dark"
+  | "motown"
+  | "live-funk";
 
 interface GenreConfig {
   id: Genre;
@@ -92,6 +107,141 @@ const GENRES: GenreConfig[] = [
     era: "Late 70s / Early 80s",
     tags: ["Up-Tempo Funk", "Staccato Soul", "Party Floor"],
     num: "08",
+  },
+  {
+    id: "italian-film",
+    label: "Italian Film",
+    sub: "Giallo Score",
+    bpm: "65–82 BPM",
+    era: "1960s Rome",
+    tags: ["Solo Flute", "Cinematic", "Eerie"],
+    num: "09",
+  },
+  {
+    id: "dark-underground",
+    label: "Dark UG",
+    sub: "Underground",
+    bpm: "65–80 BPM",
+    era: "Early 70s",
+    tags: ["Hammond Organ", "Menacing", "Cold"],
+    num: "10",
+  },
+  {
+    id: "psych-soul",
+    label: "Psych Soul",
+    sub: "Hallucinatory",
+    bpm: "68–82 BPM",
+    era: "Late 1960s",
+    tags: ["Harpsichord", "Woozy", "Dark"],
+    num: "11",
+  },
+  {
+    id: "middle-east",
+    label: "Middle East",
+    sub: "Orchestral",
+    bpm: "65–80 BPM",
+    era: "Early 70s",
+    tags: ["Oud", "Sitar", "Hypnotic"],
+    num: "12",
+  },
+  {
+    id: "soul-vocal",
+    label: "Soul Vocal",
+    sub: "Dramatic",
+    bpm: "65–80 BPM",
+    era: "Mid 1970s",
+    tags: ["Female Lead", "Grief", "Raw"],
+    num: "13",
+  },
+  {
+    id: "chipmunk-soul",
+    label: "Chipmunk",
+    sub: "Girl Group",
+    bpm: "95–115 BPM",
+    era: "Early 1960s",
+    tags: ["45 RPM", "Pitched Up", "Bouncy"],
+    num: "14",
+  },
+  {
+    id: "drum-break",
+    label: "Drum Break",
+    sub: "Live Funk",
+    bpm: "90–110 BPM",
+    era: "1970s",
+    tags: ["Solo Drums", "Raw", "Breakbeat"],
+    num: "15",
+  },
+  {
+    id: "tv-score",
+    label: "TV Score",
+    sub: "Library Music",
+    bpm: "70–90 BPM",
+    era: "Early 1970s",
+    tags: ["Flute", "Vibraphone", "Tense"],
+    num: "16",
+  },
+  {
+    id: "japanese-soul",
+    label: "Japanese",
+    sub: "Soul-Jazz",
+    bpm: "75–92 BPM",
+    era: "Mid 1970s Tokyo",
+    tags: ["Rhodes", "Dreamy", "Import"],
+    num: "17",
+  },
+  {
+    id: "afrobeat",
+    label: "Afrobeat",
+    sub: "Nigerian",
+    bpm: "100–120 BPM",
+    era: "Early 1970s Lagos",
+    tags: ["Baritone Sax", "Hypnotic", "Political"],
+    num: "18",
+  },
+  {
+    id: "reggae-dub",
+    label: "Dub",
+    sub: "Jamaican",
+    bpm: "65–80 BPM",
+    era: "Late 70s Kingston",
+    tags: ["Melodica", "Reverb", "Spacious"],
+    num: "19",
+  },
+  {
+    id: "brazilian",
+    label: "Brazilian",
+    sub: "Samba / MPB",
+    bpm: "80–100 BPM",
+    era: "Late 60s / 70s",
+    tags: ["Cavaquinho", "Nylon Guitar", "Warm"],
+    num: "20",
+  },
+  {
+    id: "boom-bap-dark",
+    label: "Dark Boom",
+    sub: "Menacing Soul",
+    bpm: "70–85 BPM",
+    era: "Late 60s / Mid 70s",
+    tags: ["Cold Piano", "Ominous", "Hard"],
+    num: "21",
+  },
+  {
+    id: "motown",
+    label: "Motown",
+    sub: "Detroit Soul",
+    bpm: "100–120 BPM",
+    era: "Late 1960s",
+    tags: ["Tambourine", "Strings", "Joy"],
+    num: "22",
+  },
+  {
+    id: "live-funk",
+    label: "Live Funk",
+    sub: "Stage Band",
+    bpm: "95–115 BPM",
+    era: "Early 1970s",
+    tags: ["Brass Section", "Raw", "Gymnasium"],
+    num: "23",
   },
 ];
 

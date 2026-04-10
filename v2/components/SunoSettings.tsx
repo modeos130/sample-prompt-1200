@@ -24,7 +24,22 @@ const GENRE_PRESETS: Record<Genre, GenrePreset> = {
   "gospel":         { loudness: 5, clarity: 4, loudnessLabel: "Moderate · raw church warmth",     clarityLabel: "Warm / lo-fi · room ambience"     },
   "jazz-soul":      { loudness: 4, clarity: 3, loudnessLabel: "Soft · late night intimacy",       clarityLabel: "Warm / dusty · analog tape hiss"  },
   "latin-soul":     { loudness: 5, clarity: 5, loudnessLabel: "Moderate · orchestral dynamics",   clarityLabel: "Balanced · cinematic warmth"      },
-  "cinematic-dark": { loudness: 6, clarity: 4, loudnessLabel: "Medium · hollow studio tension",   clarityLabel: "Dark / cold · analog menace"      },
+  "cinematic-dark":     { loudness: 6, clarity: 4, loudnessLabel: "Medium · hollow studio tension",   clarityLabel: "Dark / cold · analog menace"      },
+  "italian-film":       { loudness: 4, clarity: 4, loudnessLabel: "Soft · cinematic dynamics",        clarityLabel: "Warm · European tape character"    },
+  "dark-underground":   { loudness: 5, clarity: 3, loudnessLabel: "Moderate · cold and sparse",       clarityLabel: "Dark · concrete room reverb"       },
+  "psych-soul":         { loudness: 4, clarity: 3, loudnessLabel: "Soft · woozy tape warble",         clarityLabel: "Hazy · psychedelic lo-fi"          },
+  "middle-east":        { loudness: 5, clarity: 4, loudnessLabel: "Moderate · orchestral presence",   clarityLabel: "Warm · analog Middle Eastern"      },
+  "soul-vocal":         { loudness: 5, clarity: 5, loudnessLabel: "Moderate · vocal-forward",         clarityLabel: "Balanced · intimate studio"        },
+  "chipmunk-soul":      { loudness: 6, clarity: 5, loudnessLabel: "Medium · mono AM radio",           clarityLabel: "Bright · 45 RPM energy"           },
+  "drum-break":         { loudness: 7, clarity: 4, loudnessLabel: "Loud · raw room sound",            clarityLabel: "Warm · overhead mic ambience"      },
+  "tv-score":           { loudness: 4, clarity: 5, loudnessLabel: "Soft · broadcast standard",        clarityLabel: "Balanced · functional clarity"     },
+  "japanese-soul":      { loudness: 4, clarity: 5, loudnessLabel: "Soft · pristine analog",           clarityLabel: "Clean · Japanese studio quality"    },
+  "afrobeat":           { loudness: 7, clarity: 4, loudnessLabel: "Loud · relentless energy",         clarityLabel: "Warm · Lagos studio character"     },
+  "reggae-dub":         { loudness: 5, clarity: 3, loudnessLabel: "Moderate · spacious dub",          clarityLabel: "Deep · spring reverb & delay"      },
+  "brazilian":          { loudness: 4, clarity: 5, loudnessLabel: "Soft · intimate warmth",           clarityLabel: "Balanced · analog Brazilian"       },
+  "boom-bap-dark":      { loudness: 6, clarity: 3, loudnessLabel: "Medium · cold menacing",           clarityLabel: "Dark · sparse and ominous"         },
+  "motown":             { loudness: 6, clarity: 5, loudnessLabel: "Medium · Detroit compression",     clarityLabel: "Bright · tambourine shimmer"       },
+  "live-funk":          { loudness: 7, clarity: 3, loudnessLabel: "Loud · raw live energy",           clarityLabel: "Warm · gymnasium acoustics"        },
 };
 
 const VOCAL_NOTES: Record<VocalGender, string> = {
