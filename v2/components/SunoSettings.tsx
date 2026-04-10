@@ -40,6 +40,15 @@ const GENRE_PRESETS: Record<Genre, GenrePreset> = {
   "boom-bap-dark":      { loudness: 6, clarity: 3, loudnessLabel: "Medium · cold menacing",           clarityLabel: "Dark · sparse and ominous"         },
   "motown":             { loudness: 6, clarity: 5, loudnessLabel: "Medium · Detroit compression",     clarityLabel: "Bright · tambourine shimmer"       },
   "live-funk":          { loudness: 7, clarity: 3, loudnessLabel: "Loud · raw live energy",           clarityLabel: "Warm · gymnasium acoustics"        },
+  "soviet-estrada":     { loudness: 5, clarity: 3, loudnessLabel: "Moderate · Soviet mid-heavy warmth", clarityLabel: "Warm / dense · state studio EQ"  },
+  "yugoslav-funk":      { loudness: 6, clarity: 5, loudnessLabel: "Medium · raw room energy",           clarityLabel: "Balanced · Eastern European grit" },
+  "south-african-jazz": { loudness: 5, clarity: 4, loudnessLabel: "Moderate · township energy",        clarityLabel: "Warm / bright · live room bleed"   },
+  "afro-cuban-jazz":    { loudness: 6, clarity: 5, loudnessLabel: "Medium · Havana session warmth",    clarityLabel: "Balanced · analog Cuban studio"    },
+  "korean-psych":       { loudness: 6, clarity: 4, loudnessLabel: "Medium · psychedelic saturation",   clarityLabel: "Dark / warm · distorted tape"      },
+  "japanese-jazz-funk": { loudness: 5, clarity: 5, loudnessLabel: "Moderate · precise studio craft",   clarityLabel: "Balanced · clean analog warmth"    },
+  "algerian-rai":       { loudness: 5, clarity: 2, loudnessLabel: "Moderate · cassette-saturated heat", clarityLabel: "Lo-fi / raw · Oran market tape"   },
+  "moroccan-gnawa":     { loudness: 5, clarity: 3, loudnessLabel: "Moderate · trance ceremony depth",  clarityLabel: "Warm / deep · natural room sound"  },
+  "haitian-voodoo-jazz": { loudness: 5, clarity: 3, loudnessLabel: "Moderate · tropical studio warmth", clarityLabel: "Warm / humid · Caribbean lo-fi"   },
 };
 
 const VOCAL_NOTES: Record<VocalGender, string> = {

@@ -22,8 +22,43 @@ import { BRAZILIAN_ANALYSIS_PROMPT, buildBrazilianPrompt } from "@/lib/genres/br
 import { BOOM_BAP_DARK_ANALYSIS_PROMPT, buildBoomBapDarkPrompt } from "@/lib/genres/boom-bap-dark";
 import { MOTOWN_ANALYSIS_PROMPT, buildMotownPrompt } from "@/lib/genres/motown";
 import { LIVE_FUNK_ANALYSIS_PROMPT, buildLiveFunkPrompt } from "@/lib/genres/live-funk";
+import { SOVIET_ESTRADA_ANALYSIS_PROMPT, buildSovietEstradaPrompt } from "@/lib/genres/soviet-estrada";
+import { YUGOSLAV_FUNK_ANALYSIS_PROMPT, buildYugoslavFunkPrompt } from "@/lib/genres/yugoslav-funk";
+import { KOREAN_PSYCH_ANALYSIS_PROMPT, buildKoreanPsychPrompt } from "@/lib/genres/korean-psych";
+import { JAPANESE_JAZZ_FUNK_ANALYSIS_PROMPT, buildJapaneseJazzFunkPrompt } from "@/lib/genres/japanese-jazz-funk";
+import { SOUTH_AFRICAN_JAZZ_ANALYSIS_PROMPT, buildSouthAfricanJazzPrompt } from "@/lib/genres/south-african-jazz";
+import { AFRO_CUBAN_JAZZ_ANALYSIS_PROMPT, buildAfroCubanJazzPrompt } from "@/lib/genres/afro-cuban-jazz";
+import { ALGERIAN_RAI_ANALYSIS_PROMPT, buildAlgerianRaiPrompt } from "@/lib/genres/algerian-rai";
+import { MOROCCAN_GNAWA_ANALYSIS_PROMPT, buildMoroccanGnawaPrompt } from "@/lib/genres/moroccan-gnawa";
+import { HAITIAN_VOODOO_JAZZ_ANALYSIS_PROMPT, buildHaitianVoodooJazzPrompt } from "@/lib/genres/haitian-voodoo-jazz";
 
 export const maxDuration = 60;
+
+// ─── RATE LIMITING ────────────────────────────────────────────────────────────
+const analyzeIpLog = new Map<string, { count: number; windowStart: number }>();
+const ANALYZE_RATE_LIMIT = parseInt(process.env.ANALYZE_RATE_LIMIT ?? "10");
+const ANALYZE_RATE_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW ?? "86400000");
+let analyzeTotalCalls = 0;
+const ANALYZE_HARD_CAP = parseInt(process.env.MONTHLY_HARD_CAP ?? "500");
+
+function checkAnalyzeRateLimit(ip: string): { allowed: boolean; reason?: string } {
+  if (analyzeTotalCalls >= ANALYZE_HARD_CAP) {
+    return { allowed: false, reason: "Daily capacity reached. Check back tomorrow." };
+  }
+  const now = Date.now();
+  const record = analyzeIpLog.get(ip);
+  if (!record || now - record.windowStart > ANALYZE_RATE_WINDOW) {
+    analyzeIpLog.set(ip, { count: 1, windowStart: now });
+    analyzeTotalCalls++;
+    return { allowed: true };
+  }
+  if (record.count >= ANALYZE_RATE_LIMIT) {
+    return { allowed: false, reason: `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day.` };
+  }
+  record.count++;
+  analyzeTotalCalls++;
+  return { allowed: true };
+}
 
 const MAX_FILE_MB = 4;
 
@@ -70,14 +105,25 @@ type Genre =
   | "brazilian"
   | "boom-bap-dark"
   | "motown"
-  | "live-funk";
+  | "live-funk"
+  | "soviet-estrada"
+  | "yugoslav-funk"
+  | "korean-psych"
+  | "japanese-jazz-funk"
+  | "south-african-jazz"
+  | "afro-cuban-jazz"
+  | "algerian-rai"
+  | "moroccan-gnawa"
+  | "haitian-voodoo-jazz";
 
 const VALID_GENRES: Genre[] = [
   "boom-bap", "house", "trap", "baltimore-club", "gospel", "jazz-soul",
   "latin-soul", "cinematic-dark", "italian-film", "dark-underground",
   "psych-soul", "middle-east", "soul-vocal", "chipmunk-soul", "drum-break",
   "tv-score", "japanese-soul", "afrobeat", "reggae-dub", "brazilian",
-  "boom-bap-dark", "motown", "live-funk",
+  "boom-bap-dark", "motown", "live-funk", "soviet-estrada", "yugoslav-funk",
+  "korean-psych", "japanese-jazz-funk", "south-african-jazz", "afro-cuban-jazz",
+  "algerian-rai", "moroccan-gnawa", "haitian-voodoo-jazz",
 ];
 
 function getGenrePrompts(genre: Genre) {
@@ -105,6 +151,15 @@ function getGenrePrompts(genre: Genre) {
     case "boom-bap-dark":      return { analysisPrompt: BOOM_BAP_DARK_ANALYSIS_PROMPT,      buildPrompt: buildBoomBapDarkPrompt       };
     case "motown":             return { analysisPrompt: MOTOWN_ANALYSIS_PROMPT,             buildPrompt: buildMotownPrompt            };
     case "live-funk":          return { analysisPrompt: LIVE_FUNK_ANALYSIS_PROMPT,           buildPrompt: buildLiveFunkPrompt          };
+    case "soviet-estrada":     return { analysisPrompt: SOVIET_ESTRADA_ANALYSIS_PROMPT,     buildPrompt: buildSovietEstradaPrompt     };
+    case "yugoslav-funk":      return { analysisPrompt: YUGOSLAV_FUNK_ANALYSIS_PROMPT,      buildPrompt: buildYugoslavFunkPrompt      };
+    case "korean-psych":       return { analysisPrompt: KOREAN_PSYCH_ANALYSIS_PROMPT,       buildPrompt: buildKoreanPsychPrompt       };
+    case "japanese-jazz-funk": return { analysisPrompt: JAPANESE_JAZZ_FUNK_ANALYSIS_PROMPT, buildPrompt: buildJapaneseJazzFunkPrompt  };
+    case "south-african-jazz": return { analysisPrompt: SOUTH_AFRICAN_JAZZ_ANALYSIS_PROMPT, buildPrompt: buildSouthAfricanJazzPrompt  };
+    case "afro-cuban-jazz":    return { analysisPrompt: AFRO_CUBAN_JAZZ_ANALYSIS_PROMPT,    buildPrompt: buildAfroCubanJazzPrompt     };
+    case "algerian-rai":       return { analysisPrompt: ALGERIAN_RAI_ANALYSIS_PROMPT,       buildPrompt: buildAlgerianRaiPrompt       };
+    case "moroccan-gnawa":     return { analysisPrompt: MOROCCAN_GNAWA_ANALYSIS_PROMPT,     buildPrompt: buildMoroccanGnawaPrompt     };
+    case "haitian-voodoo-jazz": return { analysisPrompt: HAITIAN_VOODOO_JAZZ_ANALYSIS_PROMPT, buildPrompt: buildHaitianVoodooJazzPrompt };
   }
 }
 
@@ -113,10 +168,10 @@ async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string>
   let lastMsg    = "";
 
   for (const version of API_VERSIONS) {
-    const url = `https://generativelanguage.googleapis.com/${version}/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/${version}/models/${GEMINI_MODEL}:generateContent`;
     const res  = await fetch(url, {
       method:  "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body:    JSON.stringify({ contents: [{ role: "user", parts }] }),
     });
 
@@ -137,11 +192,8 @@ async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string>
     return text;
   }
 
-  throw new Error(
-    `Model "${GEMINI_MODEL}" not found on v1beta or v1. ` +
-    `Set the GEMINI_MODEL environment variable in Vercel to a model your API key can access. ` +
-    `(Last error: ${lastMsg.slice(0, 120)})`
-  );
+  console.error(`Model "${GEMINI_MODEL}" not found. Last: ${lastMsg.slice(0, 120)}`);
+  throw new Error("AI model not available. Contact support.");
 }
 
 function extractSection(text: string, header: string): string {
@@ -158,6 +210,16 @@ function capPrompt(text: string, limit: number): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit
+  const fwd = req.headers.get("x-forwarded-for");
+  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
+          ?? req.headers.get("x-real-ip")
+          ?? "unknown";
+  const limit = checkAnalyzeRateLimit(ip);
+  if (!limit.allowed) {
+    return NextResponse.json({ error: limit.reason }, { status: 429 });
+  }
+
   try {
     const formData = await req.formData();
     const file  = formData.get("file")  as File  | null;
@@ -189,7 +251,7 @@ export async function POST(req: NextRequest) {
     const mimeType = getMimeType(file.name);
     const b64      = buffer.toString("base64");
 
-    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre);
+    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre)!;
 
     // Pass 1 — audio analysis
     const rawAnalysis = await geminiGenerate(apiKey, [
@@ -206,14 +268,17 @@ export async function POST(req: NextRequest) {
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    let userMessage = `${msg.slice(0, 400)}`;
+    console.error("[analyze]", msg);
 
+    let userMessage = "An error occurred processing your request.";
     if (msg.includes("[429]") || msg.includes("RESOURCE_EXHAUSTED")) {
-      userMessage = "API quota exceeded. Enable billing at aistudio.google.com or wait for the rate-limit window.";
+      userMessage = "API quota exceeded. Try again later.";
     } else if (msg.includes("[403]") || msg.includes("API_KEY_INVALID")) {
-      userMessage = "Invalid API key. Check GEMINI_KEY in your Vercel environment variables.";
+      userMessage = "Service configuration error. Contact support.";
     } else if (msg.includes("[413]") || msg.includes("Request payload size")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
+    } else if (msg.includes("safety filters")) {
+      userMessage = "Content was blocked by safety filters. Try different audio.";
     }
 
     return NextResponse.json({ error: userMessage }, { status: 500 });
