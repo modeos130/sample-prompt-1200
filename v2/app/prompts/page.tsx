@@ -163,6 +163,19 @@ export default function PromptsPage() {
             <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — max 4 MB (use MP3 for best results)"}</div>
           </div>
 
+          {/* Upload info */}
+          <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(255,154,60,0.06)", border: "1px solid rgba(255,154,60,0.15)", borderRadius: 10 }}>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.6, margin: 0 }}>
+              <span style={{ color: "#ff9a3c", fontWeight: 600 }}>Upload limits:</span>{" "}
+              Max file size is 4 MB. MP3 files work best — a 3-minute MP3 at 128kbps is about 3 MB.
+              WAV files are much larger and will likely exceed the limit. If your file is too large,
+              convert to MP3 or trim to a shorter clip. Only the first 30-60 seconds matter for analysis.
+            </p>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088", marginTop: 8 }}>
+              Supported formats: .mp3, .wav, .m4a, .flac
+            </p>
+          </div>
+
           {/* Analyze button — enabled as soon as file is dropped, no genre needed */}
           <button onClick={handleAnalyze} disabled={!file || analyzing}
             style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", marginTop: 20, cursor: !file || analyzing ? "not-allowed" : "pointer", background: !file ? "rgba(255,77,109,0.2)" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: !file ? "#7a3040" : "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: analyzing ? 0.7 : 1 }}>
