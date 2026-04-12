@@ -221,26 +221,49 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const formData = await req.formData();
-    const file  = formData.get("file")  as File  | null;
-    const genre = formData.get("genre") as string | null;
+    // Support two input modes:
+    // 1. JSON body with fileUri (Gemini File API reference — no size limit)
+    // 2. FormData with file (legacy inline base64 — 4MB limit)
+    const contentType = req.headers.get("content-type") ?? "";
+    let genre: string | null = null;
+    let audioPart: unknown;
+    let mimeType: string;
+
+    if (contentType.includes("application/json")) {
+      // Mode 1: Gemini File API URI
+      const body = await req.json();
+      const fileUri = body.fileUri as string | undefined;
+      mimeType = body.mimeType as string || "audio/mpeg";
+      genre = body.genre as string | null;
+
+      if (!fileUri) {
+        return NextResponse.json({ error: "fileUri required" }, { status: 400 });
+      }
+      audioPart = { file_data: { mime_type: mimeType, file_uri: fileUri } };
+    } else {
+      // Mode 2: FormData with inline file (legacy, 4MB limit)
+      const formData = await req.formData();
+      const file = formData.get("file") as File | null;
+      genre = formData.get("genre") as string | null;
+
+      if (!file) {
+        return NextResponse.json({ error: "Audio file required" }, { status: 400 });
+      }
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      if (buffer.byteLength / 1_048_576 > MAX_FILE_MB) {
+        return NextResponse.json({ error: `File too large. Max ${MAX_FILE_MB} MB.` }, { status: 413 });
+      }
+
+      mimeType = getMimeType(file.name);
+      const b64 = buffer.toString("base64");
+      audioPart = { inline_data: { mime_type: mimeType, data: b64 } };
+    }
 
     const apiKey = process.env.GEMINI_KEY;
     if (!apiKey) return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
-
-    if (!file) {
-      return NextResponse.json({ error: "Audio file required" }, { status: 400 });
-    }
-
-    const bytes  = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    if (buffer.byteLength / 1_048_576 > MAX_FILE_MB) {
-      return NextResponse.json({ error: `File too large. Max ${MAX_FILE_MB} MB.` }, { status: 413 });
-    }
-
-    const mimeType = getMimeType(file.name);
-    const b64      = buffer.toString("base64");
 
     // Genre-free DNA analysis (used by /prompts page)
     if (!genre || !VALID_GENRES.includes(genre as Genre)) {
@@ -262,7 +285,7 @@ Analyze this audio and output the prompt now.`;
 
       const rawPrompt = await geminiGenerate(apiKey, [
         { text: dnaPrompt },
-        { inline_data: { mime_type: mimeType, data: b64 } },
+        audioPart,
       ]);
       const generatedPrompt = capPrompt(rawPrompt.trim(), 1000);
       return NextResponse.json({ analysis: "Sonic DNA analysis complete.", generatedPrompt, prompt: generatedPrompt });
@@ -274,7 +297,7 @@ Analyze this audio and output the prompt now.`;
     // Pass 1 — audio analysis
     const rawAnalysis = await geminiGenerate(apiKey, [
       { text: analysisPrompt },
-      { inline_data: { mime_type: mimeType, data: b64 } },
+      audioPart,
     ]);
     const analysis = extractSection(rawAnalysis, "ANALYSIS") || rawAnalysis;
 

@@ -35,34 +35,40 @@ export default function PromptsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const MAX_FILE_MB = 4;
+  const [uploadProgress, setUploadProgress] = useState("");
 
-  // Genre-free DNA analysis
+  // Genre-free DNA analysis via Gemini File API (no size limit)
   const handleAnalyze = async () => {
     if (!file) return;
-    if (file.size > MAX_FILE_MB * 1048576) {
-      setAnalysisResult(`File too large (${(file.size/1048576).toFixed(1)} MB). Max ${MAX_FILE_MB} MB. Use MP3 instead of WAV for shorter uploads.`);
-      return;
-    }
-    setAnalyzing(true); setAnalysisResult("");
+    setAnalyzing(true); setAnalysisResult(""); setUploadProgress("Uploading to Gemini...");
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/analyze", { method: "POST", body: formData });
-      if (!res.ok) {
-        const text = await res.text();
-        if (text.includes("FUNCTION_PAYLOAD_TOO_LARGE") || text.includes("Entity Too Large")) {
-          setAnalysisResult(`File too large for upload. Convert to MP3 or trim to under ${MAX_FILE_MB} MB.`);
-        } else {
-          try { const d = JSON.parse(text); setAnalysisResult(d.error || "Analysis failed."); }
-          catch { setAnalysisResult("Analysis failed. Server returned an error."); }
-        }
+      // Step 1: Upload file to Gemini File API via our proxy
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      const uploadRes = await fetch("/api/upload-audio", { method: "POST", body: uploadForm });
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
+        setAnalysisResult(errData.error || "Failed to upload audio.");
         return;
       }
-      const data = await res.json();
+      const { fileUri, mimeType } = await uploadRes.json();
+
+      // Step 2: Send only the URI to analyze (lightweight JSON, no file body)
+      setUploadProgress("Analyzing sonic DNA...");
+      const analyzeRes = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUri, mimeType }),
+      });
+      if (!analyzeRes.ok) {
+        const errData = await analyzeRes.json().catch(() => ({ error: "Analysis failed" }));
+        setAnalysisResult(errData.error || "Analysis failed.");
+        return;
+      }
+      const data = await analyzeRes.json();
       setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result");
     } catch { setAnalysisResult("Analysis failed. Check your connection and try again."); }
-    finally { setAnalyzing(false); }
+    finally { setAnalyzing(false); setUploadProgress(""); }
   };
 
   const copyAnalysis = () => {
@@ -160,26 +166,26 @@ export default function PromptsPage() {
             <input ref={fileRef} type="file" accept=".mp3,.wav,.m4a,.flac" hidden onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" strokeWidth="1.5" style={{ marginBottom: 10 }}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, color: "#f0f0f8", marginBottom: 4 }}>{file ? `${file.name} (${(file.size/1048576).toFixed(1)} MB)` : "Drop .mp3 .wav .m4a .flac here"}</div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — max 4 MB (use MP3 for best results)"}</div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — up to 20 MB"}</div>
           </div>
 
           {/* Upload info */}
           <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(255,154,60,0.06)", border: "1px solid rgba(255,154,60,0.15)", borderRadius: 10 }}>
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.6, margin: 0 }}>
-              <span style={{ color: "#ff9a3c", fontWeight: 600 }}>Upload limits:</span>{" "}
-              Max file size is 4 MB. MP3 files work best — a 3-minute MP3 at 128kbps is about 3 MB.
-              WAV files are much larger and will likely exceed the limit. If your file is too large,
-              convert to MP3 or trim to a shorter clip. Only the first 30-60 seconds matter for analysis.
+              <span style={{ color: "#ff9a3c", fontWeight: 600 }}>How it works:</span>{" "}
+              Your audio is uploaded securely to Google&apos;s servers for AI analysis. Files up to 20 MB are supported.
+              MP3, WAV, M4A, and FLAC formats accepted. Only 30-60 seconds of audio is needed for accurate analysis
+              — longer files work fine but won&apos;t improve results.
             </p>
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088", marginTop: 8 }}>
-              Supported formats: .mp3, .wav, .m4a, .flac
+              Supported formats: .mp3 .wav .m4a .flac
             </p>
           </div>
 
           {/* Analyze button — enabled as soon as file is dropped, no genre needed */}
           <button onClick={handleAnalyze} disabled={!file || analyzing}
             style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", marginTop: 20, cursor: !file || analyzing ? "not-allowed" : "pointer", background: !file ? "rgba(255,77,109,0.2)" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: !file ? "#7a3040" : "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: analyzing ? 0.7 : 1 }}>
-            {analyzing ? "ANALYZING..." : "ANALYZE SAMPLE"}
+            {analyzing ? (uploadProgress || "PROCESSING...") : "ANALYZE SAMPLE"}
           </button>
 
           {/* Analysis result */}

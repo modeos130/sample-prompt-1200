@@ -2,6 +2,12 @@
   "functions": {
     "app/api/generate-music/route.ts": {
       "maxDuration": 120
+    },
+    "app/api/upload-audio/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/analyze/route.ts": {
+      "maxDuration": 60
     }
   }
 }
