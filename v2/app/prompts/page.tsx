@@ -35,18 +35,33 @@ export default function PromptsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const MAX_FILE_MB = 4;
+
   // Genre-free DNA analysis
   const handleAnalyze = async () => {
     if (!file) return;
+    if (file.size > MAX_FILE_MB * 1048576) {
+      setAnalysisResult(`File too large (${(file.size/1048576).toFixed(1)} MB). Max ${MAX_FILE_MB} MB. Use MP3 instead of WAV for shorter uploads.`);
+      return;
+    }
     setAnalyzing(true); setAnalysisResult("");
     try {
       const formData = new FormData();
       formData.append("file", file);
-      // No genre — API will use DNA analysis mode
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
+      if (!res.ok) {
+        const text = await res.text();
+        if (text.includes("FUNCTION_PAYLOAD_TOO_LARGE") || text.includes("Entity Too Large")) {
+          setAnalysisResult(`File too large for upload. Convert to MP3 or trim to under ${MAX_FILE_MB} MB.`);
+        } else {
+          try { const d = JSON.parse(text); setAnalysisResult(d.error || "Analysis failed."); }
+          catch { setAnalysisResult("Analysis failed. Server returned an error."); }
+        }
+        return;
+      }
       const data = await res.json();
       setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result");
-    } catch { setAnalysisResult("Analysis failed. Try again."); }
+    } catch { setAnalysisResult("Analysis failed. Check your connection and try again."); }
     finally { setAnalyzing(false); }
   };
 
@@ -144,8 +159,8 @@ export default function PromptsPage() {
             onDrop={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "#2a2a3a"; const f = e.dataTransfer.files[0]; if (f) setFile(f); }}>
             <input ref={fileRef} type="file" accept=".mp3,.wav,.m4a,.flac" hidden onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" strokeWidth="1.5" style={{ marginBottom: 10 }}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, color: "#f0f0f8", marginBottom: 4 }}>{file ? file.name : "Drop .mp3 .wav .m4a .flac here"}</div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>or click to upload</div>
+            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, color: "#f0f0f8", marginBottom: 4 }}>{file ? `${file.name} (${(file.size/1048576).toFixed(1)} MB)` : "Drop .mp3 .wav .m4a .flac here"}</div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — max 4 MB (use MP3 for best results)"}</div>
           </div>
 
           {/* Analyze button — enabled as soon as file is dropped, no genre needed */}
