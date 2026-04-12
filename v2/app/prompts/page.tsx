@@ -12,7 +12,6 @@ export default function PromptsPage() {
   const [activeGenre, setActiveGenre] = useState("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [analysisGenre, setAnalysisGenre] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
   const [analysisCopied, setAnalysisCopied] = useState(false);
@@ -36,16 +35,17 @@ export default function PromptsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // Genre-free DNA analysis
   const handleAnalyze = async () => {
-    if (!file || !analysisGenre) return;
+    if (!file) return;
     setAnalyzing(true); setAnalysisResult("");
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("genre", analysisGenre);
+      // No genre — API will use DNA analysis mode
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
       const data = await res.json();
-      setAnalysisResult(data.prompt || data.error || "No result");
+      setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result");
     } catch { setAnalysisResult("Analysis failed. Try again."); }
     finally { setAnalyzing(false); }
   };
@@ -65,13 +65,19 @@ export default function PromptsPage() {
     textTransform: "uppercase" as const, whiteSpace: "nowrap" as const,
   });
 
+  const navPillStyle = { fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase" as const, color: "#b0b0c8", textDecoration: "none", padding: "8px 20px", border: "1px solid #2a2a3a", borderRadius: 20, transition: "all 0.2s" };
+
   return (
     <div style={{ background: "#0a0a0f", minHeight: "100vh", color: "#f0f0f8" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } input:focus { border-color: #ff4d6d !important; box-shadow: 0 0 0 3px rgba(255,77,109,0.15) !important; } .prompt-card:hover { border-color: #3a3a4a !important; box-shadow: 0 8px 32px rgba(255,77,109,0.15) !important; transform: translateY(-2px); }`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } input:focus { border-color: #ff4d6d !important; box-shadow: 0 0 0 3px rgba(255,77,109,0.15) !important; } .prompt-card:hover { border-color: #3a3a4a !important; box-shadow: 0 8px 32px rgba(255,77,109,0.15) !important; transform: translateY(-2px); } .nav-pill:hover { border-color: #ff4d6d !important; color: #ff4d6d !important; }`}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid #2a2a3a" }}>
-        <a href="/studio.html" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", textDecoration: "none", letterSpacing: 1 }}>BOOMAN <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span></a>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <a href="/studio.html" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", textDecoration: "none", letterSpacing: 1 }}>BOOMAN <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span></a>
+          <a href="/studio.html" className="nav-pill" style={navPillStyle}>&larr; STUDIO</a>
+          <a href="/account" className="nav-pill" style={navPillStyle}>ACCOUNT</a>
+        </div>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#ffd700", background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.2)", borderRadius: 20, padding: "5px 14px" }}>PROMPT LIBRARY</div>
       </div>
 
@@ -120,12 +126,12 @@ export default function PromptsPage() {
           ))}
         </div>
 
-        {/* SP1200 Analysis Section */}
+        {/* SP1200 Analysis Section — Genre-free DNA analysis */}
         <div style={{ marginTop: 56, background: "#111118", border: "1px solid #2a2a3a", borderRadius: 14, padding: "32px 28px", boxShadow: "0 0 40px rgba(255,77,109,0.05)" }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ width: 40, height: 2, background: "linear-gradient(90deg, #ff4d6d, #ff9a3c)", margin: "0 auto 14px" }} />
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: 3, background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>SAMPLE ANALYSIS</h2>
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: "#b0b0c8", marginTop: 8 }}>Drop any audio — get a Suno-ready prompt</p>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: "#b0b0c8", marginTop: 8 }}>Drop any audio — get a Suno-ready prompt from its sonic DNA</p>
           </div>
 
           {/* Drop zone */}
@@ -142,21 +148,18 @@ export default function PromptsPage() {
             <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>or click to upload</div>
           </div>
 
-          {/* Genre selector */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "20px 0" }}>
-            {ALL_GENRES.map((g) => <button key={g} onClick={() => setAnalysisGenre(g)} style={tabStyle(analysisGenre === g)}>{g.replace(/-/g, " ")}</button>)}
-          </div>
-
-          <button onClick={handleAnalyze} disabled={!file || !analysisGenre || analyzing}
-            style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", cursor: !file || !analysisGenre || analyzing ? "not-allowed" : "pointer", background: !file || !analysisGenre ? "rgba(255,77,109,0.2)" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: !file || !analysisGenre ? "#7a3040" : "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: analyzing ? 0.7 : 1 }}>
+          {/* Analyze button — enabled as soon as file is dropped, no genre needed */}
+          <button onClick={handleAnalyze} disabled={!file || analyzing}
+            style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", marginTop: 20, cursor: !file || analyzing ? "not-allowed" : "pointer", background: !file ? "rgba(255,77,109,0.2)" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: !file ? "#7a3040" : "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: analyzing ? 0.7 : 1 }}>
             {analyzing ? "ANALYZING..." : "ANALYZE SAMPLE"}
           </button>
 
+          {/* Analysis result */}
           {analysisResult && (
             <div style={{ marginTop: 20, background: "#0a0a0f", border: "1px solid #2a2a3a", borderRadius: 10, padding: 20 }}>
               <pre style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: "#f0f0f8", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: 16 }}>{analysisResult}</pre>
               <button onClick={copyAnalysis} style={{ width: "100%", padding: 12, borderRadius: 8, cursor: "pointer", background: analysisCopied ? "rgba(0,229,255,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))", border: analysisCopied ? "1px solid rgba(0,229,255,0.3)" : "1px solid rgba(255,77,109,0.25)", color: analysisCopied ? "#00e5ff" : "#ff4d6d", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
-                {analysisCopied ? "COPIED \u2713" : "COPY PROMPT"}
+                {analysisCopied ? "COPIED \u2713" : "COPY TO SUNO"}
               </button>
             </div>
           )}

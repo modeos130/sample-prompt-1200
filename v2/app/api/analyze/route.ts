@@ -223,22 +223,13 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file  = formData.get("file")  as File  | null;
-    const genre = formData.get("genre") as Genre | null;
-
-    if (!genre || !VALID_GENRES.includes(genre)) {
-      return NextResponse.json({ error: "Invalid genre" }, { status: 400 });
-    }
+    const genre = formData.get("genre") as string | null;
 
     const apiKey = process.env.GEMINI_KEY;
     if (!apiKey) return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
 
-    // No-file fallback: generate a random prompt without audio analysis
     if (!file) {
-      const { buildPrompt } = getGenrePrompts(genre);
-      const fallbackAnalysis = "No audio sample provided. Generate a prompt using the genre's era, instrumentation, and aesthetic defaults. Use your knowledge of the genre to create a compelling, specific source material description.";
-      const rawPrompt = await geminiGenerate(apiKey, [{ text: buildPrompt(fallbackAnalysis) }]);
-      const generatedPrompt = capPrompt(rawPrompt.trim(), 1000);
-      return NextResponse.json({ analysis: "Random prompt generated — no audio analyzed.", generatedPrompt });
+      return NextResponse.json({ error: "Audio file required" }, { status: 400 });
     }
 
     const bytes  = await file.arrayBuffer();
@@ -251,7 +242,34 @@ export async function POST(req: NextRequest) {
     const mimeType = getMimeType(file.name);
     const b64      = buffer.toString("base64");
 
-    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre)!;
+    // Genre-free DNA analysis (used by /prompts page)
+    if (!genre || !VALID_GENRES.includes(genre as Genre)) {
+      const dnaPrompt = `You are an expert music analyst. Analyze this audio and create a Suno AI music generation prompt that captures its sonic DNA.
+
+Your prompt must follow these STRICT rules (the same DNA framework used by professional producers):
+- ONE PARAGRAPH, under 1000 characters
+- Describe: era/decade, specific real instruments, recording style, tempo feel, mood/atmosphere, sonic texture
+- NO drum descriptions (Suno handles rhythm separately)
+- NO real artist names or song titles
+- NO genre labels — describe the SOUND not the category
+- Use sensory and technical language: 'muffled Rhodes', 'overdriven bass guitar', 'tape saturation', 'room reverb'
+- Include a rarity/obscurity phrase like 'pressed in small quantities on a regional label'
+- Include 'designed to feel loopable' or similar
+- Focus on what a producer would sample: the feel, the space, the frequency range, the emotional quality
+- Output ONLY the prompt text — no preamble, no explanation, no quotation marks
+
+Analyze this audio and output the prompt now.`;
+
+      const rawPrompt = await geminiGenerate(apiKey, [
+        { text: dnaPrompt },
+        { inline_data: { mime_type: mimeType, data: b64 } },
+      ]);
+      const generatedPrompt = capPrompt(rawPrompt.trim(), 1000);
+      return NextResponse.json({ analysis: "Sonic DNA analysis complete.", generatedPrompt, prompt: generatedPrompt });
+    }
+
+    // Genre-specific analysis (used by studio.html)
+    const { analysisPrompt, buildPrompt } = getGenrePrompts(genre as Genre)!;
 
     // Pass 1 — audio analysis
     const rawAnalysis = await geminiGenerate(apiKey, [
