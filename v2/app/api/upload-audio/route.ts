@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
 export const maxDuration = 60;
 
 const MIME_MAP: Record<string, string> = {
@@ -38,8 +39,7 @@ export async function POST(req: NextRequest) {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
     const mimeType = MIME_MAP[ext] ?? "audio/mpeg";
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const numBytes = buffer.byteLength;
+    const numBytes = bytes.byteLength;
 
     // Step 1: Start resumable upload
     const startRes = await fetch(
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
         "X-Goog-Upload-Command": "upload, finalize",
         "Content-Length": String(numBytes),
       },
-      body: buffer,
+      body: bytes,
     });
 
     if (!uploadRes.ok) {
