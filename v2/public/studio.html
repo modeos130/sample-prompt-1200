@@ -5,25 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOOMAN LAB — Sound Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #080b10;
-  --bg2: #0f1318;
-  --bg3: #141a22;
-  --border: #1a2030;
-  --accent: #3b9eff;
-  --accent-dim: #2878cc;
-  --accent-light: rgba(59,158,255,0.1);
-  --cyan: #00d4ff;
-  --dark: #e0e8f0;
-  --text: #d0d8e4;
-  --muted: #5a6a80;
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --border: #2a2a3a;
+  --accent: #ff4d6d;
+  --accent-dim: #c0392b;
+  --accent-light: rgba(255,77,109,0.12);
+  --accent2: #ff9a3c;
+  --cyan: #00e5ff;
+  --gold: #ffd700;
+  --dark: #f0f0f8;
+  --text: #f0f0f8;
+  --muted: #b0b0c8;
+  --text3: #707088;
   --white: #ffffff;
   --font: 'DM Sans', sans-serif;
-  --display: 'Syne', sans-serif;
+  --display: 'Space Grotesk', sans-serif;
 }
 
 body {
@@ -45,12 +48,12 @@ body {
 }
 .logo {
   font-family: var(--display);
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: var(--dark);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--white);
 }
-.logo .studio { color: var(--accent); }
+.logo .lab { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; color: transparent; }
 .header-badge {
   font-size: 11px;
   letter-spacing: 2px;
@@ -63,7 +66,9 @@ body {
 
 /* HERO */
 .hero {
-  background: linear-gradient(135deg, #080b10 0%, #0a1020 50%, #0d1530 100%);
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,77,109,0.12), transparent 60%),
+              radial-gradient(ellipse at 70% 50%, rgba(255,154,60,0.08), transparent 60%),
+              var(--bg);
   padding: 56px 40px 48px;
   text-align: center;
   position: relative;
@@ -74,20 +79,22 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 25% 60%, rgba(59,158,255,0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 78% 30%, rgba(0,212,255,0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 25% 60%, rgba(255,77,109,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 78% 30%, rgba(255,154,60,0.04) 0%, transparent 50%);
   pointer-events: none;
 }
 .hero-title {
   font-family: var(--display);
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  color: var(--dark);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  color: transparent;
   position: relative;
 }
 .hero-sub {
-  font-size: 16px;
+  font-size: 17px;
   color: var(--muted);
   margin-top: 12px;
   position: relative;
@@ -95,7 +102,7 @@ body {
 .accent-line {
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
   margin: 20px auto 0;
   border-radius: 2px;
   position: relative;
@@ -112,28 +119,31 @@ body {
 .mode-tabs {
   display: flex;
   gap: 0;
+  justify-content: center;
   border-bottom: 1px solid var(--border);
   margin-bottom: 28px;
 }
 .mode-tab {
   font-family: var(--display);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  padding: 14px 24px;
+  padding: 16px 32px;
   color: var(--muted);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
+  transition: all 0.2s;
   background: none;
   border-top: none;
   border-left: none;
   border-right: none;
+  border-radius: 8px 8px 0 0;
 }
 .mode-tab:hover { color: var(--text); }
 .mode-tab.active {
-  color: var(--accent);
+  color: var(--white);
+  background: var(--accent);
   border-bottom-color: var(--accent);
 }
 
@@ -162,7 +172,7 @@ body {
   transition: border-color 0.2s;
 }
 .search-input::placeholder { color: var(--muted); }
-.search-input:focus { border-color: var(--accent-dim); }
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,77,109,0.15); }
 
 /* FILTER TABS */
 .filter-row {
@@ -192,11 +202,11 @@ body {
   white-space: nowrap;
   transition: all 0.2s;
 }
-.filter-tab:hover { color: var(--text); border-color: var(--muted); }
+.filter-tab:hover { color: var(--text); border-color: #3a3a4a; }
 .filter-tab.active {
-  background: var(--accent-light);
+  background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--white);
 }
 .filter-count {
   font-size: 12px;
@@ -216,20 +226,26 @@ body {
   min-width: 180px;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
+  border-radius: 12px;
+  overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
 }
+.sound-card .card-art {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  display: block;
+}
+.sound-card .card-body { padding: 14px; }
 .sound-card:hover {
-  border-color: var(--accent-dim);
+  border-color: #3a3a4a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(59,158,255,0.1);
+  box-shadow: 0 8px 32px rgba(255,77,109,0.2);
 }
 .sound-card.selected {
   border-color: var(--accent);
-  background: linear-gradient(135deg, var(--bg2) 0%, rgba(59,158,255,0.06) 100%);
-  box-shadow: 0 0 16px rgba(59,158,255,0.15);
+  box-shadow: 0 0 20px rgba(255,77,109,0.25);
 }
 .card-name {
   font-family: var(--display);
@@ -289,32 +305,32 @@ body {
 .btn-surprise {
   width: 100%;
   padding: 14px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--accent2);
+  border-radius: 10px;
   font-family: var(--display);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 1px;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cyan), var(--accent));
-  color: var(--bg);
-  margin-bottom: 10px;
-  transition: opacity 0.2s, transform 0.1s;
+  background: transparent;
+  color: var(--accent2);
+  margin-top: 10px;
+  transition: all 0.2s;
 }
-.btn-surprise:hover { opacity: 0.9; }
+.btn-surprise:hover { background: rgba(255,154,60,0.1); }
 .btn-surprise:active { transform: scale(0.99); }
 
 .btn-generate {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: var(--display);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
   color: var(--white);
   transition: opacity 0.2s, transform 0.1s;
 }
@@ -346,11 +362,11 @@ body {
   transition: all 0.2s;
   text-transform: capitalize;
 }
-.genre-btn:hover { color: var(--text); border-color: var(--muted); }
+.genre-btn:hover { color: var(--text); border-color: #3a3a4a; }
 .genre-btn.active {
-  background: var(--accent-light);
+  background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--white);
 }
 
 .vibe-textarea {
@@ -587,11 +603,12 @@ body {
 <body>
 
 <!-- HEADER -->
-<div class="header">
-  <div class="logo">BOOMAN LAB</div>
-  <div class="header-badge">Beta &middot; Lyria 3</div>
-  <a href="/prompts" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#5a6a80;text-decoration:none;margin-left:16px;transition:color 0.2s;" onmouseover="this.style.color='#3b9eff'" onmouseout="this.style.color='#5a6a80'">PROMPTS</a>
-  <a href="/account" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#5a6a80;text-decoration:none;margin-left:16px;transition:color 0.2s;" onmouseover="this.style.color='#3b9eff'" onmouseout="this.style.color='#5a6a80'">ACCOUNT</a>
+<div class="header" style="flex-direction:column;align-items:center;gap:10px;padding:20px 32px">
+  <div class="logo">BOOMAN <span class="lab">LAB</span></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="/prompts" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#b0b0c8;text-decoration:none;padding:8px 20px;border:1px solid #2a2a3a;border-radius:20px;transition:all 0.2s" onmouseover="this.style.borderColor='#ff4d6d';this.style.color='#ff4d6d'" onmouseout="this.style.borderColor='#2a2a3a';this.style.color='#b0b0c8'">PROMPTS</a>
+    <a href="/account" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#b0b0c8;text-decoration:none;padding:8px 20px;border:1px solid #2a2a3a;border-radius:20px;transition:all 0.2s" onmouseover="this.style.borderColor='#ff4d6d';this.style.color='#ff4d6d'" onmouseout="this.style.borderColor='#2a2a3a';this.style.color='#b0b0c8'">ACCOUNT</a>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -626,8 +643,8 @@ body {
       <button class="model-btn" data-model="pro">Full Track</button>
     </div>
 
-    <button class="btn-generate" id="btnGenLib" disabled style="width:100%">GENERATE</button>
-    <button class="btn-surprise" id="btnSurprise" style="width:100%;background:transparent;border:1px solid rgba(59,158,255,0.3);margin-top:8px">&#127922; SURPRISE ME</button>
+    <button class="btn-generate" id="btnGenLib" disabled>GENERATE</button>
+    <button class="btn-surprise" id="btnSurprise">&#127922; SURPRISE ME</button>
   </div>
 
   <!-- TAB 2: CREATE YOUR OWN -->
@@ -810,9 +827,12 @@ function renderCards() {
   cardsGrid.innerHTML = filtered.map(s => `
     <div class="sound-card${selectedSound && selectedSound.id === s.id ? ' selected' : ''}"
          data-id="${s.id}" data-genre="${s.genre}" data-name="${s.name}">
-      <div class="card-name">${s.name}</div>
-      <div class="card-genre">${s.genre.replace(/-/g, ' ')}</div>
-      <div class="card-vibe">${s.vibe}</div>
+      <img class="card-art" src="/art/${s.id}.jpg" alt="${s.name}" loading="lazy">
+      <div class="card-body">
+        <div class="card-name">${s.name}</div>
+        <div class="card-genre">${s.genre.replace(/-/g, ' ')}</div>
+        <div class="card-vibe">${s.vibe}</div>
+      </div>
     </div>
   `).join('');
 }

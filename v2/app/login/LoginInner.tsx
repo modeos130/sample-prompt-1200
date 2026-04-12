@@ -13,131 +13,43 @@ export default function LoginInner() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Redirect to studio on success
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    if (authError) { setError(authError.message); setLoading(false); return; }
     window.location.href = "/studio.html";
   };
 
+  const inputStyle = { width: "100%", padding: "14px 18px", background: "#111118", border: "1px solid #2a2a3a", borderRadius: 10, color: "#f0f0f8", fontFamily: "'DM Sans',sans-serif", fontSize: 15, outline: "none" };
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: "#080b10" }}
-    >
-      <div className="w-full max-w-md">
-        {/* Logo / Title */}
-        <div className="text-center mb-10">
-          <h1
-            className="text-3xl font-bold tracking-tight mb-2"
-            style={{ fontFamily: "'Syne', sans-serif", color: "#ffffff" }}
-          >
-            BooManLab
+    <div style={{ background: "#0a0a0f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap'); input:focus { border-color: #ff4d6d !important; box-shadow: 0 0 0 3px rgba(255,77,109,0.15) !important; }`}</style>
+      <div style={{ width: "100%", maxWidth: 420 }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 36, letterSpacing: 3, marginBottom: 8 }}>
+            <span style={{ color: "#fff" }}>BOOMAN</span>{" "}
+            <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span>
           </h1>
-          <p style={{ color: "#5a6a80", fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>
-            Sample Prompt 1200 — 130 MODE
-          </p>
+          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: "#b0b0c8" }}>AI Music Production Studio</p>
         </div>
 
-        {/* Login Card */}
-        <form
-          onSubmit={handleLogin}
-          className="rounded-xl p-8"
-          style={{
-            background: "#0f1318",
-            border: "1px solid #1a2030",
-          }}
-        >
+        <form onSubmit={handleLogin} style={{ background: "#111118", border: "1px solid #2a2a3a", borderRadius: 14, padding: 32 }}>
           {error && (
-            <div
-              className="rounded-lg px-4 py-3 mb-6 text-sm"
-              style={{
-                background: "rgba(224,86,86,0.1)",
-                border: "1px solid rgba(224,86,86,0.2)",
-                color: "#e05656",
-              }}
-            >
-              {error}
-            </div>
+            <div style={{ background: "rgba(255,77,109,0.1)", border: "1px solid rgba(255,77,109,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#ff4d6d" }}>{error}</div>
           )}
 
-          <div className="mb-5">
-            <label
-              className="block text-xs font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "#5a6a80", fontFamily: "'Syne', sans-serif" }}
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-colors"
-              style={{
-                background: "#141a22",
-                border: "1px solid #1a2030",
-                color: "#e0e8f0",
-                fontFamily: "'DM Mono', monospace",
-              }}
-              placeholder="you@example.com"
-            />
-          </div>
+          <label style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Email</label>
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ ...inputStyle, marginBottom: 20 }} placeholder="you@example.com" />
 
-          <div className="mb-8">
-            <label
-              className="block text-xs font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "#5a6a80", fontFamily: "'Syne', sans-serif" }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-colors"
-              style={{
-                background: "#141a22",
-                border: "1px solid #1a2030",
-                color: "#e0e8f0",
-                fontFamily: "'DM Mono', monospace",
-              }}
-              placeholder="Enter password"
-            />
-          </div>
+          <label style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Password</label>
+          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 28 }} placeholder="Enter password" />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg font-semibold text-sm uppercase tracking-widest transition-all"
-            style={{
-              background: loading ? "#1a3060" : "#3b9eff",
-              color: loading ? "#5a8abf" : "#ffffff",
-              fontFamily: "'Syne', sans-serif",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
+          <button type="submit" disabled={loading} style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", cursor: loading ? "not-allowed" : "pointer", background: loading ? "#4a2030" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: loading ? 0.6 : 1 }}>
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p
-          className="text-center mt-6 text-xs"
-          style={{ color: "#3d4d5c", fontFamily: "'DM Mono', monospace" }}
-        >
-          Invite only — no signup
-        </p>
+        <p style={{ textAlign: "center", marginTop: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088" }}>Invite only — no signup</p>
       </div>
     </div>
   );
