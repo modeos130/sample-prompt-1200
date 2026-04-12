@@ -166,16 +166,17 @@ export default function PromptsPage() {
             <input ref={fileRef} type="file" accept=".mp3,.wav,.m4a,.flac" hidden onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" strokeWidth="1.5" style={{ marginBottom: 10 }}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, color: "#f0f0f8", marginBottom: 4 }}>{file ? `${file.name} (${(file.size/1048576).toFixed(1)} MB)` : "Drop .mp3 .wav .m4a .flac here"}</div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — up to 20 MB"}</div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — max 4 MB, MP3 recommended"}</div>
           </div>
 
           {/* Upload info */}
           <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(255,154,60,0.06)", border: "1px solid rgba(255,154,60,0.15)", borderRadius: 10 }}>
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.6, margin: 0 }}>
               <span style={{ color: "#ff9a3c", fontWeight: 600 }}>How it works:</span>{" "}
-              Your audio is uploaded securely to Google&apos;s servers for AI analysis. Files up to 20 MB are supported.
-              MP3, WAV, M4A, and FLAC formats accepted. Only 30-60 seconds of audio is needed for accurate analysis
-              — longer files work fine but won&apos;t improve results.
+              Your audio is uploaded securely to Google&apos;s AI servers for sonic DNA analysis.
+              Max file size is 4 MB. MP3 files work best — a 3-minute track at 128kbps is about 3 MB.
+              WAV files are much larger; convert to MP3 first. Only 30-60 seconds of audio is needed
+              for accurate analysis — trim longer tracks for best results.
             </p>
             <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088", marginTop: 8 }}>
               Supported formats: .mp3 .wav .m4a .flac
