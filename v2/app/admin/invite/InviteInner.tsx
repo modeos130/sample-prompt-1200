@@ -48,8 +48,8 @@ export default function InviteInner() {
     async function checkAuth() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
-      const { data: profile } = await supabase.from("profiles").select("tier").eq("id", user.id).single();
-      if (!profile || profile.tier !== "super_user") { setError("Super user access required"); return; }
+      const OWNER_EMAIL = "admin@modeos.app";
+      if (user.email !== OWNER_EMAIL) { setError("Owner access required"); return; }
       setAuthorized(true);
       loadUsers();
     }

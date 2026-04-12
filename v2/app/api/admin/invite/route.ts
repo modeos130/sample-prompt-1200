@@ -44,13 +44,9 @@ export async function POST(req: NextRequest) {
   if (!caller) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  const { data: callerProfile } = await supabase
-    .from("profiles")
-    .select("tier")
-    .eq("id", caller.id)
-    .single();
-  if (!callerProfile || callerProfile.tier !== "super_user") {
-    return NextResponse.json({ error: "Super user access required" }, { status: 403 });
+  const OWNER_EMAIL = process.env.ADMIN_OWNER_EMAIL || "admin@modeos.app";
+  if (caller.email !== OWNER_EMAIL) {
+    return NextResponse.json({ error: "Owner access required" }, { status: 403 });
   }
 
   let body: Record<string, unknown>;
