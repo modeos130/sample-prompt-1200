@@ -1104,6 +1104,17 @@ function downloadAudio() {
 
 // ===== BOOT =====
 init();
+
+// ===== ANALYTICS =====
+(function() {
+  try {
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'studio_visit' }),
+    }).catch(function() {});
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
