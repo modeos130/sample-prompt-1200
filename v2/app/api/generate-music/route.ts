@@ -2,38 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 120; // Music generation is slow
 
-// ─── RATE LIMITING ────────────────────────────────────────────────────────────
-// Separate counters from vibe-prompt — resets on each cold start
-const musicIpCallLog = new Map<string, { count: number; windowStart: number }>();
-
-const MUSIC_RATE_LIMIT  = parseInt(process.env.MUSIC_RATE_LIMIT  ?? "5");       // calls per IP per day
+// ─── TIER-BASED RATE LIMITING ─────────────────────────────────────────────────
+const musicUserCallLog = new Map<string, { count: number; windowStart: number }>();
 const MUSIC_RATE_WINDOW = parseInt(process.env.MUSIC_RATE_WINDOW ?? "86400000"); // 24h in ms
-const MUSIC_HARD_CAP    = parseInt(process.env.MUSIC_HARD_CAP    ?? "50");       // total calls per cold start
 
-let musicTotalCalls = 0;
+const TIER_LIMITS: Record<string, number> = {
+  super_user: 9999,
+  vip: 9999,
+  tier2: 50,
+  tier1: 10,
+  free: 3,
+};
 
-function checkMusicRateLimit(ip: string): { allowed: boolean; reason?: string; remaining?: number } {
-  if (musicTotalCalls >= MUSIC_HARD_CAP) {
-    return { allowed: false, reason: "Daily music generation capacity reached. Check back tomorrow." };
+function checkMusicRateLimit(userId: string, tier: string): { allowed: boolean; reason?: string; remaining?: number } {
+  // Unlimited tiers skip limit check entirely
+  if (tier === "super_user" || tier === "vip") {
+    return { allowed: true, remaining: 9999 };
   }
 
+  const limit = TIER_LIMITS[tier] ?? TIER_LIMITS.free;
   const now = Date.now();
-  const record = musicIpCallLog.get(ip);
+  const record = musicUserCallLog.get(userId);
 
   if (!record || now - record.windowStart > MUSIC_RATE_WINDOW) {
-    musicIpCallLog.set(ip, { count: 1, windowStart: now });
-    musicTotalCalls++;
-    return { allowed: true, remaining: MUSIC_RATE_LIMIT - 1 };
+    musicUserCallLog.set(userId, { count: 1, windowStart: now });
+    return { allowed: true, remaining: limit - 1 };
   }
 
-  if (record.count >= MUSIC_RATE_LIMIT) {
+  if (record.count >= limit) {
     const resetIn = Math.ceil((MUSIC_RATE_WINDOW - (now - record.windowStart)) / 3600000);
-    return { allowed: false, reason: `Rate limit reached. You get ${MUSIC_RATE_LIMIT} music generations per day. Resets in ~${resetIn}h.` };
+    return {
+      allowed: false,
+      reason: `You've used all ${limit} generations today. Upgrade to VIP for unlimited generations. Resets in ~${resetIn}h.`,
+    };
   }
 
   record.count++;
-  musicTotalCalls++;
-  return { allowed: true, remaining: MUSIC_RATE_LIMIT - record.count };
+  return { allowed: true, remaining: limit - record.count };
 }
 
 // ─── PROVEN PROMPTS (SERVER-SIDE ONLY — NEVER SENT TO CLIENT) ────────────────
@@ -175,14 +180,52 @@ interface ClaudeApiResponse {
 
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // Get real IP — use last value in x-forwarded-for (Vercel appends real IP at end)
-  const fwd = req.headers.get("x-forwarded-for");
-  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
-          ?? req.headers.get("x-real-ip")
-          ?? "unknown";
+  // Get user identity and tier from Supabase auth cookie
+  let userId = "anonymous";
+  let tier = "free";
 
-  // Rate limit check
-  const limit = checkMusicRateLimit(ip);
+  try {
+    const { createServerClient } = await import("@supabase/ssr");
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return req.cookies.getAll(); },
+          setAll() {},
+        },
+      }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      userId = user.id;
+      // Get tier from profiles table
+      const { createClient } = await import("@supabase/supabase-js");
+      const adminClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: profile } = await adminClient
+        .from("profiles")
+        .select("tier")
+        .eq("id", user.id)
+        .single();
+      if (profile?.tier) tier = profile.tier;
+    }
+  } catch {
+    // If auth fails, fall back to anonymous/free tier
+  }
+
+  // If not authenticated, use IP as fallback identifier
+  if (userId === "anonymous") {
+    const fwd = req.headers.get("x-forwarded-for");
+    userId = (fwd ? fwd.split(",").pop()?.trim() : null)
+            ?? req.headers.get("x-real-ip")
+            ?? "unknown";
+  }
+
+  // Rate limit check (tier-aware)
+  const limit = checkMusicRateLimit(userId, tier);
   if (!limit.allowed) {
     return NextResponse.json(
       { error: limit.reason },
