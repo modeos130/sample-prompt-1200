@@ -105,7 +105,7 @@ export default function PromptsPage() {
       {/* Hero */}
       <div style={{ textAlign: "center", padding: "48px 24px 32px", background: "radial-gradient(ellipse at 30% 50%, rgba(255,77,109,0.12), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(255,154,60,0.08), transparent 60%), #0a0a0f" }}>
         <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 36, letterSpacing: 4, marginBottom: 10, background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>PROMPT LIBRARY</h1>
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 17, color: "#b0b0c8", marginBottom: 16 }}>69 proven prompts. Copy directly into Suno.</p>
+        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 17, color: "#b0b0c8", marginBottom: 16 }}>{ALL_PROMPTS.length} proven prompts. Copy directly into Suno.</p>
         <div style={{ width: 60, height: 2, background: "linear-gradient(90deg, #ff4d6d, #ff9a3c)", margin: "0 auto" }} />
       </div>
 
