@@ -11,10 +11,13 @@ export default function PromptsPage() {
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
+  const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
   const [analysisCopied, setAnalysisCopied] = useState(false);
+  const [analysisCopyFailed, setAnalysisCopyFailed] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
@@ -26,13 +29,46 @@ export default function PromptsPage() {
     });
   }, [search, activeGenre]);
 
+  const copyText = async (text: string) => {
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // Fall through to the textarea fallback below.
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    textarea.style.top = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  };
+
   // CRITICAL: Copy from data array, NOT from DOM
-  const copyVibe = (id: string) => {
+  const copyVibe = async (id: string) => {
     const prompt = ALL_PROMPTS.find((p) => p.id === id);
     if (!prompt) return;
-    navigator.clipboard.writeText(prompt.vibe);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    setSelectedPromptId(id);
+    const copied = await copyText(prompt.vibe);
+    setCopyFailedId(copied ? null : id);
+    if (copied) {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
   };
 
   const [uploadProgress, setUploadProgress] = useState("");
@@ -71,10 +107,13 @@ export default function PromptsPage() {
     finally { setAnalyzing(false); setUploadProgress(""); }
   };
 
-  const copyAnalysis = () => {
-    navigator.clipboard.writeText(analysisResult);
-    setAnalysisCopied(true);
-    setTimeout(() => setAnalysisCopied(false), 2000);
+  const copyAnalysis = async () => {
+    const copied = await copyText(analysisResult);
+    setAnalysisCopyFailed(!copied);
+    if (copied) {
+      setAnalysisCopied(true);
+      setTimeout(() => setAnalysisCopied(false), 2000);
+    }
   };
 
   const tabStyle = (active: boolean) => ({
@@ -134,14 +173,27 @@ export default function PromptsPage() {
                 <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: 14 }}>{p.vibe}</div>
                 <button onClick={() => copyVibe(p.id)} style={{
                   width: "100%", padding: 11, borderRadius: 8, cursor: "pointer",
-                  background: copiedId === p.id ? "rgba(0,229,255,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))",
-                  border: copiedId === p.id ? "1px solid rgba(0,229,255,0.3)" : "1px solid rgba(255,77,109,0.25)",
-                  color: copiedId === p.id ? "#00e5ff" : "#ff4d6d",
+                  background: copiedId === p.id ? "rgba(0,229,255,0.12)" : selectedPromptId === p.id ? "rgba(255,154,60,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))",
+                  border: copiedId === p.id ? "1px solid rgba(0,229,255,0.3)" : selectedPromptId === p.id ? "1px solid rgba(255,154,60,0.35)" : "1px solid rgba(255,77,109,0.25)",
+                  color: copiedId === p.id ? "#00e5ff" : selectedPromptId === p.id ? "#ff9a3c" : "#ff4d6d",
                   fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase",
                   transition: "all 0.2s",
                 }}>
-                  {copiedId === p.id ? "COPIED \u2713" : "COPY TO SUNO"}
+                  {copiedId === p.id ? "COPIED \u2713" : selectedPromptId === p.id ? "PROMPT READY" : "COPY TO SUNO"}
                 </button>
+                {selectedPromptId === p.id && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: copyFailedId === p.id ? "#ff9a3c" : "#00e5ff", marginBottom: 7 }}>
+                      {copyFailedId === p.id ? "Suno prompt ready" : "Copied Suno prompt"}
+                    </div>
+                    <textarea
+                      readOnly
+                      value={p.vibe}
+                      onFocus={(e) => e.currentTarget.select()}
+                      style={{ width: "100%", minHeight: 150, resize: "vertical", background: "#0a0a0f", border: "1px solid #2a2a3a", borderRadius: 8, padding: 12, color: "#f0f0f8", fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.55, outline: "none" }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -193,8 +245,8 @@ export default function PromptsPage() {
           {analysisResult && (
             <div style={{ marginTop: 20, background: "#0a0a0f", border: "1px solid #2a2a3a", borderRadius: 10, padding: 20 }}>
               <pre style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: "#f0f0f8", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: 16 }}>{analysisResult}</pre>
-              <button onClick={copyAnalysis} style={{ width: "100%", padding: 12, borderRadius: 8, cursor: "pointer", background: analysisCopied ? "rgba(0,229,255,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))", border: analysisCopied ? "1px solid rgba(0,229,255,0.3)" : "1px solid rgba(255,77,109,0.25)", color: analysisCopied ? "#00e5ff" : "#ff4d6d", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
-                {analysisCopied ? "COPIED \u2713" : "COPY TO SUNO"}
+              <button onClick={copyAnalysis} style={{ width: "100%", padding: 12, borderRadius: 8, cursor: "pointer", background: analysisCopied ? "rgba(0,229,255,0.12)" : analysisCopyFailed ? "rgba(255,154,60,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))", border: analysisCopied ? "1px solid rgba(0,229,255,0.3)" : analysisCopyFailed ? "1px solid rgba(255,154,60,0.35)" : "1px solid rgba(255,77,109,0.25)", color: analysisCopied ? "#00e5ff" : analysisCopyFailed ? "#ff9a3c" : "#ff4d6d", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
+                {analysisCopied ? "COPIED \u2713" : analysisCopyFailed ? "PROMPT READY" : "COPY TO SUNO"}
               </button>
             </div>
           )}

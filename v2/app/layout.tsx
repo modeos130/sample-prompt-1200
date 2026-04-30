@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "BOOMAN LAB — AI Music Production Studio",
   description:
-    "69 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
+    "75 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
   openGraph: {
     title: "BOOMAN LAB — AI Music Production Studio",
     description:
-      "69 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
+      "75 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
     type: "website",
   },
 };
