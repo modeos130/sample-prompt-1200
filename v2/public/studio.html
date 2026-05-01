@@ -5,32 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOOMAN LAB — Sound Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --bg3: #1a1a24;
-  --border: #2a2a3a;
+  --bg: #080a0f;
+  --bg2: #101117;
+  --bg3: #15161f;
+  --border: #282a36;
   --accent: #ff4d6d;
   --accent-dim: #c0392b;
   --accent-light: rgba(255,77,109,0.12);
   --accent2: #ff9a3c;
   --cyan: #00e5ff;
-  --gold: #ffd700;
+  --gold: #d7b56d;
   --dark: #f0f0f8;
   --text: #f0f0f8;
-  --muted: #b0b0c8;
-  --text3: #707088;
+  --muted: #9ca0b4;
+  --text3: #666b82;
   --white: #ffffff;
   --font: 'DM Sans', sans-serif;
-  --display: 'Space Grotesk', sans-serif;
+  --display: 'Syne', sans-serif;
 }
 
 body {
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, rgba(255,77,109,0.04), transparent 280px),
+    var(--bg);
   color: var(--text);
   font-family: var(--font);
   min-height: 100vh;
@@ -38,113 +40,211 @@ body {
 
 /* HEADER */
 .header {
-  background: var(--bg2);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(8,10,15,0.88);
   border-bottom: 1px solid var(--border);
-  padding: 16px 32px;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 12px rgba(0,0,0,0.3);
+  gap: 16px;
+  backdrop-filter: blur(16px);
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 .logo {
   font-family: var(--display);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
   color: var(--white);
+  text-decoration: none;
 }
-.logo .lab { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; color: transparent; }
+.logo .lab { color: var(--accent); }
 .header-badge {
-  font-size: 11px;
-  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(215,181,109,0.32);
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: var(--gold);
+  background: rgba(215,181,109,0.08);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.nav-pill {
   color: var(--muted);
   border: 1px solid var(--border);
-  padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration: none;
   text-transform: uppercase;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.nav-pill:hover {
+  color: var(--text);
+  border-color: rgba(255,77,109,0.55);
+  background: rgba(255,77,109,0.08);
 }
 
 /* HERO */
 .hero {
-  background: radial-gradient(ellipse at 30% 50%, rgba(255,77,109,0.12), transparent 60%),
-              radial-gradient(ellipse at 70% 50%, rgba(255,154,60,0.08), transparent 60%),
-              var(--bg);
-  padding: 56px 40px 48px;
-  text-align: center;
   position: relative;
   overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+  border-bottom: 1px solid var(--border);
   background:
-    radial-gradient(ellipse at 25% 60%, rgba(255,77,109,0.06) 0%, transparent 55%),
-    radial-gradient(ellipse at 78% 30%, rgba(255,154,60,0.04) 0%, transparent 50%);
-  pointer-events: none;
+    linear-gradient(90deg, rgba(255,77,109,0.16), rgba(255,154,60,0.05), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0, rgba(255,255,255,0.028) 1px, transparent 1px, transparent 7px),
+    #0b0c12;
+}
+.hero-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 52px 24px 34px;
+}
+.hero-kicker {
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin-bottom: 12px;
 }
 .hero-title {
+  max-width: 780px;
+  margin: 0;
   font-family: var(--display);
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  color: transparent;
-  position: relative;
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.hero-title span {
+  color: var(--accent);
 }
 .hero-sub {
+  max-width: 620px;
   font-size: 17px;
   color: var(--muted);
-  margin-top: 12px;
-  position: relative;
+  line-height: 1.6;
+  margin-top: 16px;
 }
-.accent-line {
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  margin: 20px auto 0;
-  border-radius: 2px;
-  position: relative;
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.meta-badge {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: var(--muted);
+  background: rgba(255,255,255,0.035);
+  font-size: 13px;
+  font-weight: 600;
+}
+.meta-badge strong {
+  color: var(--text);
 }
 
 /* CONTAINER */
 .container {
-  max-width: 900px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 22px 24px 72px;
+}
+
+/* TOOL SWITCH */
+.tool-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 700px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(16,17,23,0.86);
+  margin-bottom: 18px;
+}
+.tool-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.tool-button:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.045);
+}
+.tool-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tool-button.active {
+  color: #0a0a0f;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
 }
 
 /* MODE TABS */
 .mode-tabs {
-  display: flex;
-  gap: 0;
-  justify-content: center;
-  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 520px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(16,17,23,0.86);
   margin-bottom: 28px;
 }
 .mode-tab {
   font-family: var(--display);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 16px 32px;
+  min-height: 42px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  padding: 0 16px;
   color: var(--muted);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
   background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-radius: 8px 8px 0 0;
+  border: 0;
+  border-radius: 7px;
+  text-transform: uppercase;
+  transition: all 0.2s;
 }
-.mode-tab:hover { color: var(--text); }
+.mode-tab:hover { color: var(--text); background: rgba(255,255,255,0.045); }
 .mode-tab.active {
-  color: var(--white);
-  background: var(--accent);
-  border-bottom-color: var(--accent);
+  color: #0a0a0f;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
 }
 
 /* SEARCH BAR */
@@ -583,12 +683,22 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .header { padding: 14px 18px; }
-  .logo { font-size: 17px; }
-  .hero { padding: 36px 20px 32px; }
-  .hero-title { font-size: 24px; letter-spacing: 2px; }
-  .hero-sub { font-size: 14px; }
-  .container { padding: 24px 16px 48px; }
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+  .header-left {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .logo { font-size: 18px; }
+  .header-badge { display: none; }
+  .hero-inner { padding: 38px 16px 28px; }
+  .hero-title { font-size: 42px; }
+  .hero-sub { font-size: 15px; }
+  .container { padding: 18px 16px 54px; }
+  .tool-switch { max-width: none; }
   .mode-tab { padding: 12px 16px; font-size: 12px; }
   .sound-card { width: calc(50% - 6px); min-width: 0; }
   .cards-grid { gap: 10px; }
@@ -596,30 +706,48 @@ body {
 }
 @media (max-width: 480px) {
   .sound-card { width: 100%; }
-  .mode-tab { padding: 10px 12px; font-size: 11px; letter-spacing: 1px; }
+  .tool-switch,
+  .mode-tabs { grid-template-columns: 1fr; }
+  .mode-tab { padding: 10px 12px; font-size: 11px; }
 }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<div class="header" style="flex-direction:column;align-items:center;gap:10px;padding:20px 32px">
-  <div class="logo">BOOMAN <span class="lab">LAB</span></div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <a href="/prompts" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#b0b0c8;text-decoration:none;padding:8px 20px;border:1px solid #2a2a3a;border-radius:20px;transition:all 0.2s" onmouseover="this.style.borderColor='#ff4d6d';this.style.color='#ff4d6d'" onmouseout="this.style.borderColor='#2a2a3a';this.style.color='#b0b0c8'">PROMPTS</a>
-    <a href="/account" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#b0b0c8;text-decoration:none;padding:8px 20px;border:1px solid #2a2a3a;border-radius:20px;transition:all 0.2s" onmouseover="this.style.borderColor='#ff4d6d';this.style.color='#ff4d6d'" onmouseout="this.style.borderColor='#2a2a3a';this.style.color='#b0b0c8'">ACCOUNT</a>
+<div class="header">
+  <div class="header-left">
+    <a href="/studio.html" class="logo">BOOMAN <span class="lab">LAB</span></a>
+    <a href="/admin/invite" class="nav-pill">Invite</a>
+    <a href="/account" class="nav-pill">Account</a>
   </div>
+  <div class="header-badge">Sound Studio</div>
 </div>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-title">SOUND STUDIO</div>
-  <div class="hero-sub">Select a sound or describe your own vibe. We handle the rest.</div>
-  <div class="accent-line"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">Sample Prompt 1200</div>
+    <h1 class="hero-title">Sound <span>Studio</span></h1>
+    <div class="hero-sub">Select a sound or describe your own vibe. We handle the rest.</div>
+    <div class="hero-meta">
+      <div class="meta-badge"><strong>75</strong> sounds</div>
+      <div class="meta-badge"><strong>2</strong> generation paths</div>
+      <div class="meta-badge"><strong>Lyria</strong> powered</div>
+      <div class="meta-badge"><strong>Loopable</strong> by design</div>
+    </div>
+  </div>
 </div>
 
 <!-- MAIN CONTAINER -->
 <div class="container">
+
+  <!-- TOOL SWITCH -->
+  <div class="tool-switch" role="tablist" aria-label="Booman Lab tools">
+    <button class="tool-button active" type="button" role="tab" aria-selected="true">Studio</button>
+    <a class="tool-button tool-link" href="/prompts" role="tab">Library</a>
+    <a class="tool-button tool-link" href="/prompts#analysis" role="tab">Sample Analysis</a>
+  </div>
 
   <!-- MODE TABS -->
   <div class="mode-tabs">

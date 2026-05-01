@@ -1,30 +1,64 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
-import { ALL_PROMPTS, ALL_GENRES } from "@/lib/prompts";
+/* eslint-disable @next/next/no-img-element */
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ALL_PROMPTS, ALL_GENRES, type Prompt } from "@/lib/prompts";
 
-function GenreCount(genre: string) {
+type Mode = "library" | "analysis";
+
+function genreLabel(genre: string) {
+  return genre.replace(/-/g, " ");
+}
+
+function genreCount(genre: string) {
   return ALL_PROMPTS.filter((p) => p.genre === genre).length;
 }
 
+const QUICK_GENRES = [
+  "all",
+  "dark-underground",
+  "cinematic-dark",
+  "vocal-chop",
+  "italian-film",
+  "vietnamese-soul",
+  "boom-bap",
+];
+
 export default function PromptsPage() {
+  const [mode, setMode] = useState<Mode>("library");
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
   const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
+  const [drawerPromptId, setDrawerPromptId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
   const [analysisCopied, setAnalysisCopied] = useState(false);
   const [analysisCopyFailed, setAnalysisCopyFailed] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (window.location.hash === "#analysis") {
+      setMode("analysis");
+    }
+  }, []);
+
+  const selectedPrompt = useMemo(
+    () => ALL_PROMPTS.find((p) => p.id === drawerPromptId) ?? null,
+    [drawerPromptId]
+  );
 
   const filtered = useMemo(() => {
     return ALL_PROMPTS.filter((p) => {
       const matchesGenre = activeGenre === "all" || p.genre === activeGenre;
-      const q = search.toLowerCase();
-      const matchesSearch = !q || p.name.toLowerCase().includes(q) || p.vibe.toLowerCase().includes(q);
+      const q = search.trim().toLowerCase();
+      const matchesSearch =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.genre.toLowerCase().includes(q) ||
+        p.vibe.toLowerCase().includes(q);
       return matchesGenre && matchesSearch;
     });
   }, [search, activeGenre]);
@@ -58,30 +92,28 @@ export default function PromptsPage() {
     }
   };
 
-  // CRITICAL: Copy from data array, NOT from DOM
-  const copyVibe = async (id: string) => {
-    const prompt = ALL_PROMPTS.find((p) => p.id === id);
-    if (!prompt) return;
-    setSelectedPromptId(id);
+  const copyPrompt = async (prompt: Prompt) => {
+    setDrawerPromptId(prompt.id);
     const copied = await copyText(prompt.vibe);
-    setCopyFailedId(copied ? null : id);
+    setCopyFailedId(copied ? null : prompt.id);
     if (copied) {
-      setCopiedId(id);
+      setCopiedId(prompt.id);
       setTimeout(() => setCopiedId(null), 2000);
     }
   };
 
-  const [uploadProgress, setUploadProgress] = useState("");
-
-  // Genre-free DNA analysis via Gemini File API (no size limit)
   const handleAnalyze = async () => {
     if (!file) return;
-    setAnalyzing(true); setAnalysisResult(""); setUploadProgress("Uploading to Gemini...");
+    setAnalyzing(true);
+    setAnalysisResult("");
+    setUploadProgress("Uploading to Gemini...");
     try {
-      // Step 1: Upload file to Gemini File API via our proxy
       const uploadForm = new FormData();
       uploadForm.append("file", file);
-      const uploadRes = await fetch("/api/upload-audio", { method: "POST", body: uploadForm });
+      const uploadRes = await fetch("/api/upload-audio", {
+        method: "POST",
+        body: uploadForm,
+      });
       if (!uploadRes.ok) {
         const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
         setAnalysisResult(errData.error || "Failed to upload audio.");
@@ -89,7 +121,6 @@ export default function PromptsPage() {
       }
       const { fileUri, mimeType } = await uploadRes.json();
 
-      // Step 2: Send only the URI to analyze (lightweight JSON, no file body)
       setUploadProgress("Analyzing sonic DNA...");
       const analyzeRes = await fetch("/api/analyze", {
         method: "POST",
@@ -103,8 +134,12 @@ export default function PromptsPage() {
       }
       const data = await analyzeRes.json();
       setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result");
-    } catch { setAnalysisResult("Analysis failed. Check your connection and try again."); }
-    finally { setAnalyzing(false); setUploadProgress(""); }
+    } catch {
+      setAnalysisResult("Analysis failed. Check your connection and try again.");
+    } finally {
+      setAnalyzing(false);
+      setUploadProgress("");
+    }
   };
 
   const copyAnalysis = async () => {
@@ -116,142 +151,1012 @@ export default function PromptsPage() {
     }
   };
 
-  const tabStyle = (active: boolean) => ({
-    flexShrink: 0 as const, padding: "7px 16px", borderRadius: 20, cursor: "pointer" as const,
-    border: active ? "1px solid #ff4d6d" : "1px solid #2a2a3a",
-    background: active ? "rgba(255,77,109,0.15)" : "#111118",
-    color: active ? "#ff4d6d" : "#b0b0c8",
-    fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1,
-    textTransform: "uppercase" as const, whiteSpace: "nowrap" as const,
-  });
-
-  const navPillStyle = { fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase" as const, color: "#b0b0c8", textDecoration: "none", padding: "8px 20px", border: "1px solid #2a2a3a", borderRadius: 20, transition: "all 0.2s" };
+  const chooseMode = (nextMode: Mode) => {
+    setMode(nextMode);
+    const nextUrl = nextMode === "analysis" ? "#analysis" : window.location.pathname;
+    window.history.replaceState(null, "", nextUrl);
+  };
 
   return (
-    <div style={{ background: "#0a0a0f", minHeight: "100vh", color: "#f0f0f8" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } input:focus { border-color: #ff4d6d !important; box-shadow: 0 0 0 3px rgba(255,77,109,0.15) !important; } .prompt-card:hover { border-color: #3a3a4a !important; box-shadow: 0 8px 32px rgba(255,77,109,0.15) !important; transform: translateY(-2px); } .nav-pill:hover { border-color: #ff4d6d !important; color: #ff4d6d !important; }`}</style>
+    <div className="prompt-page">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid #2a2a3a" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <a href="/studio.html" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", textDecoration: "none", letterSpacing: 1 }}>BOOMAN <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span></a>
-          <a href="/studio.html" className="nav-pill" style={navPillStyle}>&larr; STUDIO</a>
-          <a href="/account" className="nav-pill" style={navPillStyle}>ACCOUNT</a>
+        .prompt-page {
+          --bg: #080a0f;
+          --panel: #101117;
+          --panel-2: #15161f;
+          --line: #282a36;
+          --text: #f1f2f6;
+          --muted: #9ca0b4;
+          --dim: #666b82;
+          --red: #ff4d6d;
+          --orange: #ff9a3c;
+          --gold: #d7b56d;
+          --cyan: #54d4e8;
+          min-height: 100vh;
+          background:
+            linear-gradient(180deg, rgba(255,77,109,0.04), transparent 280px),
+            var(--bg);
+          color: var(--text);
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        .prompt-page * {
+          box-sizing: border-box;
+        }
+
+        .topbar {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 14px 24px;
+          border-bottom: 1px solid var(--line);
+          background: rgba(8,10,15,0.88);
+          backdrop-filter: blur(16px);
+        }
+
+        .topbar-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 0;
+        }
+
+        .brand {
+          flex-shrink: 0;
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 18px;
+          font-weight: 800;
+          letter-spacing: 0;
+          line-height: 1;
+          text-decoration: none;
+        }
+
+        .brand span {
+          color: var(--red);
+        }
+
+        .nav-pill,
+        .mode-button,
+        .genre-chip,
+        .card-button,
+        .drawer-button,
+        .analyze-button {
+          font-family: 'Syne', sans-serif;
+          letter-spacing: 0;
+          text-transform: uppercase;
+        }
+
+        .nav-pill {
+          color: var(--muted);
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          padding: 8px 14px;
+          font-size: 11px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+        }
+
+        .nav-pill:hover {
+          color: var(--text);
+          border-color: rgba(255,77,109,0.55);
+          background: rgba(255,77,109,0.08);
+        }
+
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          border: 1px solid rgba(215,181,109,0.32);
+          border-radius: 999px;
+          padding: 6px 12px;
+          color: var(--gold);
+          background: rgba(215,181,109,0.08);
+          font-family: 'Syne', sans-serif;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .hero {
+          position: relative;
+          overflow: hidden;
+          border-bottom: 1px solid var(--line);
+          background:
+            linear-gradient(90deg, rgba(255,77,109,0.16), rgba(255,154,60,0.05), transparent 70%),
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0, rgba(255,255,255,0.028) 1px, transparent 1px, transparent 7px),
+            #0b0c12;
+        }
+
+        .hero-inner {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 52px 24px 34px;
+        }
+
+        .hero-kicker {
+          color: var(--gold);
+          font-family: 'Syne', sans-serif;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+        }
+
+        .hero-title {
+          max-width: 780px;
+          margin: 0;
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 64px;
+          font-weight: 800;
+          letter-spacing: 0;
+          line-height: 0.9;
+          text-transform: uppercase;
+        }
+
+        .hero-title span {
+          color: var(--red);
+        }
+
+        .hero-copy {
+          max-width: 620px;
+          margin: 16px 0 0;
+          color: var(--muted);
+          font-size: 17px;
+          line-height: 1.6;
+        }
+
+        .hero-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 22px;
+        }
+
+        .meta-badge {
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 999px;
+          padding: 8px 12px;
+          color: var(--muted);
+          background: rgba(255,255,255,0.035);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .meta-badge strong {
+          color: var(--text);
+        }
+
+        .shell {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 22px 24px 72px;
+        }
+
+        .mode-switch {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 8px;
+          max-width: 700px;
+          padding: 6px;
+          border: 1px solid var(--line);
+          border-radius: 10px;
+          background: rgba(16,17,23,0.86);
+        }
+
+        .mode-button {
+          min-height: 42px;
+          border: 0;
+          border-radius: 7px;
+          color: var(--muted);
+          background: transparent;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 800;
+          text-decoration: none;
+          transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+        }
+
+        .mode-button:hover {
+          color: var(--text);
+          background: rgba(255,255,255,0.045);
+        }
+
+        .mode-link {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .mode-button.active {
+          color: #0a0a0f;
+          background: linear-gradient(135deg, var(--red), var(--orange));
+        }
+
+        .filter-panel {
+          position: sticky;
+          top: 57px;
+          z-index: 10;
+          margin-top: 18px;
+          padding: 14px;
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          background: rgba(10,11,17,0.92);
+          backdrop-filter: blur(16px);
+        }
+
+        .filter-row {
+          display: grid;
+          grid-template-columns: minmax(220px, 1fr) 250px;
+          gap: 10px;
+        }
+
+        .search-input,
+        .genre-select {
+          width: 100%;
+          min-height: 44px;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          outline: none;
+          color: var(--text);
+          background: #0b0c12;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+        }
+
+        .search-input {
+          padding: 0 14px;
+        }
+
+        .genre-select {
+          padding: 0 12px;
+          text-transform: uppercase;
+        }
+
+        .search-input:focus,
+        .genre-select:focus,
+        .prompt-textarea:focus {
+          border-color: rgba(255,77,109,0.75);
+          box-shadow: 0 0 0 3px rgba(255,77,109,0.14);
+        }
+
+        .quick-genres {
+          display: flex;
+          gap: 8px;
+          margin-top: 10px;
+          overflow-x: auto;
+          padding-bottom: 2px;
+        }
+
+        .genre-chip {
+          flex: 0 0 auto;
+          min-height: 32px;
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          padding: 0 12px;
+          color: var(--muted);
+          background: #11121a;
+          cursor: pointer;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .genre-chip.active {
+          color: var(--red);
+          border-color: rgba(255,77,109,0.56);
+          background: rgba(255,77,109,0.12);
+        }
+
+        .results-line {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          margin: 18px 0 14px;
+          color: var(--dim);
+          font-size: 13px;
+        }
+
+        .prompt-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+          align-items: stretch;
+        }
+
+        .prompt-card {
+          display: flex;
+          flex-direction: column;
+          min-height: 100%;
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--panel);
+          transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .prompt-card:hover {
+          border-color: rgba(255,77,109,0.36);
+          box-shadow: 0 18px 44px rgba(0,0,0,0.32);
+          transform: translateY(-2px);
+        }
+
+        .art-wrap {
+          position: relative;
+          aspect-ratio: 1 / 1;
+          background: #0a0b10;
+        }
+
+        .art-wrap img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+        }
+
+        .card-body {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          padding: 14px;
+        }
+
+        .prompt-name {
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 15px;
+          font-weight: 800;
+          letter-spacing: 0;
+          line-height: 1.15;
+          margin-bottom: 5px;
+        }
+
+        .prompt-genre {
+          color: var(--gold);
+          font-family: 'Syne', sans-serif;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0;
+          text-transform: uppercase;
+          margin-bottom: 10px;
+        }
+
+        .prompt-excerpt {
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          flex: 1;
+          overflow: hidden;
+          color: var(--muted);
+          font-size: 13px;
+          line-height: 1.5;
+          margin-bottom: 14px;
+        }
+
+        .card-actions {
+          display: grid;
+          grid-template-columns: 1fr 0.8fr;
+          gap: 8px;
+        }
+
+        .card-button,
+        .drawer-button,
+        .analyze-button {
+          min-height: 40px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 11px;
+          font-weight: 800;
+          transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+        }
+
+        .card-button.primary,
+        .drawer-button.primary,
+        .analyze-button {
+          color: var(--red);
+          border: 1px solid rgba(255,77,109,0.3);
+          background: linear-gradient(135deg, rgba(255,77,109,0.18), rgba(255,154,60,0.1));
+        }
+
+        .card-button.primary.copied,
+        .drawer-button.primary.copied {
+          color: var(--cyan);
+          border-color: rgba(84,212,232,0.45);
+          background: rgba(84,212,232,0.11);
+        }
+
+        .card-button.secondary,
+        .drawer-button.secondary {
+          color: var(--muted);
+          border: 1px solid var(--line);
+          background: #0b0c12;
+        }
+
+        .card-button:hover,
+        .drawer-button:hover {
+          transform: translateY(-1px);
+          border-color: rgba(255,255,255,0.22);
+        }
+
+        .analysis-panel {
+          margin-top: 18px;
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          background: var(--panel);
+          overflow: hidden;
+        }
+
+        .analysis-head {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 18px;
+          align-items: center;
+          padding: 22px;
+          border-bottom: 1px solid var(--line);
+          background: linear-gradient(90deg, rgba(255,77,109,0.1), rgba(215,181,109,0.04));
+        }
+
+        .analysis-title {
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 24px;
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: 0;
+          margin: 0 0 8px;
+          text-transform: uppercase;
+        }
+
+        .analysis-copy {
+          color: var(--muted);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+        }
+
+        .analysis-body {
+          padding: 22px;
+        }
+
+        .drop-zone {
+          border: 1px dashed rgba(255,77,109,0.38);
+          border-radius: 10px;
+          padding: 34px 20px;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(255,77,109,0.035);
+          transition: border-color 150ms ease, background 150ms ease;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragging {
+          border-color: var(--red);
+          background: rgba(255,77,109,0.07);
+        }
+
+        .drop-title {
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 15px;
+          font-weight: 800;
+          margin-bottom: 6px;
+          text-transform: uppercase;
+        }
+
+        .drop-meta,
+        .upload-note {
+          color: var(--dim);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .upload-note {
+          margin-top: 14px;
+          border: 1px solid rgba(215,181,109,0.18);
+          border-radius: 10px;
+          padding: 14px 16px;
+          background: rgba(215,181,109,0.05);
+        }
+
+        .analyze-button {
+          width: 100%;
+          margin-top: 18px;
+          border: 0;
+          min-height: 50px;
+          color: #0a0a0f;
+          background: linear-gradient(135deg, var(--red), var(--orange));
+        }
+
+        .analyze-button:disabled {
+          color: rgba(255,255,255,0.35);
+          cursor: not-allowed;
+          background: rgba(255,77,109,0.16);
+        }
+
+        .analysis-result {
+          margin-top: 18px;
+          border: 1px solid var(--line);
+          border-radius: 10px;
+          padding: 18px;
+          background: #0b0c12;
+        }
+
+        .analysis-result pre {
+          white-space: pre-wrap;
+          color: var(--text);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          line-height: 1.7;
+          margin: 0 0 14px;
+        }
+
+        .drawer-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 40;
+          display: flex;
+          justify-content: flex-end;
+          background: rgba(0,0,0,0.58);
+          backdrop-filter: blur(8px);
+        }
+
+        .prompt-drawer {
+          width: min(520px, 100%);
+          height: 100%;
+          overflow-y: auto;
+          border-left: 1px solid var(--line);
+          background: #0c0d13;
+          box-shadow: -28px 0 70px rgba(0,0,0,0.45);
+        }
+
+        .drawer-header {
+          position: sticky;
+          top: 0;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 18px;
+          border-bottom: 1px solid var(--line);
+          background: rgba(12,13,19,0.94);
+          backdrop-filter: blur(14px);
+        }
+
+        .drawer-kicker {
+          color: var(--gold);
+          font-family: 'Syne', sans-serif;
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .drawer-title {
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 24px;
+          font-weight: 800;
+          line-height: 1.05;
+          margin: 2px 0 0;
+        }
+
+        .close-button {
+          flex: 0 0 auto;
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          padding: 9px 12px;
+          color: var(--muted);
+          background: #11121a;
+          cursor: pointer;
+          font-family: 'Syne', sans-serif;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .drawer-body {
+          padding: 18px;
+        }
+
+        .drawer-art {
+          position: relative;
+          aspect-ratio: 1 / 1;
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: #0a0b10;
+        }
+
+        .drawer-art img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+        }
+
+        .prompt-textarea {
+          width: 100%;
+          min-height: 260px;
+          margin-top: 14px;
+          resize: vertical;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          outline: none;
+          padding: 14px;
+          color: var(--text);
+          background: #080a0f;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          line-height: 1.7;
+        }
+
+        .drawer-actions {
+          display: grid;
+          grid-template-columns: 1fr 0.7fr;
+          gap: 10px;
+          margin-top: 12px;
+        }
+
+        .drawer-meta {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 10px;
+          color: var(--dim);
+          font-size: 12px;
+        }
+
+        @media (max-width: 760px) {
+          .topbar {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 14px 16px;
+          }
+
+          .topbar-left {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+
+          .status-pill {
+            display: none;
+          }
+
+          .hero-inner {
+            padding: 38px 16px 28px;
+          }
+
+          .hero-title {
+            font-size: 42px;
+          }
+
+          .hero-copy {
+            font-size: 15px;
+          }
+
+          .shell {
+            padding: 18px 16px 54px;
+          }
+
+          .mode-switch {
+            max-width: none;
+          }
+
+          .filter-panel {
+            position: static;
+          }
+
+          .filter-row,
+          .analysis-head {
+            grid-template-columns: 1fr;
+          }
+
+          .prompt-grid {
+            grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+            gap: 12px;
+          }
+
+          .card-body {
+            padding: 12px;
+          }
+
+          .card-actions,
+          .drawer-actions {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <header className="topbar">
+        <div className="topbar-left">
+          <a href="/studio.html" className="brand">
+            BOOMAN <span>LAB</span>
+          </a>
+          <a href="/admin/invite" className="nav-pill">
+            Invite
+          </a>
+          <a href="/account" className="nav-pill">
+            Account
+          </a>
         </div>
-        <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#ffd700", background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.2)", borderRadius: 20, padding: "5px 14px" }}>PROMPT LIBRARY</div>
-      </div>
+        <div className="status-pill">Prompt Library</div>
+      </header>
 
-      {/* Hero */}
-      <div style={{ textAlign: "center", padding: "48px 24px 32px", background: "radial-gradient(ellipse at 30% 50%, rgba(255,77,109,0.12), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(255,154,60,0.08), transparent 60%), #0a0a0f" }}>
-        <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 36, letterSpacing: 4, marginBottom: 10, background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>PROMPT LIBRARY</h1>
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 17, color: "#b0b0c8", marginBottom: 16 }}>{ALL_PROMPTS.length} proven prompts. Copy directly into Suno.</p>
-        <div style={{ width: 60, height: 2, background: "linear-gradient(90deg, #ff4d6d, #ff9a3c)", margin: "0 auto" }} />
-      </div>
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-kicker">Sample Prompt 1200</div>
+          <h1 className="hero-title">
+            Prompt <span>Library</span>
+          </h1>
+          <p className="hero-copy">
+            {ALL_PROMPTS.length} source-record prompts built for sample-based music:
+            obscure scenes, precise instruments, modal color, and loopable forms.
+          </p>
+          <div className="hero-meta">
+            <div className="meta-badge">
+              <strong>{ALL_PROMPTS.length}</strong> prompts
+            </div>
+            <div className="meta-badge">
+              <strong>{ALL_GENRES.length}</strong> genres
+            </div>
+            <div className="meta-badge">
+              <strong>1000</strong> char max
+            </div>
+            <div className="meta-badge">
+              <strong>No</strong> real names
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Container */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 16px 64px" }}>
-        {/* Search */}
-        <input type="text" placeholder="Search prompts..." value={search} onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "14px 18px", background: "#111118", border: "1px solid #2a2a3a", borderRadius: 10, color: "#f0f0f8", fontFamily: "'DM Sans',sans-serif", fontSize: 15, outline: "none", marginBottom: 16 }} />
-
-        {/* Genre tabs */}
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, marginBottom: 16 }}>
-          <button onClick={() => setActiveGenre("all")} style={tabStyle(activeGenre === "all")}>All ({ALL_PROMPTS.length})</button>
-          {ALL_GENRES.map((g) => <button key={g} onClick={() => setActiveGenre(g)} style={tabStyle(activeGenre === g)}>{g.replace(/-/g, " ")} ({GenreCount(g)})</button>)}
+      <main className="shell">
+        <div className="mode-switch" role="tablist" aria-label="Prompt tools">
+          <a href="/studio.html" className="mode-button mode-link" role="tab">
+            Studio
+          </a>
+          <button
+            className={`mode-button ${mode === "library" ? "active" : ""}`}
+            onClick={() => chooseMode("library")}
+            type="button"
+            role="tab"
+            aria-selected={mode === "library"}
+          >
+            Library
+          </button>
+          <button
+            className={`mode-button ${mode === "analysis" ? "active" : ""}`}
+            onClick={() => chooseMode("analysis")}
+            type="button"
+            role="tab"
+            aria-selected={mode === "analysis"}
+          >
+            Sample Analysis
+          </button>
         </div>
 
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088", marginBottom: 16 }}>Showing {filtered.length} of {ALL_PROMPTS.length}</p>
+        {mode === "library" ? (
+          <>
+            <section className="filter-panel" aria-label="Prompt filters">
+              <div className="filter-row">
+                <input
+                  className="search-input"
+                  type="text"
+                  placeholder="Search by sound, instrument, region, or mood..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <select
+                  className="genre-select"
+                  value={activeGenre}
+                  onChange={(e) => setActiveGenre(e.target.value)}
+                  aria-label="Filter by genre"
+                >
+                  <option value="all">All genres ({ALL_PROMPTS.length})</option>
+                  {ALL_GENRES.map((genre) => (
+                    <option key={genre} value={genre}>
+                      {genreLabel(genre)} ({genreCount(genre)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="quick-genres" aria-label="Quick genres">
+                {QUICK_GENRES.map((genre) => {
+                  const active = activeGenre === genre;
+                  const count = genre === "all" ? ALL_PROMPTS.length : genreCount(genre);
+                  return (
+                    <button
+                      key={genre}
+                      className={`genre-chip ${active ? "active" : ""}`}
+                      onClick={() => setActiveGenre(genre)}
+                      type="button"
+                    >
+                      {genre === "all" ? "All" : genreLabel(genre)} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-        {/* Cards grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-          {filtered.map((p) => (
-            <div key={p.id} className="prompt-card" style={{ background: "#111118", border: "1px solid #2a2a3a", borderRadius: 12, overflow: "hidden", transition: "all 0.2s" }}>
-              <img src={p.art} alt={p.name} style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }} />
-              <div style={{ padding: 16 }}>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 14, color: "#f0f0f8", marginBottom: 4 }}>{p.name}</div>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", color: "#707088", marginBottom: 10 }}>{p.genre.replace(/-/g, " ")}</div>
-                <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: 14 }}>{p.vibe}</div>
-                <button onClick={() => copyVibe(p.id)} style={{
-                  width: "100%", padding: 11, borderRadius: 8, cursor: "pointer",
-                  background: copiedId === p.id ? "rgba(0,229,255,0.12)" : selectedPromptId === p.id ? "rgba(255,154,60,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))",
-                  border: copiedId === p.id ? "1px solid rgba(0,229,255,0.3)" : selectedPromptId === p.id ? "1px solid rgba(255,154,60,0.35)" : "1px solid rgba(255,77,109,0.25)",
-                  color: copiedId === p.id ? "#00e5ff" : selectedPromptId === p.id ? "#ff9a3c" : "#ff4d6d",
-                  fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase",
-                  transition: "all 0.2s",
-                }}>
-                  {copiedId === p.id ? "COPIED \u2713" : selectedPromptId === p.id ? "PROMPT READY" : "COPY TO SUNO"}
-                </button>
-                {selectedPromptId === p.id && (
-                  <div style={{ marginTop: 12 }}>
-                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: copyFailedId === p.id ? "#ff9a3c" : "#00e5ff", marginBottom: 7 }}>
-                      {copyFailedId === p.id ? "Suno prompt ready" : "Copied Suno prompt"}
-                    </div>
-                    <textarea
-                      readOnly
-                      value={p.vibe}
-                      onFocus={(e) => e.currentTarget.select()}
-                      style={{ width: "100%", minHeight: 150, resize: "vertical", background: "#0a0a0f", border: "1px solid #2a2a3a", borderRadius: 8, padding: 12, color: "#f0f0f8", fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.55, outline: "none" }}
-                    />
+            <div className="results-line">
+              <span>
+                Showing {filtered.length} of {ALL_PROMPTS.length}
+              </span>
+              <span>{activeGenre === "all" ? "All genres" : genreLabel(activeGenre)}</span>
+            </div>
+
+            <section className="prompt-grid" aria-label="Prompt cards">
+              {filtered.map((prompt) => (
+                <article className="prompt-card" key={prompt.id}>
+                  <div className="art-wrap">
+                    <img src={prompt.art} alt={prompt.name} />
                   </div>
-                )}
+                  <div className="card-body">
+                    <h2 className="prompt-name">{prompt.name}</h2>
+                    <div className="prompt-genre">{genreLabel(prompt.genre)}</div>
+                    <p className="prompt-excerpt">{prompt.vibe}</p>
+                    <div className="card-actions">
+                      <button
+                        className={`card-button primary ${copiedId === prompt.id ? "copied" : ""}`}
+                        onClick={() => copyPrompt(prompt)}
+                        type="button"
+                      >
+                        {copiedId === prompt.id ? "Copied" : copyFailedId === prompt.id ? "Ready" : "Copy To Suno"}
+                      </button>
+                      <button
+                        className="card-button secondary"
+                        onClick={() => setDrawerPromptId(prompt.id)}
+                        type="button"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </section>
+          </>
+        ) : (
+          <section className="analysis-panel" aria-label="Sample analysis">
+            <div className="analysis-head">
+              <div>
+                <h2 className="analysis-title">Sample Analysis</h2>
+                <p className="analysis-copy">
+                  Drop an audio file and generate a Suno-ready prompt from its sonic DNA.
+                </p>
+              </div>
+              <div className="meta-badge">
+                <strong>MP3</strong> recommended
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* SP1200 Analysis Section — Genre-free DNA analysis */}
-        <div style={{ marginTop: 56, background: "#111118", border: "1px solid #2a2a3a", borderRadius: 14, padding: "32px 28px", boxShadow: "0 0 40px rgba(255,77,109,0.05)" }}>
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ width: 40, height: 2, background: "linear-gradient(90deg, #ff4d6d, #ff9a3c)", margin: "0 auto 14px" }} />
-            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: 3, background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>SAMPLE ANALYSIS</h2>
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: "#b0b0c8", marginTop: 8 }}>Drop any audio — get a Suno-ready prompt from its sonic DNA</p>
-          </div>
+            <div className="analysis-body">
+              <div
+                className="drop-zone"
+                onClick={() => fileRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.classList.add("dragging");
+                }}
+                onDragLeave={(e) => {
+                  e.currentTarget.classList.remove("dragging");
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.classList.remove("dragging");
+                  const droppedFile = e.dataTransfer.files[0];
+                  if (droppedFile) setFile(droppedFile);
+                }}
+              >
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".mp3,.wav,.m4a,.flac"
+                  hidden
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) setFile(e.target.files[0]);
+                  }}
+                />
+                <div className="drop-title">
+                  {file ? `${file.name} (${(file.size / 1048576).toFixed(1)} MB)` : "Drop audio here"}
+                </div>
+                <div className="drop-meta">
+                  {file ? "Click to change file" : ".mp3 .wav .m4a .flac, max 4 MB"}
+                </div>
+              </div>
 
-          {/* Drop zone */}
-          <div onClick={() => fileRef.current?.click()}
-            style={{ border: "2px dashed #2a2a3a", borderRadius: 12, padding: 36, textAlign: "center", cursor: "pointer", transition: "all 0.2s", background: "rgba(255,77,109,0.02)" }}
-            onMouseOver={(e) => { e.currentTarget.style.borderColor = "#ff4d6d"; e.currentTarget.style.background = "rgba(255,77,109,0.05)"; }}
-            onMouseOut={(e) => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.background = "rgba(255,77,109,0.02)"; }}
-            onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "#ff4d6d"; }}
-            onDragLeave={(e) => { e.currentTarget.style.borderColor = "#2a2a3a"; }}
-            onDrop={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "#2a2a3a"; const f = e.dataTransfer.files[0]; if (f) setFile(f); }}>
-            <input ref={fileRef} type="file" accept=".mp3,.wav,.m4a,.flac" hidden onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" strokeWidth="1.5" style={{ marginBottom: 10 }}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, color: "#f0f0f8", marginBottom: 4 }}>{file ? `${file.name} (${(file.size/1048576).toFixed(1)} MB)` : "Drop .mp3 .wav .m4a .flac here"}</div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#707088" }}>{file ? "Click to change file" : "or click to upload — max 4 MB, MP3 recommended"}</div>
-          </div>
+              <div className="upload-note">
+                MP3 files work best. A trimmed 30-60 second section is usually enough for accurate analysis.
+              </div>
 
-          {/* Upload info */}
-          <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(255,154,60,0.06)", border: "1px solid rgba(255,154,60,0.15)", borderRadius: 10 }}>
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#b0b0c8", lineHeight: 1.6, margin: 0 }}>
-              <span style={{ color: "#ff9a3c", fontWeight: 600 }}>How it works:</span>{" "}
-              Your audio is uploaded securely to Google&apos;s AI servers for sonic DNA analysis.
-              Max file size is 4 MB. MP3 files work best — a 3-minute track at 128kbps is about 3 MB.
-              WAV files are much larger; convert to MP3 first. Only 30-60 seconds of audio is needed
-              for accurate analysis — trim longer tracks for best results.
-            </p>
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088", marginTop: 8 }}>
-              Supported formats: .mp3 .wav .m4a .flac
-            </p>
-          </div>
+              <button
+                className="analyze-button"
+                onClick={handleAnalyze}
+                disabled={!file || analyzing}
+                type="button"
+              >
+                {analyzing ? uploadProgress || "Processing..." : "Analyze Sample"}
+              </button>
 
-          {/* Analyze button — enabled as soon as file is dropped, no genre needed */}
-          <button onClick={handleAnalyze} disabled={!file || analyzing}
-            style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", marginTop: 20, cursor: !file || analyzing ? "not-allowed" : "pointer", background: !file ? "rgba(255,77,109,0.2)" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: !file ? "#7a3040" : "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: analyzing ? 0.7 : 1 }}>
-            {analyzing ? (uploadProgress || "PROCESSING...") : "ANALYZE SAMPLE"}
-          </button>
+              {analysisResult && (
+                <div className="analysis-result">
+                  <pre>{analysisResult}</pre>
+                  <button
+                    onClick={copyAnalysis}
+                    className={`drawer-button primary ${analysisCopied ? "copied" : ""}`}
+                    type="button"
+                  >
+                    {analysisCopied ? "Copied" : analysisCopyFailed ? "Prompt Ready" : "Copy To Suno"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+      </main>
 
-          {/* Analysis result */}
-          {analysisResult && (
-            <div style={{ marginTop: 20, background: "#0a0a0f", border: "1px solid #2a2a3a", borderRadius: 10, padding: 20 }}>
-              <pre style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: "#f0f0f8", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: 16 }}>{analysisResult}</pre>
-              <button onClick={copyAnalysis} style={{ width: "100%", padding: 12, borderRadius: 8, cursor: "pointer", background: analysisCopied ? "rgba(0,229,255,0.12)" : analysisCopyFailed ? "rgba(255,154,60,0.12)" : "linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,154,60,0.1))", border: analysisCopied ? "1px solid rgba(0,229,255,0.3)" : analysisCopyFailed ? "1px solid rgba(255,154,60,0.35)" : "1px solid rgba(255,77,109,0.25)", color: analysisCopied ? "#00e5ff" : analysisCopyFailed ? "#ff9a3c" : "#ff4d6d", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
-                {analysisCopied ? "COPIED \u2713" : analysisCopyFailed ? "PROMPT READY" : "COPY TO SUNO"}
+      {selectedPrompt && (
+        <div
+          className="drawer-backdrop"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDrawerPromptId(null);
+          }}
+        >
+          <aside className="prompt-drawer" aria-label={`${selectedPrompt.name} full prompt`}>
+            <div className="drawer-header">
+              <div>
+                <div className="drawer-kicker">{genreLabel(selectedPrompt.genre)}</div>
+                <h2 className="drawer-title">{selectedPrompt.name}</h2>
+              </div>
+              <button className="close-button" onClick={() => setDrawerPromptId(null)} type="button">
+                Close
               </button>
             </div>
-          )}
+            <div className="drawer-body">
+              <div className="drawer-art">
+                <img src={selectedPrompt.art} alt={selectedPrompt.name} />
+              </div>
+              <textarea
+                className="prompt-textarea"
+                readOnly
+                value={selectedPrompt.vibe}
+                onFocus={(e) => e.currentTarget.select()}
+              />
+              <div className="drawer-actions">
+                <button
+                  className={`drawer-button primary ${copiedId === selectedPrompt.id ? "copied" : ""}`}
+                  onClick={() => copyPrompt(selectedPrompt)}
+                  type="button"
+                >
+                  {copiedId === selectedPrompt.id ? "Copied" : copyFailedId === selectedPrompt.id ? "Prompt Ready" : "Copy To Suno"}
+                </button>
+                <button
+                  className="drawer-button secondary"
+                  onClick={() => setDrawerPromptId(null)}
+                  type="button"
+                >
+                  Done
+                </button>
+              </div>
+              <div className="drawer-meta">
+                <span>{selectedPrompt.vibe.length}/1000 characters</span>
+                <span>{selectedPrompt.id}</span>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      )}
     </div>
   );
 }
