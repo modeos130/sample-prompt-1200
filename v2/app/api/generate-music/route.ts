@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ALL_PROMPTS } from "@/lib/prompts";
+import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 
 export const maxDuration = 120; // Music generation is slow
 
@@ -145,52 +146,11 @@ interface ClaudeApiResponse {
 
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // Get user identity and tier from Supabase auth cookie
-  let userId = "anonymous";
-  let tier = "free";
-
-  try {
-    const { createServerClient } = await import("@supabase/ssr");
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return req.cookies.getAll(); },
-          setAll() {},
-        },
-      }
-    );
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      userId = user.id;
-      // Get tier from profiles table
-      const { createClient } = await import("@supabase/supabase-js");
-      const adminClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { data: profile } = await adminClient
-        .from("profiles")
-        .select("tier")
-        .eq("id", user.id)
-        .single();
-      if (profile?.tier) tier = profile.tier;
-    }
-  } catch {
-    // If auth fails, fall back to anonymous/free tier
-  }
-
-  // If not authenticated, use IP as fallback identifier
-  if (userId === "anonymous") {
-    const fwd = req.headers.get("x-forwarded-for");
-    userId = (fwd ? fwd.split(",").pop()?.trim() : null)
-            ?? req.headers.get("x-real-ip")
-            ?? "unknown";
-  }
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
 
   // Rate limit check (tier-aware)
-  const limit = checkMusicRateLimit(userId, tier);
+  const limit = checkMusicRateLimit(activeUser.user.id, activeUser.user.tier);
   if (!limit.allowed) {
     return NextResponse.json(
       { error: limit.reason },

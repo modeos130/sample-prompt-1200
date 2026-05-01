@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 
 export const maxDuration = 30;
 
@@ -126,14 +127,11 @@ Output ONLY the prompt text. No preamble, no explanation, no quotes around it. J
 
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // Get real IP — use last value in x-forwarded-for (Vercel appends real IP at end)
-  const fwd = req.headers.get("x-forwarded-for");
-  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
-          ?? req.headers.get("x-real-ip")
-          ?? "unknown";
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
 
   // Rate limit check
-  const limit = checkRateLimit(ip);
+  const limit = checkRateLimit(activeUser.user.id);
   if (!limit.allowed) {
     return NextResponse.json(
       { error: limit.reason },

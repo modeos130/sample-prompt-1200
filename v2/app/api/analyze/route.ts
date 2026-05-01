@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { BOOM_BAP_ANALYSIS_PROMPT, buildBoomBapPrompt } from "@/lib/genres/boom-bap";
 import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
 import { TRAP_ANALYSIS_PROMPT, buildTrapPrompt } from "@/lib/genres/trap";
@@ -164,7 +165,6 @@ function getGenrePrompts(genre: Genre) {
 }
 
 async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string> {
-  let lastStatus = 0;
   let lastMsg    = "";
 
   for (const version of API_VERSIONS) {
@@ -179,7 +179,6 @@ async function geminiGenerate(apiKey: string, parts: unknown[]): Promise<string>
     const errMsg = (data?.error as Record<string, string>)?.message ?? `HTTP ${res.status}`;
 
     if (res.status === 404) {
-      lastStatus = 404;
       lastMsg    = errMsg;
       continue;
     }
@@ -210,12 +209,11 @@ function capPrompt(text: string, limit: number): string {
 }
 
 export async function POST(req: NextRequest) {
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
+
   // Rate limit
-  const fwd = req.headers.get("x-forwarded-for");
-  const ip = (fwd ? fwd.split(",").pop()?.trim() : null)
-          ?? req.headers.get("x-real-ip")
-          ?? "unknown";
-  const limit = checkAnalyzeRateLimit(ip);
+  const limit = checkAnalyzeRateLimit(activeUser.user.id);
   if (!limit.allowed) {
     return NextResponse.json({ error: limit.reason }, { status: 429 });
   }

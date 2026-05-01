@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { isOwnerEmail } from "@/lib/auth/active-user";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
@@ -6,7 +7,9 @@ export async function updateSession(request: NextRequest) {
 
   // Public paths — no auth required
   const isPublicPath =
+    pathname === "/" ||
     pathname === "/login" ||
+    pathname === "/vibe-to-prompt.html" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon") ||
@@ -49,6 +52,24 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (user && !isPublicPath) {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("active")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile?.active) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("error", "invite-required");
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (pathname.startsWith("/admin") && !isOwnerEmail(user.email)) {
+      return NextResponse.redirect(new URL("/studio.html", request.url));
+    }
   }
 
   return supabaseResponse;

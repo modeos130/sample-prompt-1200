@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,24 +29,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server not configured" }, { status: 500 });
   }
 
-  // Verify caller is super_user via cookie auth
-  const { createServerClient } = await import("@supabase/ssr");
-  const callerClient = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return req.cookies.getAll(); },
-        setAll() {},
-      },
-    }
-  );
-  const { data: { user: caller } } = await callerClient.auth.getUser();
-  if (!caller) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-  const OWNER_EMAIL = process.env.ADMIN_OWNER_EMAIL || "admin@modeos.app";
-  if (caller.email !== OWNER_EMAIL) {
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
+  if (!isOwnerEmail(activeUser.user.email)) {
     return NextResponse.json({ error: "Owner access required" }, { status: 403 });
   }
 

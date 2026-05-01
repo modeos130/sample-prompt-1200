@@ -3,10 +3,18 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+function initialLoginError() {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  return params.get("error") === "invite-required"
+    ? "An active invitation is required. Contact the Booman Lab admin for access."
+    : "";
+}
+
 export default function LoginInner() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialLoginError);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -14,8 +22,30 @@ export default function LoginInner() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) { setError(authError.message); setLoading(false); return; }
+
+    const userId = data.user?.id;
+    if (!userId) {
+      await supabase.auth.signOut();
+      setError("Unable to verify this account.");
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("active")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profileError || !profile?.active) {
+      await supabase.auth.signOut();
+      setError("An active invitation is required. Contact the Booman Lab admin for access.");
+      setLoading(false);
+      return;
+    }
+
     window.location.href = "/studio.html";
   };
 
