@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 
 export const runtime = "edge";
 export const maxDuration = 60;
@@ -23,6 +24,9 @@ const MIME_MAP: Record<string, string> = {
  * Gemini File API supports up to 2GB per file.
  */
 export async function POST(req: NextRequest) {
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
+
   const apiKey = process.env.GEMINI_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
