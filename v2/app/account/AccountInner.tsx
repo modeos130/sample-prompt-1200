@@ -48,7 +48,7 @@ export default function AccountInner() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap'); input:focus { border-color: #ff4d6d !important; box-shadow: 0 0 0 3px rgba(255,77,109,0.15) !important; }`}</style>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid #2a2a3a" }}>
-        <a href="/studio.html" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", textDecoration: "none", letterSpacing: 1 }}>BOOMAN <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span></a>
+        <a href="/home" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", textDecoration: "none", letterSpacing: 1 }}>BOOMAN <span style={{ background: "linear-gradient(135deg, #ff4d6d, #ff9a3c)", WebkitBackgroundClip: "text", color: "transparent" }}>LAB</span></a>
         <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", background: "rgba(255,77,109,0.08)", border: "1px solid rgba(255,77,109,0.2)", borderRadius: 20, padding: "5px 14px" }}>ACCOUNT</div>
       </div>
 
@@ -80,7 +80,7 @@ export default function AccountInner() {
           <button onClick={handleUpdatePassword} style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #ff4d6d, #c0392b)", color: "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>UPDATE PASSWORD</button>
         </div>
 
-        <a href="/studio.html" style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, fontWeight: 600, color: "#b0b0c8", textDecoration: "none" }}>&larr; STUDIO</a>
+        <a href="/home" style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, fontWeight: 600, color: "#b0b0c8", textDecoration: "none" }}>&larr; BOOMAN LAB</a>
       </div>
     </div>
   );

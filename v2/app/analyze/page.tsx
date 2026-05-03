@@ -1,311 +1,681 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import GenreSelector, { type Genre } from "@/components/GenreSelector";
-import AudioUploader from "@/components/AudioUploader";
-import AnalysisOutput from "@/components/AnalysisOutput";
-import PromptOutput from "@/components/PromptOutput";
-import SunoSettings from "@/components/SunoSettings";
+import { useRef, useState } from "react";
 
-type AppState = "idle" | "pass1" | "pass2" | "done" | "error";
-type ResultTab = "prompt" | "analysis" | "suno";
+const ACCEPTED_AUDIO = ".mp3,.wav,.m4a,.flac,.aac,.ogg";
 
-const STATUS_MAP: Record<AppState, { dot: string; text: string }> = {
-  idle:  { dot: "bg-[#2a3545]",                    text: "Ready — select a mode to begin"  },
-  pass1: { dot: "bg-[#2ecc71] animate-pulse-slow", text: "Pass 1 · Analyzing audio…"       },
-  pass2: { dot: "bg-[#2ecc71] animate-pulse-slow", text: "Pass 2 · Building prompt…"       },
-  done:  { dot: "bg-[#2ecc71]",                    text: "Complete — prompt ready to copy" },
-  error: { dot: "bg-[#e05656]",                    text: "Error — see details below"       },
-};
+function formatFile(file: File) {
+  return `${file.name} (${(file.size / 1048576).toFixed(1)} MB)`;
+}
 
-const STATUS_TEXT_COLOR: Record<AppState, string> = {
-  idle:  "text-[#6a7a8a]",
-  pass1: "text-[#8a9aaa]",
-  pass2: "text-[#8a9aaa]",
-  done:  "text-[#34c97a]",
-  error: "text-[#e05656]",
-};
+export default function AnalyzePage() {
+  const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState("");
+  const [uploadProgress, setUploadProgress] = useState("");
+  const [analysisCopied, setAnalysisCopied] = useState(false);
+  const [analysisCopyFailed, setAnalysisCopyFailed] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-const TAB_LABELS: Record<ResultTab, string> = {
-  prompt:   "Generated Prompt",
-  analysis: "Sample Analysis",
-  suno:     "Suno Settings",
-};
+  const copyText = async (text: string) => {
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // Fall through to textarea fallback.
+    }
 
-export default function Home() {
-  const [genre, setGenre]                     = useState<Genre | null>(null);
-  const [appState, setAppState]               = useState<AppState>("idle");
-  const [statusMsg, setStatusMsg]             = useState("");
-  const [analysis, setAnalysis]               = useState("");
-  const [generatedPrompt, setGeneratedPrompt] = useState("");
-  const [activeTab, setActiveTab]             = useState<ResultTab>("prompt");
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    textarea.style.top = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
 
-  function handleStatusChange(status: AppState, msg?: string) {
-    setAppState(status);
-    if (msg) setStatusMsg(msg);
-  }
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  };
 
-  function handleResult(a: string, p: string) {
-    setAnalysis(a);
-    setGeneratedPrompt(p);
-    setActiveTab("prompt");
-  }
+  const chooseFile = (nextFile?: File) => {
+    if (!nextFile) return;
+    setFile(nextFile);
+    setAnalysisResult("");
+    setAnalysisCopied(false);
+    setAnalysisCopyFailed(false);
+  };
 
-  function handleGenreSelect(g: Genre) {
-    setGenre(g);
-    setAnalysis("");
-    setGeneratedPrompt("");
-    setAppState("idle");
-    setStatusMsg("");
-  }
+  const handleAnalyze = async () => {
+    if (!file) return;
+    setAnalyzing(true);
+    setAnalysisResult("");
+    setAnalysisCopied(false);
+    setAnalysisCopyFailed(false);
+    setUploadProgress("Uploading audio...");
 
-  function handleReset() {
-    setGenre(null);
-    setAnalysis("");
-    setGeneratedPrompt("");
-    setAppState("idle");
-    setStatusMsg("");
-  }
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
 
-  function handleRetry() {
-    setAppState("idle");
-    setStatusMsg("");
-  }
+      const uploadRes = await fetch("/api/upload-audio", {
+        method: "POST",
+        body: uploadForm,
+      });
 
-  const { dot, text } = STATUS_MAP[appState];
-  const displayText =
-    statusMsg && (appState === "pass1" || appState === "pass2" || appState === "error")
-      ? statusMsg
-      : text;
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
+        setAnalysisResult(errData.error || "Failed to upload audio.");
+        return;
+      }
 
-  const hasResults = !!analysis;
+      const { fileUri, mimeType } = await uploadRes.json();
+      setUploadProgress("Analyzing sonic DNA...");
+
+      const analyzeRes = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUri, mimeType }),
+      });
+
+      if (!analyzeRes.ok) {
+        const errData = await analyzeRes.json().catch(() => ({ error: "Analysis failed" }));
+        setAnalysisResult(errData.error || "Analysis failed.");
+        return;
+      }
+
+      const data = await analyzeRes.json();
+      setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result returned.");
+    } catch {
+      setAnalysisResult("Analysis failed. Check your connection and try again.");
+    } finally {
+      setAnalyzing(false);
+      setUploadProgress("");
+    }
+  };
+
+  const copyAnalysis = async () => {
+    const copied = await copyText(analysisResult);
+    setAnalysisCopyFailed(!copied);
+    if (copied) {
+      setAnalysisCopied(true);
+      setTimeout(() => setAnalysisCopied(false), 2000);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#080a0c] flex flex-col">
+    <div className="analysis-page">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-      {/* ── STICKY HEADER ── */}
-      <header className="sticky top-0 z-20 border-b border-[#111820] bg-[#080a0c]/96 backdrop-blur-md">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-[62px] flex items-center justify-between gap-4">
+        .analysis-page {
+          --bg: #080a0f;
+          --panel: #101117;
+          --panel2: #15161f;
+          --line: #282a36;
+          --text: #f1f2f6;
+          --muted: #9ca0b4;
+          --dim: #666b82;
+          --red: #ff4d6d;
+          --orange: #ff9a3c;
+          --gold: #d7b56d;
+          --cyan: #54d4e8;
+          min-height: 100vh;
+          color: var(--text);
+          background:
+            linear-gradient(180deg, rgba(84,212,232,0.055), transparent 300px),
+            var(--bg);
+          font-family: 'DM Sans', sans-serif;
+        }
 
-          {/* Logo + wordmark */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 border border-[#c9a84c]/30 shadow-[0_0_18px_rgba(201,168,76,0.18)]">
-              <Image src="/logo.png" alt="130 MODE" width={36} height={36} className="w-full h-full object-cover" priority />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-['Syne',sans-serif] font-extrabold text-[18px] leading-none text-[#eef2f7] tracking-tight">
-                Sample Prompt <span className="text-[#c9a84c]">1200</span>
-              </span>
-              <span className="text-[9px] font-mono text-[#4a5a70] tracking-[2px] hidden sm:inline">V2</span>
-            </div>
-          </div>
+        .analysis-page * {
+          box-sizing: border-box;
+        }
 
-          {/* Status pill */}
-          <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0d1118] border border-[#1a2030]">
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
-            <span className={`text-[11px] font-mono max-w-[200px] lg:max-w-[300px] truncate ${STATUS_TEXT_COLOR[appState]}`}>
-              {displayText}
-            </span>
-          </div>
+        .topbar {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 14px 24px;
+          border-bottom: 1px solid var(--line);
+          background: rgba(8,10,15,0.88);
+          backdrop-filter: blur(16px);
+        }
 
-          {/* Platform pills */}
-          <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-[9px] font-mono tracking-[1.5px] uppercase text-[#4a5a70] mr-1">Works with</span>
-            {["Suno", "Udio", "Sampla"].map((p) => (
-              <span key={p} className="px-2.5 py-1 rounded-full bg-[#0d1118] border border-[#1e2838] text-[10px] font-mono text-[#7e8fa0]">
-                {p}
-              </span>
-            ))}
-          </div>
+        .topbar-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 0;
+        }
+
+        .brand,
+        .nav-pill,
+        .status-pill,
+        .hero-kicker,
+        .feature-link,
+        .analysis-title,
+        .drop-title,
+        .action-button,
+        .detail-label {
+          font-family: 'Syne', sans-serif;
+          letter-spacing: 0;
+          text-transform: uppercase;
+        }
+
+        .brand {
+          flex-shrink: 0;
+          color: var(--text);
+          font-size: 18px;
+          font-weight: 800;
+          line-height: 1;
+          text-decoration: none;
+        }
+
+        .brand span {
+          color: var(--cyan);
+        }
+
+        .nav-pill {
+          color: var(--muted);
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          padding: 8px 14px;
+          font-size: 11px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+        }
+
+        .nav-pill:hover {
+          color: var(--text);
+          border-color: rgba(84,212,232,0.55);
+          background: rgba(84,212,232,0.08);
+        }
+
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          border: 1px solid rgba(84,212,232,0.32);
+          border-radius: 999px;
+          padding: 6px 12px;
+          color: var(--cyan);
+          background: rgba(84,212,232,0.08);
+          font-size: 10px;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        .hero {
+          overflow: hidden;
+          border-bottom: 1px solid var(--line);
+          background:
+            linear-gradient(90deg, rgba(84,212,232,0.15), rgba(215,181,109,0.06), transparent 70%),
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0, rgba(255,255,255,0.028) 1px, transparent 1px, transparent 7px),
+            #0b0c12;
+        }
+
+        .hero-inner {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 52px 24px 34px;
+        }
+
+        .hero-kicker {
+          color: var(--gold);
+          font-size: 12px;
+          font-weight: 800;
+          margin-bottom: 12px;
+        }
+
+        .hero-title {
+          max-width: 780px;
+          margin: 0;
+          color: var(--text);
+          font-family: 'Syne', sans-serif;
+          font-size: 64px;
+          font-weight: 800;
+          line-height: 0.9;
+          text-transform: uppercase;
+        }
+
+        .hero-title span {
+          color: var(--cyan);
+        }
+
+        .hero-copy {
+          max-width: 620px;
+          margin: 16px 0 0;
+          color: var(--muted);
+          font-size: 17px;
+          line-height: 1.6;
+        }
+
+        .feature-nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 22px;
+        }
+
+        .feature-link {
+          display: inline-flex;
+          align-items: center;
+          min-height: 34px;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 999px;
+          padding: 0 12px;
+          color: var(--muted);
+          background: rgba(255,255,255,0.035);
+          font-size: 10px;
+          font-weight: 800;
+          text-decoration: none;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+        }
+
+        .feature-link:hover {
+          color: var(--text);
+          border-color: rgba(84,212,232,0.48);
+        }
+
+        .feature-link.active {
+          color: #0a0a0f;
+          border-color: transparent;
+          background: linear-gradient(135deg, var(--cyan), var(--gold));
+        }
+
+        .shell {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 24px 24px 72px;
+        }
+
+        .analysis-panel {
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          background: var(--panel);
+          overflow: hidden;
+        }
+
+        .analysis-head {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 18px;
+          align-items: center;
+          padding: 22px;
+          border-bottom: 1px solid var(--line);
+          background: linear-gradient(90deg, rgba(84,212,232,0.1), rgba(215,181,109,0.04));
+        }
+
+        .analysis-title {
+          color: var(--text);
+          font-size: 24px;
+          font-weight: 800;
+          line-height: 1;
+          margin: 0 0 8px;
+        }
+
+        .analysis-copy {
+          max-width: 720px;
+          color: var(--muted);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+        }
+
+        .detail-pill {
+          border: 1px solid rgba(215,181,109,0.28);
+          border-radius: 999px;
+          padding: 8px 12px;
+          color: var(--gold);
+          background: rgba(215,181,109,0.07);
+          font-size: 12px;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .analysis-body {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 360px;
+          gap: 18px;
+          padding: 22px;
+        }
+
+        .input-panel,
+        .guide-panel,
+        .analysis-result {
+          border: 1px solid var(--line);
+          border-radius: 10px;
+          background: #0b0c12;
+        }
+
+        .input-panel {
+          padding: 18px;
+        }
+
+        .drop-zone {
+          border: 1px dashed rgba(84,212,232,0.44);
+          border-radius: 10px;
+          padding: 38px 20px;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(84,212,232,0.035);
+          transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragging {
+          border-color: var(--cyan);
+          background: rgba(84,212,232,0.08);
+          transform: translateY(-1px);
+        }
+
+        .drop-title {
+          color: var(--text);
+          font-size: 15px;
+          font-weight: 800;
+          margin-bottom: 6px;
+        }
+
+        .drop-meta {
+          color: var(--dim);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .upload-note {
+          margin-top: 14px;
+          border: 1px solid rgba(215,181,109,0.18);
+          border-radius: 10px;
+          padding: 14px 16px;
+          color: var(--muted);
+          background: rgba(215,181,109,0.05);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .action-button {
+          width: 100%;
+          min-height: 50px;
+          margin-top: 18px;
+          border: 0;
+          border-radius: 8px;
+          color: #0a0a0f;
+          background: linear-gradient(135deg, var(--cyan), var(--gold));
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 800;
+          transition: transform 150ms ease, opacity 150ms ease;
+        }
+
+        .action-button:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        .action-button:disabled {
+          opacity: 0.38;
+          cursor: not-allowed;
+        }
+
+        .action-button.secondary {
+          margin-top: 14px;
+          color: var(--cyan);
+          border: 1px solid rgba(84,212,232,0.35);
+          background: rgba(84,212,232,0.1);
+        }
+
+        .action-button.secondary.copied {
+          color: #0a0a0f;
+          border-color: transparent;
+          background: linear-gradient(135deg, var(--cyan), var(--gold));
+        }
+
+        .guide-panel {
+          padding: 18px;
+        }
+
+        .detail-label {
+          color: var(--gold);
+          font-size: 11px;
+          font-weight: 800;
+          margin-bottom: 10px;
+        }
+
+        .guide-panel p,
+        .guide-panel li {
+          color: var(--muted);
+          font-size: 14px;
+          line-height: 1.6;
+        }
+
+        .guide-panel p {
+          margin: 0 0 14px;
+        }
+
+        .guide-panel ul {
+          margin: 0;
+          padding-left: 18px;
+        }
+
+        .analysis-result {
+          grid-column: 1 / -1;
+          padding: 18px;
+        }
+
+        .analysis-result pre {
+          white-space: pre-wrap;
+          color: var(--text);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
+          line-height: 1.7;
+          margin: 0;
+        }
+
+        .result-meta {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 12px;
+          color: var(--dim);
+          font-size: 12px;
+        }
+
+        @media (max-width: 850px) {
+          .topbar {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 14px 16px;
+          }
+
+          .topbar-left {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+
+          .status-pill {
+            display: none;
+          }
+
+          .hero-inner,
+          .shell {
+            padding-left: 16px;
+            padding-right: 16px;
+          }
+
+          .hero-inner {
+            padding-top: 38px;
+            padding-bottom: 28px;
+          }
+
+          .hero-title {
+            font-size: 42px;
+          }
+
+          .hero-copy {
+            font-size: 15px;
+          }
+
+          .analysis-head,
+          .analysis-body {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <header className="topbar">
+        <div className="topbar-left">
+          <a href="/home" className="brand">
+            BOOMAN <span>LAB</span>
+          </a>
+          <a href="/admin/invite" className="nav-pill">
+            Invite
+          </a>
+          <a href="/account" className="nav-pill">
+            Account
+          </a>
         </div>
+        <div className="status-pill">Sample Analysis</div>
       </header>
 
-      {/* ── CONTENT ── */}
-      <div className="flex-1 bg-[#0a0d12]">
-        <main className="max-w-[1200px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-
-          {/* ── HERO — only before genre is selected ── */}
-          {!genre && (
-            <div className="mb-10 animate-fade-in">
-              <p className="text-[9px] font-mono font-medium tracking-[5px] uppercase text-[#c9a84c] mb-4">
-                130 MODE · AI Sample Analysis
-              </p>
-              <h1 className="font-['Syne',sans-serif] font-extrabold text-[48px] sm:text-[56px] leading-[0.92] tracking-[-2.5px] text-[#eef2f7] mb-5">
-                Drop a sample.<br />
-                <span className="text-[#c9a84c]">Get the prompt.</span>
-              </h1>
-              <p className="text-[13px] font-mono text-[#6a7a8a] max-w-[540px] leading-[1.8]">
-                Era-locked genre analysis via Gemini. Outputs a ready-to-paste prompt for Suno,
-                Udio, and Sampla.ai — no artist names, no drums, pure sonic DNA.
-              </p>
-            </div>
-          )}
-
-          {/* ── PRE-SELECTION: full-width genre cards ── */}
-          {!genre && (
-            <section className="animate-fade-in">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
-                  <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">1</span>
-                </span>
-                <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Select Mode</span>
-              </div>
-              <GenreSelector selected={null} onSelect={handleGenreSelect} compact={false} />
-            </section>
-          )}
-
-          {/* ── POST-SELECTION: 2-col layout ── */}
-          {genre && (
-            <div className="lg:grid lg:grid-cols-[400px_1fr] lg:gap-8 lg:items-start animate-fade-in">
-
-              {/* ── LEFT: Input controls ── */}
-              <div className="space-y-5">
-
-                {/* Step 1: compact genre switcher */}
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
-                      <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">1</span>
-                    </span>
-                    <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Select Mode</span>
-                  </div>
-                  <GenreSelector selected={genre} onSelect={handleGenreSelect} compact />
-                </section>
-
-                <div className="h-px bg-gradient-to-r from-transparent via-[#1a2030] to-transparent" />
-
-                {/* Step 2: uploader */}
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="w-[22px] h-[22px] rounded-full bg-[#c9a84c] flex items-center justify-center flex-shrink-0">
-                      <span className="font-['Syne',sans-serif] font-extrabold text-[10px] text-[#080a0c] leading-none">2</span>
-                    </span>
-                    <span className="text-[11px] font-mono tracking-[4px] uppercase text-[#7e8fa0]">Upload Sample</span>
-                  </div>
-                  <AudioUploader
-                    genre={genre}
-                    disabled={false}
-                    onResult={handleResult}
-                    onStatusChange={handleStatusChange}
-                  />
-                </section>
-
-                {/* Error block */}
-                {appState === "error" && statusMsg && (
-                  <div className="animate-slide-down rounded-2xl bg-[rgba(224,86,86,0.10)] border border-[#e05656]/30 border-l-4 border-l-[#e05656] px-5 py-4">
-                    <p className="text-[9px] font-mono tracking-[3px] uppercase text-[#e05656] mb-2">Error Details</p>
-                    <p className="text-[12px] font-mono text-[rgba(224,86,86,0.85)] leading-relaxed mb-4">{statusMsg}</p>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleRetry}
-                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[10px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl bg-[rgba(224,86,86,0.12)] border border-[#e05656]/40 text-[#e05656] hover:bg-[rgba(224,86,86,0.2)] transition-colors duration-150"
-                      >
-                        ↺ Try Again
-                      </button>
-                      <button
-                        onClick={handleReset}
-                        className="inline-flex items-center gap-2 font-['Syne',sans-serif] font-bold text-[10px] tracking-[2.5px] uppercase px-4 py-2 rounded-xl text-[#6a7a8a] hover:text-[#8a9aaa] transition-colors duration-150"
-                      >
-                        Clear & Start Over
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* New Analysis — shown below uploader once results are in */}
-                {hasResults && (
-                  <div className="pt-1">
-                    <div className="h-px bg-gradient-to-r from-transparent via-[#1a2030] to-transparent mb-4" />
-                    <button
-                      onClick={handleReset}
-                      className="inline-flex items-center gap-2.5 font-['Syne',sans-serif] font-bold text-[11px] tracking-[3px] uppercase text-[#5a6a7a] hover:text-[#c9a84c] transition-colors duration-200"
-                    >
-                      <span className="text-[16px] leading-none">↺</span>
-                      New Analysis
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ── RIGHT: Results panel ── */}
-              <div className="mt-8 lg:mt-0 lg:sticky lg:top-[78px]">
-                {hasResults ? (
-                  <div className="animate-slide-down">
-
-                    {/* Tab bar */}
-                    <div className="flex items-center border-b border-[#1a2030] mb-5">
-                      {(["prompt", "analysis", "suno"] as ResultTab[]).map((tab) => (
-                        <button
-                          key={tab}
-                          onClick={() => setActiveTab(tab)}
-                          className={[
-                            "px-4 py-2.5 text-[11px] font-mono tracking-[2px] uppercase transition-all duration-150 border-b-2 -mb-px",
-                            activeTab === tab
-                              ? "border-[#c9a84c] text-[#c9a84c]"
-                              : "border-transparent text-[#5a6a7a] hover:text-[#8a9aaa]",
-                          ].join(" ")}
-                        >
-                          {TAB_LABELS[tab]}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Tab content — scrollable on desktop */}
-                    <div className="lg:max-h-[calc(100vh-200px)] lg:overflow-y-auto lg:pr-1">
-                      {activeTab === "prompt" && (
-                        <div className="animate-fade-in">
-                          {generatedPrompt ? (
-                            <PromptOutput prompt={generatedPrompt} />
-                          ) : (
-                            <div className="rounded-2xl bg-[rgba(224,86,86,0.06)] border border-[#e05656]/30 px-5 py-5 text-[12px] font-mono text-[#e05656]">
-                              Prompt not generated — please try again.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {activeTab === "analysis" && (
-                        <div className="animate-fade-in">
-                          <AnalysisOutput raw={analysis} />
-                        </div>
-                      )}
-                      {activeTab === "suno" && (
-                        <div className="animate-fade-in">
-                          <SunoSettings analysis={analysis} genre={genre} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  /* Waiting placeholder — desktop only */
-                  <div className="hidden lg:flex flex-col items-center justify-center min-h-[340px] rounded-2xl border border-dashed border-[#141c28] text-center px-8">
-                    <div className="w-12 h-12 rounded-2xl border border-[#1e2838] flex items-center justify-center mb-4">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3d4d5c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 18V5l12-2v13" />
-                        <circle cx="6" cy="18" r="3" />
-                        <circle cx="18" cy="16" r="3" />
-                      </svg>
-                    </div>
-                    <p className="font-['Syne',sans-serif] font-bold text-[12px] tracking-[2px] uppercase text-[#3d4d5c] mb-1.5">Results</p>
-                    <p className="text-[11px] font-mono text-[#2a3545]">Upload and analyze a sample<br />to see output here</p>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          )}
-
-        </main>
-      </div>
-
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-[#0d1118] bg-[#080a0c]">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between text-[9px] font-mono text-[#3d4d5c] tracking-[1px]">
-          <span className="font-['Syne',sans-serif] font-bold">Sample Prompt 1200 V2</span>
-          <span>130 MODE · Booman Systems · 2026</span>
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-kicker">Sample Prompt 1200</div>
+          <h1 className="hero-title">
+            Sample <span>Analysis</span>
+          </h1>
+          <p className="hero-copy">
+            Upload a reference and convert its sonic fingerprint into a one-paragraph prompt for
+            your preferred AI music tool.
+          </p>
+          <div className="feature-nav" aria-label="Tool navigation">
+            <a className="feature-link" href="/studio.html">
+              Sound Studio
+            </a>
+            <a className="feature-link" href="/prompts">
+              Prompt Library
+            </a>
+            <a className="feature-link active" href="/analyze">
+              Sample Analysis
+            </a>
+            <a className="feature-link" href="/create.html">
+              Create Your Own
+            </a>
+          </div>
         </div>
-      </footer>
+      </section>
 
+      <main className="shell">
+        <section className="analysis-panel" aria-label="Sample analysis">
+          <div className="analysis-head">
+            <div>
+              <h2 className="analysis-title">Build Prompt DNA From Audio</h2>
+              <p className="analysis-copy">
+                The analyzer listens for era, place, instrumentation, modal color, texture, and
+                sample-ready mood, then returns a compact prompt built for copy/paste.
+              </p>
+            </div>
+            <div className="detail-pill">Audio Upload</div>
+          </div>
+
+          <div className="analysis-body">
+            <section className="input-panel">
+              <div
+                className={`drop-zone ${dragging ? "dragging" : ""}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => fileRef.current?.click()}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    fileRef.current?.click();
+                  }
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                  chooseFile(event.dataTransfer.files[0]);
+                }}
+              >
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept={ACCEPTED_AUDIO}
+                  hidden
+                  onChange={(event) => chooseFile(event.target.files?.[0])}
+                />
+                <div className="drop-title">{file ? formatFile(file) : "Drop Audio Here"}</div>
+                <div className="drop-meta">
+                  {file ? "Click to change file" : "MP3, WAV, M4A, FLAC, AAC, or OGG"}
+                </div>
+              </div>
+
+              <div className="upload-note">
+                Trimmed clips usually work best. Use a section with the core mood, instruments,
+                and recording texture you want translated.
+              </div>
+
+              <button
+                className="action-button"
+                onClick={handleAnalyze}
+                disabled={!file || analyzing}
+                type="button"
+                aria-live="polite"
+              >
+                {analyzing ? uploadProgress || "Processing..." : "Analyze Sample"}
+              </button>
+            </section>
+
+            <aside className="guide-panel">
+              <div className="detail-label">Output Rules</div>
+              <p>
+                The result is a single paragraph under 1000 characters with no real names and no
+                rhythm descriptions.
+              </p>
+              <ul>
+                <li>Era and geographic specificity</li>
+                <li>Precise instrument language</li>
+                <li>Minor or modal emotional color</li>
+                <li>Scarcity framing and loopable intent</li>
+              </ul>
+            </aside>
+
+            {analysisResult && (
+              <section className="analysis-result" aria-label="Generated prompt">
+                <pre>{analysisResult}</pre>
+                <button
+                  onClick={copyAnalysis}
+                  className={`action-button secondary ${analysisCopied ? "copied" : ""}`}
+                  type="button"
+                >
+                  {analysisCopied ? "Copied" : analysisCopyFailed ? "Copy Failed" : "Copy Prompt"}
+                </button>
+                <div className="result-meta">
+                  <span>{analysisResult.length}/1000 characters</span>
+                  <span>Generated prompt</span>
+                </div>
+              </section>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

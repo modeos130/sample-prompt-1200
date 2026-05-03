@@ -165,6 +165,33 @@ body {
 .meta-badge strong {
   color: var(--text);
 }
+.feature-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.feature-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 0 12px;
+  color: var(--muted);
+  background: rgba(255,255,255,0.035);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.feature-link.active {
+  color: #0a0a0f;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
 
 /* CONTAINER */
 .container {
@@ -717,7 +744,7 @@ body {
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
-    <a href="/studio.html" class="logo">BOOMAN <span class="lab">LAB</span></a>
+    <a href="/home" class="logo">BOOMAN <span class="lab">LAB</span></a>
     <a href="/admin/invite" class="nav-pill">Invite</a>
     <a href="/account" class="nav-pill">Account</a>
   </div>
@@ -729,12 +756,12 @@ body {
   <div class="hero-inner">
     <div class="hero-kicker">Sample Prompt 1200</div>
     <h1 class="hero-title">Sound <span>Studio</span></h1>
-    <div class="hero-sub">Select a sound or describe your own vibe. We handle the rest.</div>
-    <div class="hero-meta">
-      <div class="meta-badge"><strong>75</strong> sounds</div>
-      <div class="meta-badge"><strong>2</strong> generation paths</div>
-      <div class="meta-badge"><strong>Lyria</strong> powered</div>
-      <div class="meta-badge"><strong>Loopable</strong> by design</div>
+    <div class="hero-sub">Select a proven sound card and generate a source-style audio idea.</div>
+    <div class="feature-nav" aria-label="Tool navigation">
+      <a class="feature-link active" href="/studio.html">Sound Studio</a>
+      <a class="feature-link" href="/prompts">Prompt Library</a>
+      <a class="feature-link" href="/analyze">Sample Analysis</a>
+      <a class="feature-link" href="/create.html">Create Your Own</a>
     </div>
   </div>
 </div>
@@ -742,20 +769,7 @@ body {
 <!-- MAIN CONTAINER -->
 <div class="container">
 
-  <!-- TOOL SWITCH -->
-  <div class="tool-switch" role="tablist" aria-label="Booman Lab tools">
-    <button class="tool-button active" type="button" role="tab" aria-selected="true">Studio</button>
-    <a class="tool-button tool-link" href="/prompts" role="tab">Library</a>
-    <a class="tool-button tool-link" href="/prompts#analysis" role="tab">Sample Analysis</a>
-  </div>
-
-  <!-- MODE TABS -->
-  <div class="mode-tabs">
-    <button class="mode-tab active" data-tab="library">Sound Library</button>
-    <button class="mode-tab" data-tab="create">Create Your Own</button>
-  </div>
-
-  <!-- TAB 1: SOUND LIBRARY -->
+  <!-- SOUND LIBRARY -->
   <div id="tab-library">
     <div class="search-wrap">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -773,19 +787,6 @@ body {
 
     <button class="btn-generate" id="btnGenLib" disabled>GENERATE</button>
     <button class="btn-surprise" id="btnSurprise">&#127922; SURPRISE ME</button>
-  </div>
-
-  <!-- TAB 2: CREATE YOUR OWN -->
-  <div id="tab-create" class="hidden">
-    <div class="genre-grid" id="genreGrid"></div>
-    <textarea class="vibe-textarea" id="vibeInput" rows="3" placeholder="Describe the sound you're hearing..."></textarea>
-
-    <div class="model-toggle" id="modelToggle2">
-      <button class="model-btn active" data-model="clip">Preview (30s)</button>
-      <button class="model-btn" data-model="pro">Full Track</button>
-    </div>
-
-    <button class="btn-generate" id="btnGenCreate" disabled>GENERATE</button>
   </div>
 
   <!-- OUTPUT AREA -->
@@ -926,9 +927,7 @@ const CREATE_GENRES = [
 
 // ===== STATE =====
 let selectedSound = null;
-let selectedGenre = null;
 let currentModel = 'clip';
-let currentTab = 'library';
 let currentFilter = 'all';
 let timerInterval = null;
 let abortController = null;
@@ -939,14 +938,10 @@ let lastPayload = null;
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 
-const tabLibrary = $('#tab-library');
-const tabCreate = $('#tab-create');
 const searchInput = $('#searchInput');
 const filterRow = $('#filterRow');
 const filterCount = $('#filterCount');
 const cardsGrid = $('#cardsGrid');
-const genreGrid = $('#genreGrid');
-const vibeInput = $('#vibeInput');
 const outputArea = $('#outputArea');
 const stateLoading = $('#stateLoading');
 const stateSuccess = $('#stateSuccess');
@@ -958,13 +953,11 @@ const resultBadge = $('#resultBadge');
 const remainingText = $('#remainingText');
 const errorMsg = $('#errorMsg');
 const btnGenLib = $('#btnGenLib');
-const btnGenCreate = $('#btnGenCreate');
 
 // ===== INIT =====
 function init() {
   buildFilterTabs();
   renderCards();
-  buildGenreGrid();
   bindEvents();
 }
 
@@ -1008,44 +1001,13 @@ function renderCards() {
   `).join('');
 }
 
-// ===== GENRE GRID (Create Your Own) =====
-const GENRE_LABELS = {
-  'bollywood': 'Bollywood Score',
-  'french-library': 'French Library',
-  'philly-soul': 'Philly Soul',
-  'blaxploitation': 'Blaxploitation',
-  'spiritual-jazz': 'Spiritual Jazz',
-  'synth-funk': 'Synth-Funk / Quiet Storm',
-  'kung-fu-score': 'Kung Fu Score',
-  'greek-rebetiko': 'Greek Rebetiko',
-};
-function buildGenreGrid() {
-  genreGrid.innerHTML = CREATE_GENRES.map(g => {
-    const label = GENRE_LABELS[g] || g.replace(/-/g, ' ');
-    return `<button class="genre-btn" data-genre="${g}">${label}</button>`;
-  }).join('');
-}
-
 // ===== UPDATE GENERATE BUTTON STATES =====
 function updateGenButtons() {
   btnGenLib.disabled = !selectedSound;
-  btnGenCreate.disabled = !(selectedGenre && vibeInput.value.trim());
 }
 
 // ===== EVENT BINDING =====
 function bindEvents() {
-  // Mode tabs
-  $$('.mode-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      $$('.mode-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentTab = tab.dataset.tab;
-      tabLibrary.classList.toggle('hidden', currentTab !== 'library');
-      tabCreate.classList.toggle('hidden', currentTab !== 'create');
-      clearOutput();
-    });
-  });
-
   // Search
   searchInput.addEventListener('input', renderCards);
 
@@ -1069,19 +1031,6 @@ function bindEvents() {
     card.classList.add('selected');
     updateGenButtons();
   });
-
-  // Genre buttons (delegated)
-  genreGrid.addEventListener('click', (e) => {
-    const btn = e.target.closest('.genre-btn');
-    if (!btn) return;
-    genreGrid.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedGenre = btn.dataset.genre;
-    updateGenButtons();
-  });
-
-  // Vibe textarea
-  vibeInput.addEventListener('input', updateGenButtons);
 
   // Model toggles
   document.querySelectorAll('.model-toggle').forEach(toggle => {
@@ -1122,12 +1071,6 @@ function bindEvents() {
   btnGenLib.addEventListener('click', () => {
     if (!selectedSound) return;
     generateMusic({ promptId: selectedSound.id, model: currentModel });
-  });
-
-  // Generate (Create)
-  btnGenCreate.addEventListener('click', () => {
-    if (!selectedGenre || !vibeInput.value.trim()) return;
-    generateMusic({ vibe: vibeInput.value.trim(), genre: selectedGenre, model: currentModel });
   });
 
   // Cancel

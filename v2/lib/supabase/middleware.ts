@@ -68,7 +68,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (pathname.startsWith("/admin") && !isOwnerEmail(user.email)) {
-      return NextResponse.redirect(new URL("/studio.html", request.url));
+      return NextResponse.redirect(new URL("/home", request.url));
     }
   }
 

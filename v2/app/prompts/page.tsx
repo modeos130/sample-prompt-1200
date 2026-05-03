@@ -1,10 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { ALL_PROMPTS, ALL_GENRES, type Prompt } from "@/lib/prompts";
-
-type Mode = "library" | "analysis";
 
 function genreLabel(genre: string) {
   return genre.replace(/-/g, " ");
@@ -25,30 +23,10 @@ const QUICK_GENRES = [
 ];
 
 export default function PromptsPage() {
-  const [mode, setMode] = useState<Mode>("library");
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
-  const [drawerPromptId, setDrawerPromptId] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState("");
-  const [analysisCopied, setAnalysisCopied] = useState(false);
-  const [analysisCopyFailed, setAnalysisCopyFailed] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (window.location.hash === "#analysis") {
-      setMode("analysis");
-    }
-  }, []);
-
-  const selectedPrompt = useMemo(
-    () => ALL_PROMPTS.find((p) => p.id === drawerPromptId) ?? null,
-    [drawerPromptId]
-  );
 
   const filtered = useMemo(() => {
     return ALL_PROMPTS.filter((p) => {
@@ -93,68 +71,12 @@ export default function PromptsPage() {
   };
 
   const copyPrompt = async (prompt: Prompt) => {
-    setDrawerPromptId(prompt.id);
     const copied = await copyText(prompt.vibe);
     setCopyFailedId(copied ? null : prompt.id);
     if (copied) {
       setCopiedId(prompt.id);
       setTimeout(() => setCopiedId(null), 2000);
     }
-  };
-
-  const handleAnalyze = async () => {
-    if (!file) return;
-    setAnalyzing(true);
-    setAnalysisResult("");
-    setUploadProgress("Uploading to Gemini...");
-    try {
-      const uploadForm = new FormData();
-      uploadForm.append("file", file);
-      const uploadRes = await fetch("/api/upload-audio", {
-        method: "POST",
-        body: uploadForm,
-      });
-      if (!uploadRes.ok) {
-        const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
-        setAnalysisResult(errData.error || "Failed to upload audio.");
-        return;
-      }
-      const { fileUri, mimeType } = await uploadRes.json();
-
-      setUploadProgress("Analyzing sonic DNA...");
-      const analyzeRes = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileUri, mimeType }),
-      });
-      if (!analyzeRes.ok) {
-        const errData = await analyzeRes.json().catch(() => ({ error: "Analysis failed" }));
-        setAnalysisResult(errData.error || "Analysis failed.");
-        return;
-      }
-      const data = await analyzeRes.json();
-      setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result");
-    } catch {
-      setAnalysisResult("Analysis failed. Check your connection and try again.");
-    } finally {
-      setAnalyzing(false);
-      setUploadProgress("");
-    }
-  };
-
-  const copyAnalysis = async () => {
-    const copied = await copyText(analysisResult);
-    setAnalysisCopyFailed(!copied);
-    if (copied) {
-      setAnalysisCopied(true);
-      setTimeout(() => setAnalysisCopied(false), 2000);
-    }
-  };
-
-  const chooseMode = (nextMode: Mode) => {
-    setMode(nextMode);
-    const nextUrl = nextMode === "analysis" ? "#analysis" : window.location.pathname;
-    window.history.replaceState(null, "", nextUrl);
   };
 
   return (
@@ -321,6 +243,42 @@ export default function PromptsPage() {
           flex-wrap: wrap;
           gap: 10px;
           margin-top: 22px;
+        }
+
+        .feature-nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 22px;
+        }
+
+        .feature-link {
+          display: inline-flex;
+          align-items: center;
+          min-height: 34px;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 999px;
+          padding: 0 12px;
+          color: var(--muted);
+          background: rgba(255,255,255,0.035);
+          font-family: 'Syne', sans-serif;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0;
+          text-decoration: none;
+          text-transform: uppercase;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+        }
+
+        .feature-link:hover {
+          color: var(--text);
+          border-color: rgba(255,77,109,0.45);
+        }
+
+        .feature-link.active {
+          color: #0a0a0f;
+          border-color: transparent;
+          background: linear-gradient(135deg, var(--red), var(--orange));
         }
 
         .meta-badge {
@@ -546,7 +504,7 @@ export default function PromptsPage() {
 
         .card-actions {
           display: grid;
-          grid-template-columns: 1fr 0.8fr;
+          grid-template-columns: 1fr;
           gap: 8px;
         }
 
@@ -880,7 +838,7 @@ export default function PromptsPage() {
 
       <header className="topbar">
         <div className="topbar-left">
-          <a href="/studio.html" className="brand">
+          <a href="/home" className="brand">
             BOOMAN <span>LAB</span>
           </a>
           <a href="/admin/invite" className="nav-pill">
@@ -900,263 +858,99 @@ export default function PromptsPage() {
             Prompt <span>Library</span>
           </h1>
           <p className="hero-copy">
-            {ALL_PROMPTS.length} source-record prompts built for sample-based music:
-            obscure scenes, precise instruments, modal color, and loopable forms.
+            Source-record prompts built for sample-based music: obscure scenes, precise
+            instruments, modal color, and loopable forms.
           </p>
-          <div className="hero-meta">
-            <div className="meta-badge">
-              <strong>{ALL_PROMPTS.length}</strong> prompts
-            </div>
-            <div className="meta-badge">
-              <strong>{ALL_GENRES.length}</strong> genres
-            </div>
-            <div className="meta-badge">
-              <strong>1000</strong> char max
-            </div>
-            <div className="meta-badge">
-              <strong>No</strong> real names
-            </div>
+          <div className="feature-nav" aria-label="Tool navigation">
+            <a className="feature-link" href="/studio.html">
+              Sound Studio
+            </a>
+            <a className="feature-link active" href="/prompts">
+              Prompt Library
+            </a>
+            <a className="feature-link" href="/analyze">
+              Sample Analysis
+            </a>
+            <a className="feature-link" href="/create.html">
+              Create Your Own
+            </a>
           </div>
         </div>
       </section>
 
       <main className="shell">
-        <div className="mode-switch" role="tablist" aria-label="Prompt tools">
-          <a href="/studio.html" className="mode-button mode-link" role="tab">
-            Studio
-          </a>
-          <button
-            className={`mode-button ${mode === "library" ? "active" : ""}`}
-            onClick={() => chooseMode("library")}
-            type="button"
-            role="tab"
-            aria-selected={mode === "library"}
-          >
-            Library
-          </button>
-          <button
-            className={`mode-button ${mode === "analysis" ? "active" : ""}`}
-            onClick={() => chooseMode("analysis")}
-            type="button"
-            role="tab"
-            aria-selected={mode === "analysis"}
-          >
-            Sample Analysis
-          </button>
+        <section className="filter-panel" aria-label="Prompt filters">
+          <div className="filter-row">
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Search by sound, instrument, region, or mood..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <select
+              className="genre-select"
+              value={activeGenre}
+              onChange={(e) => setActiveGenre(e.target.value)}
+              aria-label="Filter by genre"
+            >
+              <option value="all">All genres ({ALL_PROMPTS.length})</option>
+              {ALL_GENRES.map((genre) => (
+                <option key={genre} value={genre}>
+                  {genreLabel(genre)} ({genreCount(genre)})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="quick-genres" aria-label="Quick genres">
+            {QUICK_GENRES.map((genre) => {
+              const active = activeGenre === genre;
+              const count = genre === "all" ? ALL_PROMPTS.length : genreCount(genre);
+              return (
+                <button
+                  key={genre}
+                  className={`genre-chip ${active ? "active" : ""}`}
+                  onClick={() => setActiveGenre(genre)}
+                  type="button"
+                >
+                  {genre === "all" ? "All" : genreLabel(genre)} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <div className="results-line">
+          <span>
+            Showing {filtered.length} of {ALL_PROMPTS.length}
+          </span>
+          <span>{activeGenre === "all" ? "All genres" : genreLabel(activeGenre)}</span>
         </div>
 
-        {mode === "library" ? (
-          <>
-            <section className="filter-panel" aria-label="Prompt filters">
-              <div className="filter-row">
-                <input
-                  className="search-input"
-                  type="text"
-                  placeholder="Search by sound, instrument, region, or mood..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <select
-                  className="genre-select"
-                  value={activeGenre}
-                  onChange={(e) => setActiveGenre(e.target.value)}
-                  aria-label="Filter by genre"
-                >
-                  <option value="all">All genres ({ALL_PROMPTS.length})</option>
-                  {ALL_GENRES.map((genre) => (
-                    <option key={genre} value={genre}>
-                      {genreLabel(genre)} ({genreCount(genre)})
-                    </option>
-                  ))}
-                </select>
+        <section className="prompt-grid" aria-label="Prompt cards">
+          {filtered.map((prompt) => (
+            <article className="prompt-card" key={prompt.id}>
+              <div className="art-wrap">
+                <img src={prompt.art} alt={prompt.name} />
               </div>
-              <div className="quick-genres" aria-label="Quick genres">
-                {QUICK_GENRES.map((genre) => {
-                  const active = activeGenre === genre;
-                  const count = genre === "all" ? ALL_PROMPTS.length : genreCount(genre);
-                  return (
-                    <button
-                      key={genre}
-                      className={`genre-chip ${active ? "active" : ""}`}
-                      onClick={() => setActiveGenre(genre)}
-                      type="button"
-                    >
-                      {genre === "all" ? "All" : genreLabel(genre)} ({count})
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <div className="results-line">
-              <span>
-                Showing {filtered.length} of {ALL_PROMPTS.length}
-              </span>
-              <span>{activeGenre === "all" ? "All genres" : genreLabel(activeGenre)}</span>
-            </div>
-
-            <section className="prompt-grid" aria-label="Prompt cards">
-              {filtered.map((prompt) => (
-                <article className="prompt-card" key={prompt.id}>
-                  <div className="art-wrap">
-                    <img src={prompt.art} alt={prompt.name} />
-                  </div>
-                  <div className="card-body">
-                    <h2 className="prompt-name">{prompt.name}</h2>
-                    <div className="prompt-genre">{genreLabel(prompt.genre)}</div>
-                    <p className="prompt-excerpt">{prompt.vibe}</p>
-                    <div className="card-actions">
-                      <button
-                        className={`card-button primary ${copiedId === prompt.id ? "copied" : ""}`}
-                        onClick={() => copyPrompt(prompt)}
-                        type="button"
-                      >
-                        {copiedId === prompt.id ? "Copied" : copyFailedId === prompt.id ? "Ready" : "Copy To Suno"}
-                      </button>
-                      <button
-                        className="card-button secondary"
-                        onClick={() => setDrawerPromptId(prompt.id)}
-                        type="button"
-                      >
-                        View
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </section>
-          </>
-        ) : (
-          <section className="analysis-panel" aria-label="Sample analysis">
-            <div className="analysis-head">
-              <div>
-                <h2 className="analysis-title">Sample Analysis</h2>
-                <p className="analysis-copy">
-                  Drop an audio file and generate a Suno-ready prompt from its sonic DNA.
-                </p>
-              </div>
-              <div className="meta-badge">
-                <strong>MP3</strong> recommended
-              </div>
-            </div>
-
-            <div className="analysis-body">
-              <div
-                className="drop-zone"
-                onClick={() => fileRef.current?.click()}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.classList.add("dragging");
-                }}
-                onDragLeave={(e) => {
-                  e.currentTarget.classList.remove("dragging");
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.classList.remove("dragging");
-                  const droppedFile = e.dataTransfer.files[0];
-                  if (droppedFile) setFile(droppedFile);
-                }}
-              >
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".mp3,.wav,.m4a,.flac"
-                  hidden
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) setFile(e.target.files[0]);
-                  }}
-                />
-                <div className="drop-title">
-                  {file ? `${file.name} (${(file.size / 1048576).toFixed(1)} MB)` : "Drop audio here"}
-                </div>
-                <div className="drop-meta">
-                  {file ? "Click to change file" : ".mp3 .wav .m4a .flac, max 4 MB"}
-                </div>
-              </div>
-
-              <div className="upload-note">
-                MP3 files work best. A trimmed 30-60 second section is usually enough for accurate analysis.
-              </div>
-
-              <button
-                className="analyze-button"
-                onClick={handleAnalyze}
-                disabled={!file || analyzing}
-                type="button"
-              >
-                {analyzing ? uploadProgress || "Processing..." : "Analyze Sample"}
-              </button>
-
-              {analysisResult && (
-                <div className="analysis-result">
-                  <pre>{analysisResult}</pre>
+              <div className="card-body">
+                <h2 className="prompt-name">{prompt.name}</h2>
+                <div className="prompt-genre">{genreLabel(prompt.genre)}</div>
+                <p className="prompt-excerpt">{prompt.vibe}</p>
+                <div className="card-actions">
                   <button
-                    onClick={copyAnalysis}
-                    className={`drawer-button primary ${analysisCopied ? "copied" : ""}`}
+                    className={`card-button primary ${copiedId === prompt.id ? "copied" : ""}`}
+                    onClick={() => copyPrompt(prompt)}
                     type="button"
                   >
-                    {analysisCopied ? "Copied" : analysisCopyFailed ? "Prompt Ready" : "Copy To Suno"}
+                    {copiedId === prompt.id ? "Copied" : copyFailedId === prompt.id ? "Copy Failed" : "Copy Prompt"}
                   </button>
                 </div>
-              )}
-            </div>
-          </section>
-        )}
+              </div>
+            </article>
+          ))}
+        </section>
       </main>
-
-      {selectedPrompt && (
-        <div
-          className="drawer-backdrop"
-          role="presentation"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setDrawerPromptId(null);
-          }}
-        >
-          <aside className="prompt-drawer" aria-label={`${selectedPrompt.name} full prompt`}>
-            <div className="drawer-header">
-              <div>
-                <div className="drawer-kicker">{genreLabel(selectedPrompt.genre)}</div>
-                <h2 className="drawer-title">{selectedPrompt.name}</h2>
-              </div>
-              <button className="close-button" onClick={() => setDrawerPromptId(null)} type="button">
-                Close
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div className="drawer-art">
-                <img src={selectedPrompt.art} alt={selectedPrompt.name} />
-              </div>
-              <textarea
-                className="prompt-textarea"
-                readOnly
-                value={selectedPrompt.vibe}
-                onFocus={(e) => e.currentTarget.select()}
-              />
-              <div className="drawer-actions">
-                <button
-                  className={`drawer-button primary ${copiedId === selectedPrompt.id ? "copied" : ""}`}
-                  onClick={() => copyPrompt(selectedPrompt)}
-                  type="button"
-                >
-                  {copiedId === selectedPrompt.id ? "Copied" : copyFailedId === selectedPrompt.id ? "Prompt Ready" : "Copy To Suno"}
-                </button>
-                <button
-                  className="drawer-button secondary"
-                  onClick={() => setDrawerPromptId(null)}
-                  type="button"
-                >
-                  Done
-                </button>
-              </div>
-              <div className="drawer-meta">
-                <span>{selectedPrompt.vibe.length}/1000 characters</span>
-                <span>{selectedPrompt.id}</span>
-              </div>
-            </div>
-          </aside>
-        </div>
-      )}
     </div>
   );
 }

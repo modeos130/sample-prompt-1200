@@ -46,7 +46,7 @@ export default function LoginInner() {
       return;
     }
 
-    window.location.href = "/studio.html";
+    window.location.href = "/home";
   };
 
   const inputStyle = { width: "100%", padding: "14px 18px", background: "#111118", border: "1px solid #2a2a3a", borderRadius: 10, color: "#f0f0f8", fontFamily: "'DM Sans',sans-serif", fontSize: 15, outline: "none" };
