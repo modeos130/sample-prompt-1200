@@ -112,7 +112,18 @@ body {
     repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0, rgba(255,255,255,0.028) 1px, transparent 1px, transparent 7px),
     #0b0c12;
 }
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0 30%, rgba(255,255,255,0.05) 46%, transparent 64% 100%);
+  transform: translateX(-38%);
+  animation: heroSweep 13s ease-in-out infinite;
+}
 .hero-inner {
+  position: relative;
+  z-index: 1;
   max-width: 1180px;
   margin: 0 auto;
   padding: 52px 24px 34px;
@@ -349,6 +360,7 @@ body {
   margin-bottom: 24px;
 }
 .sound-card {
+  position: relative;
   width: calc(25% - 9px);
   min-width: 180px;
   background: var(--bg2);
@@ -356,19 +368,39 @@ body {
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s;
+  animation: cardRise 360ms ease backwards;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.sound-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,0.12) 50%, transparent 58% 100%);
+  opacity: 0;
+  transform: translateX(-35%);
+  transition: opacity 180ms ease, transform 260ms ease;
 }
 .sound-card .card-art {
   width: 100%;
   aspect-ratio: 1/1;
   object-fit: cover;
   display: block;
+  transition: transform 220ms ease, filter 220ms ease;
 }
 .sound-card .card-body { padding: 14px; }
 .sound-card:hover {
   border-color: #3a3a4a;
   transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(255,77,109,0.2);
+}
+.sound-card:hover::after {
+  opacity: 1;
+  transform: translateX(35%);
+}
+.sound-card:hover .card-art {
+  filter: saturate(1.08) contrast(1.04);
+  transform: scale(1.025);
 }
 .sound-card.selected {
   border-color: var(--accent);
@@ -707,6 +739,33 @@ body {
 
 /* HIDDEN */
 .hidden { display: none !important; }
+
+@keyframes heroSweep {
+  0%, 46% { transform: translateX(-42%); opacity: 0; }
+  56% { opacity: 1; }
+  100% { transform: translateX(42%); opacity: 0; }
+}
+
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .sound-card {
+    animation: none;
+  }
+
+  .sound-card,
+  .sound-card:hover,
+  .sound-card:hover .card-art,
+  .sound-card::after,
+  .sound-card:hover::after {
+    transform: none;
+    transition: none;
+  }
+}
 
 /* RESPONSIVE */
 @media (max-width: 768px) {

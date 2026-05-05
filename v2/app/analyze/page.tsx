@@ -220,6 +220,7 @@ export default function AnalyzePage() {
         }
 
         .hero {
+          position: relative;
           overflow: hidden;
           border-bottom: 1px solid var(--line);
           background:
@@ -228,7 +229,19 @@ export default function AnalyzePage() {
             #0b0c12;
         }
 
+        .hero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 0 30%, rgba(255,255,255,0.05) 46%, transparent 64% 100%);
+          transform: translateX(-38%);
+          animation: heroSweep 13s ease-in-out infinite;
+        }
+
         .hero-inner {
+          position: relative;
+          z-index: 1;
           max-width: 1180px;
           margin: 0 auto;
           padding: 52px 24px 34px;
@@ -308,6 +321,7 @@ export default function AnalyzePage() {
           border-radius: 12px;
           background: var(--panel);
           overflow: hidden;
+          animation: panelRise 420ms ease;
         }
 
         .analysis-head {
@@ -367,6 +381,8 @@ export default function AnalyzePage() {
         }
 
         .drop-zone {
+          position: relative;
+          overflow: hidden;
           border: 1px dashed rgba(84,212,232,0.44);
           border-radius: 10px;
           padding: 38px 20px;
@@ -376,11 +392,28 @@ export default function AnalyzePage() {
           transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
         }
 
+        .drop-zone::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(115deg, transparent 0 42%, rgba(84,212,232,0.12) 50%, transparent 58% 100%);
+          opacity: 0;
+          transform: translateX(-35%);
+          transition: opacity 180ms ease, transform 280ms ease;
+        }
+
         .drop-zone:hover,
         .drop-zone.dragging {
           border-color: var(--cyan);
           background: rgba(84,212,232,0.08);
           transform: translateY(-1px);
+        }
+
+        .drop-zone:hover::before,
+        .drop-zone.dragging::before {
+          opacity: 1;
+          transform: translateX(35%);
         }
 
         .drop-title {
@@ -445,6 +478,13 @@ export default function AnalyzePage() {
 
         .guide-panel {
           padding: 18px;
+          transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+        }
+
+        .guide-panel:hover {
+          transform: translateY(-2px);
+          border-color: rgba(215,181,109,0.25);
+          background: rgba(14,15,22,0.96);
         }
 
         .detail-label {
@@ -491,6 +531,36 @@ export default function AnalyzePage() {
           margin-top: 12px;
           color: var(--dim);
           font-size: 12px;
+        }
+
+        @keyframes heroSweep {
+          0%, 46% { transform: translateX(-42%); opacity: 0; }
+          56% { opacity: 1; }
+          100% { transform: translateX(42%); opacity: 0; }
+        }
+
+        @keyframes panelRise {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero::before,
+          .analysis-panel {
+            animation: none;
+          }
+
+          .drop-zone,
+          .drop-zone:hover,
+          .drop-zone.dragging,
+          .drop-zone::before,
+          .drop-zone:hover::before,
+          .drop-zone.dragging::before,
+          .guide-panel,
+          .guide-panel:hover {
+            transform: none;
+            transition: none;
+          }
         }
 
         @media (max-width: 850px) {

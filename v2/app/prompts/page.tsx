@@ -198,7 +198,19 @@ export default function PromptsPage() {
             #0b0c12;
         }
 
+        .hero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 0 30%, rgba(255,255,255,0.05) 46%, transparent 64% 100%);
+          transform: translateX(-38%);
+          animation: heroSweep 13s ease-in-out infinite;
+        }
+
         .hero-inner {
+          position: relative;
+          z-index: 1;
           max-width: 1180px;
           margin: 0 auto;
           padding: 52px 24px 34px;
@@ -441,6 +453,7 @@ export default function PromptsPage() {
           border: 1px solid var(--line);
           border-radius: 8px;
           background: var(--panel);
+          animation: cardRise 360ms ease backwards;
           transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
         }
 
@@ -452,6 +465,7 @@ export default function PromptsPage() {
 
         .art-wrap {
           position: relative;
+          overflow: hidden;
           aspect-ratio: 1 / 1;
           background: #0a0b10;
         }
@@ -461,6 +475,28 @@ export default function PromptsPage() {
           height: 100%;
           display: block;
           object-fit: cover;
+          transition: transform 220ms ease, filter 220ms ease;
+        }
+
+        .art-wrap::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,0.14) 50%, transparent 58% 100%);
+          opacity: 0;
+          transform: translateX(-35%);
+          transition: opacity 180ms ease, transform 260ms ease;
+        }
+
+        .prompt-card:hover .art-wrap img {
+          filter: saturate(1.08) contrast(1.04);
+          transform: scale(1.025);
+        }
+
+        .prompt-card:hover .art-wrap::after {
+          opacity: 1;
+          transform: translateX(35%);
         }
 
         .card-body {
@@ -773,6 +809,37 @@ export default function PromptsPage() {
           margin-top: 10px;
           color: var(--dim);
           font-size: 12px;
+        }
+
+        .prompt-card:nth-child(2n) { animation-delay: 35ms; }
+        .prompt-card:nth-child(3n) { animation-delay: 70ms; }
+        .prompt-card:nth-child(5n) { animation-delay: 105ms; }
+
+        @keyframes heroSweep {
+          0%, 46% { transform: translateX(-42%); opacity: 0; }
+          56% { opacity: 1; }
+          100% { transform: translateX(42%); opacity: 0; }
+        }
+
+        @keyframes cardRise {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero::before,
+          .prompt-card {
+            animation: none;
+          }
+
+          .prompt-card,
+          .prompt-card:hover,
+          .prompt-card:hover .art-wrap img,
+          .art-wrap::after,
+          .prompt-card:hover .art-wrap::after {
+            transform: none;
+            transition: none;
+          }
         }
 
         @media (max-width: 760px) {

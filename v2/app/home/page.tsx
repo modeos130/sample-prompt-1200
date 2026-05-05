@@ -119,6 +119,8 @@ export default function HomePage() {
         }
 
         .hero {
+          position: relative;
+          overflow: hidden;
           border-bottom: 1px solid var(--line);
           background:
             linear-gradient(90deg, rgba(255,77,109,0.16), rgba(255,154,60,0.05), transparent 70%),
@@ -126,7 +128,19 @@ export default function HomePage() {
             #0b0c12;
         }
 
+        .hero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 0 28%, rgba(255,255,255,0.05) 44%, transparent 62% 100%);
+          transform: translateX(-35%);
+          animation: heroSweep 12s ease-in-out infinite;
+        }
+
         .hero-inner {
+          position: relative;
+          z-index: 1;
           max-width: 1180px;
           margin: 0 auto;
           display: grid;
@@ -184,6 +198,14 @@ export default function HomePage() {
             #101117;
           border: 1px solid rgba(255,255,255,0.12);
           box-shadow: 0 24px 80px rgba(0,0,0,0.45), 0 0 70px rgba(255,77,109,0.12);
+          animation: coverGlow 7s ease-in-out infinite;
+          transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+        }
+
+        .record-cover:hover {
+          transform: translateY(-4px) rotate(-0.4deg);
+          border-color: rgba(215,181,109,0.32);
+          box-shadow: 0 30px 90px rgba(0,0,0,0.5), 0 0 92px rgba(255,77,109,0.18);
         }
 
         .record-cover::before {
@@ -199,6 +221,7 @@ export default function HomePage() {
             repeating-radial-gradient(circle at center, #0d0e14 0 7px, #191b24 8px 10px, #0b0c12 11px 13px);
           border: 1px solid rgba(255,255,255,0.1);
           opacity: 0.96;
+          animation: recordSpin 26s linear infinite;
         }
 
         .record-cover::after {
@@ -240,6 +263,15 @@ export default function HomePage() {
           border-radius: 8px;
           padding: 18px;
           background: rgba(16,17,23,0.88);
+          animation: cardRise 420ms ease backwards;
+          transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .tool-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(255,255,255,0.18);
+          background: rgba(19,20,29,0.94);
+          box-shadow: 0 20px 52px rgba(0,0,0,0.34);
         }
 
         .tool-eyebrow {
@@ -280,6 +312,12 @@ export default function HomePage() {
           font-size: 12px;
           font-weight: 800;
           text-decoration: none;
+          transition: transform 160ms ease, filter 160ms ease;
+        }
+
+        .tool-button:hover {
+          filter: saturate(1.12) brightness(1.04);
+          transform: translateY(-1px);
         }
 
         .tool-card.studio .tool-button {
@@ -300,6 +338,44 @@ export default function HomePage() {
         .tool-card.create .tool-button {
           color: #0a0a0f;
           background: linear-gradient(135deg, var(--orange), var(--gold));
+        }
+
+        @keyframes heroSweep {
+          0%, 45% { transform: translateX(-42%); opacity: 0; }
+          55% { opacity: 1; }
+          100% { transform: translateX(42%); opacity: 0; }
+        }
+
+        @keyframes coverGlow {
+          0%, 100% { box-shadow: 0 24px 80px rgba(0,0,0,0.45), 0 0 70px rgba(255,77,109,0.12); }
+          50% { box-shadow: 0 28px 88px rgba(0,0,0,0.48), 0 0 90px rgba(215,181,109,0.16); }
+        }
+
+        @keyframes recordSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes cardRise {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero::before,
+          .record-cover,
+          .record-cover::before,
+          .tool-card {
+            animation: none;
+          }
+
+          .record-cover,
+          .record-cover:hover,
+          .tool-card,
+          .tool-card:hover,
+          .tool-button,
+          .tool-button:hover {
+            transform: none;
+          }
         }
 
         @media (max-width: 980px) {
@@ -368,8 +444,12 @@ export default function HomePage() {
 
       <section className="tools" aria-label="Booman Lab tools">
         <div className="tool-grid">
-          {TOOLS.map((tool) => (
-            <article className={`tool-card ${tool.tone}`} key={tool.href}>
+          {TOOLS.map((tool, index) => (
+            <article
+              className={`tool-card ${tool.tone}`}
+              key={tool.href}
+              style={{ animationDelay: `${index * 70}ms` }}
+            >
               <div className="tool-eyebrow">{tool.eyebrow}</div>
               <h2 className="tool-title">{tool.title}</h2>
               <p className="tool-copy">{tool.copy}</p>
