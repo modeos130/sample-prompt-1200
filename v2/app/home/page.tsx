@@ -71,6 +71,7 @@ export default function HomePage() {
           border-bottom: 1px solid var(--line);
           background: rgba(8,10,15,0.88);
           backdrop-filter: blur(16px);
+          box-shadow: 0 12px 34px rgba(0,0,0,0.24);
         }
 
         .brand,
@@ -136,6 +137,18 @@ export default function HomePage() {
           background: linear-gradient(110deg, transparent 0 28%, rgba(255,255,255,0.05) 44%, transparent 62% 100%);
           transform: translateX(-35%);
           animation: heroSweep 12s ease-in-out infinite;
+        }
+
+        .hero::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.2;
+          background:
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 11px),
+            repeating-linear-gradient(0deg, transparent 0, transparent 17px, rgba(255,77,109,0.022) 18px, transparent 19px);
+          animation: surfaceDrift 18s linear infinite;
         }
 
         .hero-inner {
@@ -247,6 +260,7 @@ export default function HomePage() {
           max-width: 1180px;
           margin: 0 auto;
           padding: 24px 24px 72px;
+          perspective: 1200px;
         }
 
         .tool-grid {
@@ -263,6 +277,7 @@ export default function HomePage() {
           border-radius: 8px;
           padding: 18px;
           background: rgba(16,17,23,0.88);
+          box-shadow: 0 16px 46px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.035);
           animation: cardRise 420ms ease backwards;
           transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
         }
@@ -271,7 +286,7 @@ export default function HomePage() {
           transform: translateY(-4px);
           border-color: rgba(255,255,255,0.18);
           background: rgba(19,20,29,0.94);
-          box-shadow: 0 20px 52px rgba(0,0,0,0.34);
+          box-shadow: 0 24px 62px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.055);
         }
 
         .tool-eyebrow {
@@ -355,6 +370,10 @@ export default function HomePage() {
           to { transform: rotate(360deg); }
         }
 
+        @keyframes surfaceDrift {
+          to { transform: translate3d(18px, 10px, 0); }
+        }
+
         @keyframes cardRise {
           from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
@@ -362,6 +381,7 @@ export default function HomePage() {
 
         @media (prefers-reduced-motion: reduce) {
           .hero::before,
+          .hero::after,
           .record-cover,
           .record-cover::before,
           .tool-card {

@@ -31,6 +31,9 @@ body {
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,6 +42,7 @@ body {
   border-bottom: 1px solid var(--line);
   background: rgba(8,10,15,0.88);
   backdrop-filter: blur(16px);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.26);
 }
 
 .brand {
@@ -100,6 +104,8 @@ body {
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   min-height: calc(100vh - 57px);
   display: grid;
   align-items: center;
@@ -108,9 +114,34 @@ body {
     linear-gradient(90deg, rgba(255,77,109,0.16), rgba(255,154,60,0.05), transparent 70%),
     repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0, rgba(255,255,255,0.028) 1px, transparent 1px, transparent 7px),
     #0b0c12;
+  box-shadow: inset 0 -90px 120px rgba(0,0,0,0.26);
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero::before {
+  background: linear-gradient(110deg, transparent 0 30%, rgba(255,255,255,0.055) 46%, transparent 64% 100%);
+  transform: translateX(-38%);
+  animation: heroSweep 12s ease-in-out infinite;
+}
+
+.hero::after {
+  opacity: 0.23;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 11px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 17px, rgba(255,77,109,0.025) 18px, transparent 19px);
+  animation: surfaceDrift 18s linear infinite;
 }
 
 .hero-inner {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -165,12 +196,21 @@ body {
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
+  box-shadow: 0 12px 28px rgba(255,77,109,0.18);
+  transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+}
+
+.cta:hover {
+  filter: saturate(1.12) brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(255,77,109,0.24);
 }
 
 .cta.secondary {
   color: var(--muted);
   border: 1px solid var(--line);
   background: rgba(16,17,23,0.86);
+  box-shadow: none;
 }
 
 .details {
@@ -187,6 +227,15 @@ body {
   border-radius: 8px;
   padding: 16px;
   background: rgba(16,17,23,0.82);
+  box-shadow: 0 16px 42px rgba(0,0,0,0.18);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.detail:hover {
+  transform: translateY(-3px);
+  border-color: rgba(215,181,109,0.22);
+  background: rgba(18,19,27,0.94);
+  box-shadow: 0 22px 54px rgba(0,0,0,0.26);
 }
 
 .detail-label {
@@ -209,6 +258,8 @@ body {
   border-radius: 8px;
   background: rgba(16,17,23,0.68);
   overflow: hidden;
+  box-shadow: 0 22px 58px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04);
+  animation: signalFloat 7s ease-in-out infinite;
 }
 
 .signal-head {
@@ -239,12 +290,57 @@ body {
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--red), rgba(255,154,60,0.46));
   opacity: 0.74;
+  transform-origin: bottom;
+  animation: eqPulse 920ms ease-in-out infinite;
 }
 
 .signal-bars span:nth-child(3n) { height: 72%; }
 .signal-bars span:nth-child(3n + 1) { height: 42%; }
 .signal-bars span:nth-child(3n + 2) { height: 94%; }
 .signal-bars span:nth-child(5n) { opacity: 0.38; }
+.signal-bars span:nth-child(2n) { animation-duration: 780ms; animation-delay: -180ms; }
+.signal-bars span:nth-child(4n) { animation-duration: 1120ms; animation-delay: -320ms; }
+.signal-bars span:nth-child(5n) { animation-duration: 980ms; animation-delay: -460ms; }
+.signal-bars span:nth-child(7n) { animation-duration: 1280ms; animation-delay: -620ms; }
+
+@keyframes eqPulse {
+  0%, 100% { transform: scaleY(0.38); filter: saturate(0.92); }
+  36% { transform: scaleY(1); filter: saturate(1.16); }
+  62% { transform: scaleY(0.58); }
+}
+
+@keyframes heroSweep {
+  0%, 45% { transform: translateX(-42%); opacity: 0; }
+  55% { opacity: 1; }
+  100% { transform: translateX(42%); opacity: 0; }
+}
+
+@keyframes surfaceDrift {
+  to { transform: translate3d(18px, 10px, 0); }
+}
+
+@keyframes signalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .hero::after,
+  .signal,
+  .signal-bars span {
+    animation: none;
+  }
+
+  .cta,
+  .cta:hover,
+  .detail,
+  .detail:hover,
+  .signal {
+    transform: none;
+    transition: none;
+  }
+}
 
 @media (max-width: 760px) {
   .topbar {

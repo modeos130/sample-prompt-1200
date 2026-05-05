@@ -153,6 +153,7 @@ export default function AnalyzePage() {
           border-bottom: 1px solid var(--line);
           background: rgba(8,10,15,0.88);
           backdrop-filter: blur(16px);
+          box-shadow: 0 12px 34px rgba(0,0,0,0.24);
         }
 
         .topbar-left {
@@ -239,6 +240,18 @@ export default function AnalyzePage() {
           animation: heroSweep 13s ease-in-out infinite;
         }
 
+        .hero::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.2;
+          background:
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 11px),
+            repeating-linear-gradient(0deg, transparent 0, transparent 17px, rgba(84,212,232,0.024) 18px, transparent 19px);
+          animation: surfaceDrift 18s linear infinite;
+        }
+
         .hero-inner {
           position: relative;
           z-index: 1;
@@ -321,6 +334,7 @@ export default function AnalyzePage() {
           border-radius: 12px;
           background: var(--panel);
           overflow: hidden;
+          box-shadow: 0 22px 58px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.04);
           animation: panelRise 420ms ease;
         }
 
@@ -544,8 +558,13 @@ export default function AnalyzePage() {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes surfaceDrift {
+          to { transform: translate3d(18px, 10px, 0); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .hero::before,
+          .hero::after,
           .analysis-panel {
             animation: none;
           }

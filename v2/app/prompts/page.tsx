@@ -120,6 +120,7 @@ export default function PromptsPage() {
           border-bottom: 1px solid var(--line);
           background: rgba(8,10,15,0.88);
           backdrop-filter: blur(16px);
+          box-shadow: 0 12px 34px rgba(0,0,0,0.24);
         }
 
         .topbar-left {
@@ -206,6 +207,18 @@ export default function PromptsPage() {
           background: linear-gradient(110deg, transparent 0 30%, rgba(255,255,255,0.05) 46%, transparent 64% 100%);
           transform: translateX(-38%);
           animation: heroSweep 13s ease-in-out infinite;
+        }
+
+        .hero::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.2;
+          background:
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 11px),
+            repeating-linear-gradient(0deg, transparent 0, transparent 17px, rgba(255,77,109,0.022) 18px, transparent 19px);
+          animation: surfaceDrift 18s linear infinite;
         }
 
         .hero-inner {
@@ -453,13 +466,14 @@ export default function PromptsPage() {
           border: 1px solid var(--line);
           border-radius: 8px;
           background: var(--panel);
+          box-shadow: 0 16px 46px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.035);
           animation: cardRise 360ms ease backwards;
           transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
         }
 
         .prompt-card:hover {
           border-color: rgba(255,77,109,0.36);
-          box-shadow: 0 18px 44px rgba(0,0,0,0.32);
+          box-shadow: 0 24px 62px rgba(0,0,0,0.36), 0 18px 44px rgba(255,77,109,0.08);
           transform: translateY(-2px);
         }
 
@@ -826,8 +840,13 @@ export default function PromptsPage() {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes surfaceDrift {
+          to { transform: translate3d(18px, 10px, 0); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .hero::before,
+          .hero::after,
           .prompt-card {
             animation: none;
           }
