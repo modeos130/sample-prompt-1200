@@ -31,8 +31,11 @@ export default function AccountInner() {
 
   const handleUpdatePassword = async () => {
     setPwMsg(""); setPwErr(false);
+    if (!currentPw) { setPwMsg("Current password is required"); setPwErr(true); return; }
     if (newPw !== confirmPw) { setPwMsg("Passwords do not match"); setPwErr(true); return; }
     if (newPw.length < 6) { setPwMsg("Password must be at least 6 characters"); setPwErr(true); return; }
+    const { error: confirmError } = await supabase.auth.signInWithPassword({ email, password: currentPw });
+    if (confirmError) { setPwMsg("Current password is incorrect"); setPwErr(true); return; }
     const { error } = await supabase.auth.updateUser({ password: newPw });
     if (error) { setPwMsg(error.message); setPwErr(true); }
     else { setPwMsg("Password updated"); setPwErr(false); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
@@ -71,11 +74,11 @@ export default function AccountInner() {
         <div style={{ background: "#111118", border: "1px solid #2a2a3a", borderRadius: 12, padding: 24, marginBottom: 20 }}>
           <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 20 }}>CHANGE PASSWORD</h3>
           <label style={labelStyle}>Current Password</label>
-          <input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} style={inputStyle} />
+          <input type="password" autoComplete="current-password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} style={inputStyle} />
           <label style={labelStyle}>New Password</label>
-          <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} style={inputStyle} />
+          <input type="password" autoComplete="new-password" value={newPw} onChange={(e) => setNewPw(e.target.value)} style={inputStyle} />
           <label style={labelStyle}>Confirm New Password</label>
-          <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} style={inputStyle} />
+          <input type="password" autoComplete="new-password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} style={inputStyle} />
           {pwMsg && <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: pwErr ? "#ff4d6d" : "#00e5ff", marginBottom: 12 }}>{pwErr ? "\u2717 " : "\u2713 "}{pwMsg}</p>}
           <button onClick={handleUpdatePassword} style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #ff4d6d, #c0392b)", color: "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>UPDATE PASSWORD</button>
         </div>

@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BOOMAN LAB
 
-## Getting Started
+Private AI music production studio for sample-minded producers. The app combines a sound-generation studio, prompt library, sample-analysis workflow, custom prompt/sound creation, invite-only authentication, and owner-only user administration.
 
-First, run the development server:
+## Current Status
+
+- App framework: Next.js 16 App Router
+- Runtime target: Vercel, with this `v2/` folder as the project root
+- Access model: private invite-only app, with `/vibe-to-prompt.html` intentionally public as the branded coming-soon/private-beta page
+- Database/auth: Supabase Auth plus `profiles` and `analytics` tables
+- AI providers: Google Gemini/Lyria and Anthropic Claude
+- Payments: not implemented yet
+
+## Main Routes
+
+| Path | Purpose | Access |
+| --- | --- | --- |
+| `/` | Redirects public visitors to `/vibe-to-prompt.html` | Public |
+| `/vibe-to-prompt.html` | Branded coming-soon/private-beta page | Public |
+| `/login` | Invite-only login | Public |
+| `/home` | Private tool hub | Active invited user |
+| `/studio.html` | Sound Studio generation UI | Active invited user |
+| `/prompts` | Prompt Library | Active invited user |
+| `/analyze` | Sample Analysis | Active invited user |
+| `/create.html` | Create Your Own sound generator | Active invited user |
+| `/account` | Account and password update | Active invited user |
+| `/admin/invite` | Owner invite/admin page | Owner only |
+| `/admin/users` | Owner user management | Owner only |
+
+## Required Environment Variables
+
+Copy `.env.example` to `.env.local` for local development. Never commit `.env.local`.
+
+| Variable | Required | Used for |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Browser and server Supabase clients |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Browser and server Supabase auth |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-side admin, invite, revoke, analytics writes |
+| `ADMIN_OWNER_EMAIL` | Yes for production | Owner-only admin authorization |
+| `GEMINI_KEY` | Yes | Gemini sample analysis and Lyria generation |
+| `ANTHROPIC_API_KEY` | Yes | Claude prompt creation |
+| `CLAUDE_MODEL` | Optional | Claude model override |
+| `GEMINI_MODEL` | Optional | Gemini analysis model override |
+| `LYRIA_CLIP_MODEL` | Optional | Lyria clip model override |
+| `LYRIA_PRO_MODEL` | Optional | Lyria full/pro model override |
+| `RATE_LIMIT_CALLS` | Optional | Vibe prompt daily in-memory rate limit |
+| `RATE_LIMIT_WINDOW` | Optional | Vibe/analyze rate window in ms |
+| `ANALYZE_RATE_LIMIT` | Optional | Sample-analysis daily in-memory rate limit |
+| `MUSIC_RATE_WINDOW` | Optional | Music generation rate window in ms |
+| `MONTHLY_HARD_CAP` | Optional | Instance-level analyze/vibe cap |
+| `UPLOAD_AUDIO_MAX_MB` | Optional | Upload route max file size, default 25 MB |
+
+## Local Development
 
 ```bash
+cd /Users/booman/Documents/sample-prompt-1200/v2
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If port 3000 is occupied:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev -- --port 3002
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Validation Commands
 
-## Learn More
+```bash
+cd /Users/booman/Documents/sample-prompt-1200/v2
+npm run lint
+npm run build
+npm audit --audit-level=moderate
+npm outdated
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Database Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The original setup script is at `scripts/setup.sql`. Existing production Supabase policy hardening should use `scripts/rls_hardening.sql` after review.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Important: do not run database migrations blindly. Review SQL in Supabase SQL Editor first and confirm the current table/policy state.
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The Vercel project is configured with `v2/` as the root directory. Run Vercel commands from the repository root:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cd /Users/booman/Documents/sample-prompt-1200
+vercel deploy --prod --yes
+```
+
+Production deployment should only happen after:
+
+1. `npm run lint` passes.
+2. `npm run build` passes.
+3. Supabase RLS policies are verified.
+4. Protected routes redirect unauthenticated visitors to `/login`.
+5. Owner-only admin routes reject non-owner users.
+6. Public legal/privacy posture is accepted for the current private-beta stage.
+
+## Common Troubleshooting
+
+- Login says Supabase URL/API key are missing: restart the dev server after creating `.env.local`, then hard-refresh the browser.
+- Protected page redirects to login after valid login: check `profiles.active` for that user.
+- Admin page redirects to `/home`: set `ADMIN_OWNER_EMAIL` to the owner account email in Vercel and local `.env.local`.
+- Gemini/Lyria generation fails: confirm `GEMINI_KEY`, model availability, and provider quota.
+- Claude prompt generation fails: confirm `ANTHROPIC_API_KEY` and `CLAUDE_MODEL`.
+
+## Launch Documents
+
+- `STACK_INVENTORY.md`
+- `SECURITY_AUDIT.md`
+- `QA_TEST_PLAN.md`
+- `LAUNCH_CHECKLIST.md`
+- `COMPLETION_PUNCH_LIST.md`
+- `PROFESSIONAL_READINESS_AUDIT_REPORT.md`

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,20 +13,13 @@ function getServiceClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const activeUser = await getActiveUser(req);
+  if (!activeUser.ok) return activeUserError(activeUser);
+
   const supabase = getServiceClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, error: "Not configured" }, { status: 500 });
   }
-
-  let body: Record<string, unknown> = {};
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ ok: false }, { status: 400 });
-  }
-
-  const userId = typeof body.user_id === "string" ? body.user_id : null;
-  const tier = typeof body.tier === "string" ? body.tier : null;
 
   // Extract country from headers (Vercel sets x-vercel-ip-country)
   const country =
@@ -34,9 +28,9 @@ export async function POST(req: NextRequest) {
     null;
 
   const { error } = await supabase.from("analytics").insert({
-    user_id: userId,
+    user_id: activeUser.user.id,
     action: "studio_visit",
-    tier,
+    tier: activeUser.user.tier,
     country,
   });
 

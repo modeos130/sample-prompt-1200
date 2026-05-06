@@ -26,11 +26,16 @@ create table if not exists public.analytics (
 alter table public.profiles enable row level security;
 alter table public.analytics enable row level security;
 
-create policy "Users own profile" on public.profiles
-  for select using (auth.uid() = id);
+drop policy if exists "Users own profile" on public.profiles;
+drop policy if exists "Service full access profiles" on public.profiles;
+drop policy if exists "Service full access analytics" on public.analytics;
+drop policy if exists "profiles_select_own" on public.profiles;
 
-create policy "Service full access profiles" on public.profiles
-  for all using (true);
+create policy "profiles_select_own" on public.profiles
+  for select
+  to authenticated
+  using (auth.uid() = id);
 
-create policy "Service full access analytics" on public.analytics
-  for all using (true);
+-- Admin profile writes and analytics writes are handled by trusted Next.js
+-- server routes with SUPABASE_SERVICE_ROLE_KEY. Do not create browser-facing
+-- all-access policies for profiles or analytics.

@@ -15,6 +15,14 @@ const MIME_MAP: Record<string, string> = {
   aif: "audio/aiff",
 };
 
+const DEFAULT_UPLOAD_AUDIO_MAX_MB = 25;
+
+function maxUploadBytes() {
+  const parsed = Number(process.env.UPLOAD_AUDIO_MAX_MB);
+  const mb = Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_UPLOAD_AUDIO_MAX_MB;
+  return mb * 1024 * 1024;
+}
+
 /**
  * Uploads an audio file to Gemini's File API and returns the file URI.
  * This bypasses Vercel's 4.5MB body limit for the analyze route because
@@ -41,9 +49,30 @@ export async function POST(req: NextRequest) {
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
-    const mimeType = MIME_MAP[ext] ?? "audio/mpeg";
+    const mimeType = MIME_MAP[ext];
+    if (!mimeType) {
+      return NextResponse.json(
+        { error: `Unsupported audio type. Use: ${Object.keys(MIME_MAP).join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    const limitBytes = maxUploadBytes();
+    if (file.size > limitBytes) {
+      return NextResponse.json(
+        { error: `Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.` },
+        { status: 413 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const numBytes = bytes.byteLength;
+    if (numBytes > limitBytes) {
+      return NextResponse.json(
+        { error: `Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.` },
+        { status: 413 }
+      );
+    }
 
     // Step 1: Start resumable upload
     const startRes = await fetch(

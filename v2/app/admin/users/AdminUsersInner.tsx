@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 interface Profile {
   id: string;
@@ -27,80 +26,76 @@ export default function AdminUsersInner() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [currentTier, setCurrentTier] = useState<string | null>(null);
-
-  const supabase = createClient();
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchErr } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
+    setError("");
 
-    if (fetchErr) {
-      setError(fetchErr.message);
-    } else {
-      setProfiles(data || []);
-    }
-    setLoading(false);
-  }, [supabase]);
+    try {
+      const res = await fetch("/api/admin/users", { cache: "no-store" });
+      const data = await res.json();
 
-  useEffect(() => {
-    async function checkAccess() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
+      if (res.status === 401) {
         window.location.href = "/login";
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("tier")
-        .eq("id", user.id)
-        .single();
-
-      if (!profile || profile.tier !== "super_user") {
-        setError("Access denied — super_user only");
-        setLoading(false);
+      if (!res.ok) {
+        setError(data.error || "Unable to load users");
         return;
       }
 
-      setCurrentTier(profile.tier);
-      loadUsers();
+      setProfiles(data.users || []);
+    } catch {
+      setError("Network error while loading users");
+    } finally {
+      setLoading(false);
     }
-    checkAccess();
-  }, [supabase, loadUsers]);
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const toggleActive = async (profile: Profile) => {
-    const { error: updateErr } = await supabase
-      .from("profiles")
-      .update({ active: !profile.active })
-      .eq("id", profile.id);
-
-    if (updateErr) {
-      setError(updateErr.message);
-      return;
+    setError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: profile.id, active: !profile.active }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Unable to update user");
+        return;
+      }
+      loadUsers();
+    } catch {
+      setError("Network error while updating user");
     }
-    loadUsers();
   };
 
   const updateTier = async (profile: Profile, newTier: string) => {
-    const { error: updateErr } = await supabase
-      .from("profiles")
-      .update({ tier: newTier })
-      .eq("id", profile.id);
-
-    if (updateErr) {
-      setError(updateErr.message);
-      return;
+    setError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: profile.id, tier: newTier }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Unable to update tier");
+        return;
+      }
+      loadUsers();
+    } catch {
+      setError("Network error while updating tier");
     }
-    loadUsers();
   };
 
-  if (error && !currentTier) {
+  if (error && !loading && profiles.length === 0) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -224,6 +219,7 @@ export default function AdminUsersInner() {
                     <td className="px-5 py-3">
                       <button
                         onClick={() => toggleActive(p)}
+                        aria-label={p.active ? `Deactivate ${p.email}` : `Activate ${p.email}`}
                         className="rounded-full w-10 h-5 relative transition-colors"
                         style={{
                           background: p.active

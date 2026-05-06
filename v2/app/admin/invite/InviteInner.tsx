@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 interface Profile {
   id: string;
@@ -33,28 +32,36 @@ export default function InviteInner() {
   const [revoking, setRevoking] = useState<string | null>(null);
   const [authorized, setAuthorized] = useState(false);
 
-  const supabase = createClient();
-
   const loadUsers = useCallback(async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setUsers(data || []);
-    setLoadingUsers(false);
-  }, [supabase]);
+    setLoadingUsers(true);
+    try {
+      const res = await fetch("/api/admin/users", { cache: "no-store" });
+      const data = await res.json();
+
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data.error || "Owner access required");
+        setAuthorized(false);
+        return;
+      }
+
+      setUsers(data.users || []);
+      setAuthorized(true);
+    } catch {
+      setError("Network error while loading users");
+      setAuthorized(false);
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function checkAuth() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { window.location.href = "/login"; return; }
-      const OWNER_EMAIL = "admin@modeos.app";
-      if (user.email !== OWNER_EMAIL) { setError("Owner access required"); return; }
-      setAuthorized(true);
-      loadUsers();
-    }
-    checkAuth();
-  }, [supabase, loadUsers]);
+    loadUsers();
+  }, [loadUsers]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();

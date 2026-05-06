@@ -4,12 +4,16 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "BOOMAN LAB — AI Music Production Studio",
   description:
-    "75 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
+    "Private AI music production tools for sample-minded producers: sound generation, prompt design, sample analysis, and crate-inspired creative workflows.",
   openGraph: {
     title: "BOOMAN LAB — AI Music Production Studio",
     description:
-      "75 proven Suno prompts. Drop any sample, get a prompt. Made by DJ Booman.",
+      "Private AI music production tools for sample-minded producers: sound generation, prompt design, sample analysis, and crate-inspired creative workflows.",
     type: "website",
+  },
+  robots: {
+    index: false,
+    follow: false,
   },
 };
 
