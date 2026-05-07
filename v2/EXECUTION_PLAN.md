@@ -150,7 +150,7 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: Invited users may land on `/` and see coming soon instead of an obvious login path.
 - File paths involved: `app/page.tsx`, `public/vibe-to-prompt.html`, `app/home/page.tsx`.
-- Exact implementation steps: add clear owner-approved login CTA on public page or change `/` behavior.
+- Exact implementation steps: public page copy and CTAs now clearly direct invited members to sign in while preserving request-access/private-beta posture.
 - Risk level: Low.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: logged-out navigation.
@@ -160,7 +160,7 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: Pages should feel like one product.
 - File paths involved: `public/studio.html`, `public/create.html`, `app/prompts/page.tsx`, `app/analyze/page.tsx`.
-- Exact implementation steps: align nav labels, active states, account/admin links.
+- Exact implementation steps: active tool tabs now expose `aria-current="page"` and static/React hover behavior is aligned.
 - Risk level: Low.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: mobile/desktop visual pass.

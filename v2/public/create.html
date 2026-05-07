@@ -197,14 +197,16 @@ body {
   font-family: 'Syne', sans-serif;
   font-size: 10px;
   font-weight: 800;
+  letter-spacing: 0;
   text-decoration: none;
   text-transform: uppercase;
-  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 
 .feature-link:hover {
   color: var(--text);
   border-color: rgba(255,154,60,0.48);
+  transform: translateY(-1px);
 }
 
 .feature-link.active {
@@ -572,7 +574,7 @@ body {
       <a class="feature-link" href="/studio.html">Sound Studio</a>
       <a class="feature-link" href="/prompts">Prompt Library</a>
       <a class="feature-link" href="/analyze">Sample Analysis</a>
-      <a class="feature-link active" href="/create.html">Create Your Own</a>
+      <a class="feature-link active" href="/create.html" aria-current="page">Create Your Own</a>
     </div>
   </div>
 </section>

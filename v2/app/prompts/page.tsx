@@ -292,12 +292,13 @@ export default function PromptsPage() {
           letter-spacing: 0;
           text-decoration: none;
           text-transform: uppercase;
-          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease;
         }
 
         .feature-link:hover {
           color: var(--text);
           border-color: rgba(255,77,109,0.45);
+          transform: translateY(-1px);
         }
 
         .feature-link.active {
@@ -951,7 +952,7 @@ export default function PromptsPage() {
             <a className="feature-link" href="/studio.html">
               Sound Studio
             </a>
-            <a className="feature-link active" href="/prompts">
+            <a className="feature-link active" href="/prompts" aria-current="page">
               Prompt Library
             </a>
             <a className="feature-link" href="/analyze">

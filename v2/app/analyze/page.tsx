@@ -306,15 +306,19 @@ export default function AnalyzePage() {
           padding: 0 12px;
           color: var(--muted);
           background: rgba(255,255,255,0.035);
+          font-family: 'Syne', sans-serif;
           font-size: 10px;
           font-weight: 800;
+          letter-spacing: 0;
           text-decoration: none;
-          transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+          text-transform: uppercase;
+          transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease;
         }
 
         .feature-link:hover {
           color: var(--text);
           border-color: rgba(84,212,232,0.48);
+          transform: translateY(-1px);
         }
 
         .feature-link.active {
@@ -656,7 +660,7 @@ export default function AnalyzePage() {
             <a className="feature-link" href="/prompts">
               Prompt Library
             </a>
-            <a className="feature-link active" href="/analyze">
+            <a className="feature-link active" href="/analyze" aria-current="page">
               Sample Analysis
             </a>
             <a className="feature-link" href="/create.html">
