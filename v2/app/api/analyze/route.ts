@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
+import { consumeRateLimit } from "@/lib/rate-limit";
 import { BOOM_BAP_ANALYSIS_PROMPT, buildBoomBapPrompt } from "@/lib/genres/boom-bap";
 import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
 import { TRAP_ANALYSIS_PROMPT, buildTrapPrompt } from "@/lib/genres/trap";
@@ -35,31 +36,8 @@ import { HAITIAN_VOODOO_JAZZ_ANALYSIS_PROMPT, buildHaitianVoodooJazzPrompt } fro
 
 export const maxDuration = 60;
 
-// ─── RATE LIMITING ────────────────────────────────────────────────────────────
-const analyzeIpLog = new Map<string, { count: number; windowStart: number }>();
 const ANALYZE_RATE_LIMIT = parseInt(process.env.ANALYZE_RATE_LIMIT ?? "10");
 const ANALYZE_RATE_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW ?? "86400000");
-let analyzeTotalCalls = 0;
-const ANALYZE_HARD_CAP = parseInt(process.env.MONTHLY_HARD_CAP ?? "500");
-
-function checkAnalyzeRateLimit(ip: string): { allowed: boolean; reason?: string } {
-  if (analyzeTotalCalls >= ANALYZE_HARD_CAP) {
-    return { allowed: false, reason: "Daily capacity reached. Check back tomorrow." };
-  }
-  const now = Date.now();
-  const record = analyzeIpLog.get(ip);
-  if (!record || now - record.windowStart > ANALYZE_RATE_WINDOW) {
-    analyzeIpLog.set(ip, { count: 1, windowStart: now });
-    analyzeTotalCalls++;
-    return { allowed: true };
-  }
-  if (record.count >= ANALYZE_RATE_LIMIT) {
-    return { allowed: false, reason: `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day.` };
-  }
-  record.count++;
-  analyzeTotalCalls++;
-  return { allowed: true };
-}
 
 const MAX_FILE_MB = 4;
 
@@ -213,9 +191,20 @@ export async function POST(req: NextRequest) {
   if (!activeUser.ok) return activeUserError(activeUser);
 
   // Rate limit
-  const limit = checkAnalyzeRateLimit(activeUser.user.id);
+  const limit = await consumeRateLimit({
+    scope: "sample_analysis",
+    subjectId: activeUser.user.id,
+    limit: ANALYZE_RATE_LIMIT,
+    windowMs: ANALYZE_RATE_WINDOW,
+  });
   if (!limit.allowed) {
-    return NextResponse.json({ error: limit.reason }, { status: 429 });
+    return NextResponse.json(
+      {
+        error: limit.error
+          ?? `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day. Resets in ~${limit.resetInHours ?? 1}h.`,
+      },
+      { status: limit.error ? 503 : 429 }
+    );
   }
 
   try {

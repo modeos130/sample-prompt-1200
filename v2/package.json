@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "verify:rls": "node scripts/verify-rls.mjs"
+    "verify:rls": "node scripts/verify-rls.mjs",
+    "verify:rate-limit": "node scripts/verify-rate-limit.mjs",
+    "verify:routes": "node scripts/verify-routes.mjs",
+    "verify:security": "npm run verify:rls && npm run verify:rate-limit && npm run verify:routes"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

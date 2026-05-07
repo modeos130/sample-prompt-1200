@@ -1,44 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
-// ─── RATE LIMITING ────────────────────────────────────────────────────────────
-// In-memory store: resets on each cold start (every ~few hours on Vercel free tier)
-// Good enough for limited beta testing — upgrade to Upstash Redis for production
-const ipCallLog = new Map<string, { count: number; windowStart: number }>();
-
 const RATE_LIMIT_CALLS   = parseInt(process.env.RATE_LIMIT_CALLS   ?? "10"); // calls per window
 const RATE_LIMIT_WINDOW  = parseInt(process.env.RATE_LIMIT_WINDOW  ?? "86400000"); // 24h in ms
-const MONTHLY_HARD_CAP   = parseInt(process.env.MONTHLY_HARD_CAP   ?? "500"); // total calls this instance
-
-let totalCallsThisInstance = 0;
-
-function checkRateLimit(ip: string): { allowed: boolean; reason?: string; remaining?: number } {
-  // Hard cap on total instance calls (resets on cold start)
-  if (totalCallsThisInstance >= MONTHLY_HARD_CAP) {
-    return { allowed: false, reason: "Daily capacity reached. Check back tomorrow." };
-  }
-
-  const now = Date.now();
-  const record = ipCallLog.get(ip);
-
-  if (!record || now - record.windowStart > RATE_LIMIT_WINDOW) {
-    // New window
-    ipCallLog.set(ip, { count: 1, windowStart: now });
-    totalCallsThisInstance++;
-    return { allowed: true, remaining: RATE_LIMIT_CALLS - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT_CALLS) {
-    const resetIn = Math.ceil((RATE_LIMIT_WINDOW - (now - record.windowStart)) / 3600000);
-    return { allowed: false, reason: `Rate limit reached. You get ${RATE_LIMIT_CALLS} generations per day. Resets in ~${resetIn}h.` };
-  }
-
-  record.count++;
-  totalCallsThisInstance++;
-  return { allowed: true, remaining: RATE_LIMIT_CALLS - record.count };
-}
 
 // ─── GENRE RULES ─────────────────────────────────────────────────────────────
 const GENRE_RULES: Record<string, string> = {
@@ -131,12 +98,20 @@ export async function POST(req: NextRequest) {
   if (!activeUser.ok) return activeUserError(activeUser);
 
   // Rate limit check
-  const limit = checkRateLimit(activeUser.user.id);
+  const limit = await consumeRateLimit({
+    scope: "vibe_prompt",
+    subjectId: activeUser.user.id,
+    limit: RATE_LIMIT_CALLS,
+    windowMs: RATE_LIMIT_WINDOW,
+  });
   if (!limit.allowed) {
     return NextResponse.json(
-      { error: limit.reason },
       {
-        status: 429,
+        error: limit.error
+          ?? `Rate limit reached. You get ${RATE_LIMIT_CALLS} generations per day. Resets in ~${limit.resetInHours ?? 1}h.`,
+      },
+      {
+        status: limit.error ? 503 : 429,
         headers: { "X-RateLimit-Remaining": "0" },
       }
     );

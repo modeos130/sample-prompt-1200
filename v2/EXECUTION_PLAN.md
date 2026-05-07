@@ -95,11 +95,11 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 ### Task 2.1: Add Automated Auth/RLS Regression Tests
 
 - Why it matters: The same class of bug must not reappear silently.
-- File paths involved: `tests/*`, `package.json`, `playwright.config.ts`, `scripts/verify-rls.mjs`.
-- Exact implementation steps: install Playwright, add route matrix tests, add RLS test to CI.
+- File paths involved: `package.json`, `scripts/verify-rls.mjs`, `scripts/verify-routes.mjs`.
+- Exact implementation steps: add route matrix verification, keep RLS verification, and run both through `npm run verify:security`.
 - Risk level: High.
 - Whether Codex can do it now: Yes after Phase 1.
-- How I test it: `npm run test:e2e`, `npm run verify:rls`.
+- How I test it: `npm run verify:rls`, `npm run verify:routes`, `npm run verify:security`.
 - Acceptance criteria: CI fails if private routes or RLS regress.
 
 ### Task 2.2: Replace In-Memory Rate Limits

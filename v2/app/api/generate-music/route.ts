@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ALL_PROMPTS } from "@/lib/prompts";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 120; // Music generation is slow
 
-// ─── TIER-BASED RATE LIMITING ─────────────────────────────────────────────────
-const musicUserCallLog = new Map<string, { count: number; windowStart: number }>();
 const MUSIC_RATE_WINDOW = parseInt(process.env.MUSIC_RATE_WINDOW ?? "86400000"); // 24h in ms
 
 const TIER_LIMITS: Record<string, number> = {
@@ -15,33 +14,6 @@ const TIER_LIMITS: Record<string, number> = {
   tier1: 10,
   free: 3,
 };
-
-function checkMusicRateLimit(userId: string, tier: string): { allowed: boolean; reason?: string; remaining?: number } {
-  // Unlimited tiers skip limit check entirely
-  if (tier === "super_user" || tier === "vip") {
-    return { allowed: true, remaining: 9999 };
-  }
-
-  const limit = TIER_LIMITS[tier] ?? TIER_LIMITS.free;
-  const now = Date.now();
-  const record = musicUserCallLog.get(userId);
-
-  if (!record || now - record.windowStart > MUSIC_RATE_WINDOW) {
-    musicUserCallLog.set(userId, { count: 1, windowStart: now });
-    return { allowed: true, remaining: limit - 1 };
-  }
-
-  if (record.count >= limit) {
-    const resetIn = Math.ceil((MUSIC_RATE_WINDOW - (now - record.windowStart)) / 3600000);
-    return {
-      allowed: false,
-      reason: `You've used all ${limit} generations today. Upgrade to VIP for unlimited generations. Resets in ~${resetIn}h.`,
-    };
-  }
-
-  record.count++;
-  return { allowed: true, remaining: limit - record.count };
-}
 
 // ─── PROVEN PROMPTS (SERVER-SIDE ONLY — NEVER SENT TO CLIENT) ────────────────
 // Derived from the canonical catalog in lib/prompts.ts so the Sound Library and the
@@ -150,12 +122,22 @@ export async function POST(req: NextRequest) {
   if (!activeUser.ok) return activeUserError(activeUser);
 
   // Rate limit check (tier-aware)
-  const limit = checkMusicRateLimit(activeUser.user.id, activeUser.user.tier);
+  const tierLimit = TIER_LIMITS[activeUser.user.tier] ?? TIER_LIMITS.free;
+  const limit = await consumeRateLimit({
+    scope: "music_generation",
+    subjectId: activeUser.user.id,
+    limit: tierLimit,
+    windowMs: MUSIC_RATE_WINDOW,
+    bypass: activeUser.user.tier === "super_user" || activeUser.user.tier === "vip",
+  });
   if (!limit.allowed) {
     return NextResponse.json(
-      { error: limit.reason },
       {
-        status: 429,
+        error: limit.error
+          ?? `You've used all ${tierLimit} generations today. Upgrade to VIP for unlimited generations. Resets in ~${limit.resetInHours ?? 1}h.`,
+      },
+      {
+        status: limit.error ? 503 : 429,
         headers: { "X-RateLimit-Remaining": "0" },
       }
     );
