@@ -9,8 +9,9 @@
     "lint": "eslint",
     "verify:rls": "node scripts/verify-rls.mjs",
     "verify:rate-limit": "node scripts/verify-rate-limit.mjs",
+    "verify:admin-audit": "node scripts/verify-admin-audit.mjs",
     "verify:routes": "node scripts/verify-routes.mjs",
-    "verify:security": "npm run verify:rls && npm run verify:rate-limit && npm run verify:routes"
+    "verify:security": "npm run verify:rls && npm run verify:rate-limit && npm run verify:admin-audit && npm run verify:routes"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

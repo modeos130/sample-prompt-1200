@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
+import { recordAdminAuditEvent } from "@/lib/admin/audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,6 +81,20 @@ export async function POST(req: NextRequest) {
 
   if (profileError) {
     return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  const audit = await recordAdminAuditEvent(supabase, {
+    actor: activeUser.user,
+    action: "invite_created",
+    targetUserId: userId,
+    targetEmail: email,
+    metadata: {
+      tier,
+      displayNameProvided: Boolean(displayName),
+    },
+  });
+  if (!audit.ok) {
+    return NextResponse.json({ error: "Invite created, but audit logging failed." }, { status: 500 });
   }
 
   // Return credentials (shown to admin only, never logged)

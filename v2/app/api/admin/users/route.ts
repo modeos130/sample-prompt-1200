@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
+import { recordAdminAuditEvent, type AdminAuditAction } from "@/lib/admin/audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -88,6 +89,16 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "No valid updates supplied" }, { status: 400 });
   }
 
+  const { data: previous, error: previousError } = await supabase
+    .from("profiles")
+    .select("id,email,tier,active")
+    .eq("id", userId)
+    .single();
+
+  if (previousError) {
+    return NextResponse.json({ error: "Unable to load user before update" }, { status: 500 });
+  }
+
   const { data, error } = await supabase
     .from("profiles")
     .update(updates)
@@ -97,6 +108,31 @@ export async function PATCH(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: "Unable to update user" }, { status: 500 });
+  }
+
+  let action: AdminAuditAction = "user_updated";
+  if (updates.tier && updates.active === undefined) action = "user_tier_updated";
+  if (updates.active !== undefined && updates.tier === undefined) action = "user_active_updated";
+
+  const audit = await recordAdminAuditEvent(supabase, {
+    actor: owner.activeUser,
+    action,
+    targetUserId: userId,
+    targetEmail: data.email,
+    metadata: {
+      before: {
+        tier: previous.tier,
+        active: previous.active,
+      },
+      after: {
+        tier: data.tier,
+        active: data.active,
+      },
+      changedFields: Object.keys(updates),
+    },
+  });
+  if (!audit.ok) {
+    return NextResponse.json({ error: "User updated, but audit logging failed." }, { status: 500 });
   }
 
   return NextResponse.json({ user: data });

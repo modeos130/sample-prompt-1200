@@ -114,3 +114,4 @@ Production deployment should only happen after:
 - `LAUNCH_CHECKLIST.md`
 - `COMPLETION_PUNCH_LIST.md`
 - `PROFESSIONAL_READINESS_AUDIT_REPORT.md`
+- `PAYMENT_MODEL.md`

@@ -127,18 +127,18 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 ### Task 3.1: Define Payment Model Before Coding
 
 - Why it matters: Payment flow is currently missing; building it without business rules creates security and refund risk.
-- File paths involved: future `app/api/checkout/*`, `app/api/webhooks/stripe/*`, DB migrations.
-- Exact implementation steps: decide free/private-only vs paid tiers, define products/prices, refund policy, access unlock rules.
+- File paths involved: `PAYMENT_MODEL.md`, future `app/api/checkout/*`, `app/api/webhooks/stripe/*`, DB migrations.
+- Exact implementation steps: current private-only/no-payment model documented; future work must decide paid tiers, products/prices, refund policy, and access unlock rules before coding checkout.
 - Risk level: Medium now, Critical before monetization.
-- Whether Codex can do it now: Planning yes; implementation requires owner decisions.
+- Whether Codex can do it now: Current no-payment model documented; paid implementation requires owner decisions.
 - How I test it: Stripe test mode checkout and signed webhook tests.
 - Acceptance criteria: no frontend-fake payment success; server-side fulfillment only.
 
 ### Task 3.2: Add Admin Audit Logs
 
 - Why it matters: Invites, revokes, and tier changes should be traceable.
-- File paths involved: `app/api/admin/*`, Supabase migration.
-- Exact implementation steps: create `admin_audit_events`, insert event on invite/revoke/update.
+- File paths involved: `app/api/admin/*`, `lib/admin/audit.ts`, Supabase migration.
+- Exact implementation steps: `admin_audit_events` table added; invite, revoke, restore, tier, and active updates now insert audit rows after successful admin mutations.
 - Risk level: Medium.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: perform admin action and query audit log.

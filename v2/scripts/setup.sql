@@ -23,8 +23,20 @@ create table if not exists public.analytics (
   created_at timestamptz default now()
 );
 
+create table if not exists public.admin_audit_events (
+  id uuid primary key default gen_random_uuid(),
+  actor_user_id uuid references public.profiles(id) on delete set null,
+  actor_email text not null,
+  target_user_id uuid references public.profiles(id) on delete set null,
+  target_email text,
+  action text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 alter table public.profiles enable row level security;
 alter table public.analytics enable row level security;
+alter table public.admin_audit_events enable row level security;
 
 drop policy if exists "Users own profile" on public.profiles;
 drop policy if exists "Service full access profiles" on public.profiles;

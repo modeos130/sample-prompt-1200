@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
+import { recordAdminAuditEvent } from "@/lib/admin/audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,6 +44,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Cannot revoke your own access" }, { status: 400 });
   }
 
+  const { data: targetProfile } = await supabase
+    .from("profiles")
+    .select("email,tier,active")
+    .eq("id", userId)
+    .maybeSingle();
+
   if (action === "revoke") {
     // Disable in profiles
     const { error: profileErr } = await supabase
@@ -59,6 +66,20 @@ export async function POST(req: NextRequest) {
     });
     if (banErr) {
       return NextResponse.json({ error: banErr.message }, { status: 500 });
+    }
+
+    const audit = await recordAdminAuditEvent(supabase, {
+      actor: activeUser.user,
+      action: "user_revoked",
+      targetUserId: userId,
+      targetEmail: targetProfile?.email ?? null,
+      metadata: {
+        previousActive: targetProfile?.active ?? null,
+        tier: targetProfile?.tier ?? null,
+      },
+    });
+    if (!audit.ok) {
+      return NextResponse.json({ error: "User revoked, but audit logging failed." }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, action: "revoked", userId });
@@ -80,6 +101,20 @@ export async function POST(req: NextRequest) {
     });
     if (unbanErr) {
       return NextResponse.json({ error: unbanErr.message }, { status: 500 });
+    }
+
+    const audit = await recordAdminAuditEvent(supabase, {
+      actor: activeUser.user,
+      action: "user_restored",
+      targetUserId: userId,
+      targetEmail: targetProfile?.email ?? null,
+      metadata: {
+        previousActive: targetProfile?.active ?? null,
+        tier: targetProfile?.tier ?? null,
+      },
+    });
+    if (!audit.ok) {
+      return NextResponse.json({ error: "User restored, but audit logging failed." }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, action: "restored", userId });
