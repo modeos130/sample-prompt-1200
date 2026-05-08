@@ -1,25 +1,25 @@
 # BOOMAN LAB QA Test Plan
 
-Date: 2026-05-06
+Date: 2026-05-08
 
 ## Current Test Status
 
-Automated test framework: not present.
+Automated test framework: Playwright + axe-core.
 
-Validated during audit:
+Validated during phased hardening:
 
 - `npm run lint` passes.
 - `npm run build` passes.
-- `npm audit fix` patched non-breaking transitive advisories.
 - Build output includes all expected Next app routes.
-- Local unauthenticated route smoke on port 3029 passed: `/login` 200, `/vibe-to-prompt.html` 200, `/home` 307 to `/login`, `/admin/invite` 307 to `/login`, `/api/analytics` 401, `/api/admin/users` 401.
+- `npm run verify:security` passes RLS, persistent rate-limit, admin-audit, route-gate, and protected API error-shape checks.
+- `npm run test:e2e` passes public/login UI, anonymous route gates, and protected API auth tests.
+- `npm run test:a11y` passes axe checks for the public entry page, login page, and protected-route login redirect.
 
 Not validated end-to-end in this audit:
 
-- Real authenticated browser session.
+- Real authenticated browser session unless `E2E_TEST_EMAIL` and `E2E_TEST_PASSWORD` are set.
 - Real Gemini/Lyria generation.
 - Real Claude prompt synthesis.
-- Real Supabase RLS after policy hardening.
 - Mobile visual QA.
 - Keyboard-only navigation.
 
@@ -55,23 +55,25 @@ Not validated end-to-end in this audit:
 | Legal pages | Terms/privacy/license/contact | Manual | Public pages exist and are linked where required |
 | Rollback | Vercel rollback | DevOps drill | Known prior deploy can be restored quickly |
 
-## Suggested Tooling
-
-Install later after owner approval:
+## Automated Test Commands
 
 ```bash
-npm install --save-dev @playwright/test axe-core
-npx playwright install
+npm run verify:security
+npm run test:e2e
+npm run test:a11y
 ```
 
-Suggested scripts:
+Authenticated smoke tests are included but skipped unless these environment variables are set:
 
-```json
-{
-  "test:e2e": "playwright test",
-  "test:a11y": "playwright test tests/accessibility.spec.ts",
-  "check": "npm run lint && npm run build && npm audit --audit-level=moderate"
-}
+```bash
+E2E_TEST_EMAIL=invited-user@example.com
+E2E_TEST_PASSWORD=invited-user-password
+```
+
+Playwright browser setup, if needed on a new machine:
+
+```bash
+npx playwright install chromium
 ```
 
 ## Manual QA Checklist

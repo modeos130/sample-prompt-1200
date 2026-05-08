@@ -68,18 +68,18 @@ export default function LoginInner() {
             <div style={{ background: "rgba(255,77,109,0.1)", border: "1px solid rgba(255,77,109,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#ff4d6d" }}>{error}</div>
           )}
 
-          <label style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Email</label>
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ ...inputStyle, marginBottom: 20 }} placeholder="you@example.com" />
+          <label htmlFor="login-email" style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Email</label>
+          <input id="login-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ ...inputStyle, marginBottom: 20 }} placeholder="you@example.com" />
 
-          <label style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Password</label>
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 28 }} placeholder="Enter password" />
+          <label htmlFor="login-password" style={{ display: "block", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "#b0b0c8", marginBottom: 8 }}>Password</label>
+          <input id="login-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 28 }} placeholder="Enter password" />
 
           <button type="submit" disabled={loading} style={{ width: "100%", padding: 16, borderRadius: 10, border: "none", cursor: loading ? "not-allowed" : "pointer", background: loading ? "#4a2030" : "linear-gradient(135deg, #ff4d6d, #c0392b)", color: "#fff", fontFamily: "'Space Grotesk',sans-serif", fontSize: 15, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: loading ? 0.6 : 1 }}>
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#707088" }}>Invite only — no signup</p>
+        <p style={{ textAlign: "center", marginTop: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#8e90a8" }}>Invite only — no signup</p>
       </div>
     </div>
   );

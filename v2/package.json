@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:e2e": "playwright test tests/e2e.spec.ts",
+    "test:a11y": "playwright test tests/accessibility.spec.ts",
     "verify:rls": "node scripts/verify-rls.mjs",
     "verify:rate-limit": "node scripts/verify-rate-limit.mjs",
     "verify:admin-audit": "node scripts/verify-admin-audit.mjs",
@@ -21,10 +23,12 @@
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^20.19.39",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "^4.11.4",
     "eslint": "^9",
     "eslint-config-next": "^16.2.4",
     "tailwindcss": "^4.2.4",

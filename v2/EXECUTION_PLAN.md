@@ -194,7 +194,7 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: Route gates, prompt copy, and admin checks need repeatable proof.
 - File paths involved: `tests/*.spec.ts`, `package.json`, `playwright.config.ts`.
-- Exact implementation steps: install Playwright, add tests for route matrix and core UI.
+- Exact implementation steps: Playwright installed; route-gate, standardized API auth-error, public/login UI, and optional authenticated prompt-library smoke tests added.
 - Risk level: High.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: `npm run test:e2e`.
@@ -204,7 +204,7 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: Keyboard and screen-reader blockers should be caught early.
 - File paths involved: `tests/accessibility.spec.ts`.
-- Exact implementation steps: add axe checks for public/login/private pages.
+- Exact implementation steps: axe-core checks added for the public entry page, login page, protected-route login redirect, and optional authenticated private hub.
 - Risk level: Medium.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: `npm run test:a11y`.

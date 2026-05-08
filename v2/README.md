@@ -70,9 +70,14 @@ npm run dev -- --port 3002
 cd /Users/booman/Documents/sample-prompt-1200/v2
 npm run lint
 npm run build
+npm run verify:security
+npm run test:e2e
+npm run test:a11y
 npm audit --audit-level=moderate
 npm outdated
 ```
+
+`test:e2e` and `test:a11y` run anonymous/public checks by default. Authenticated smoke tests are present but skipped unless `E2E_TEST_EMAIL` and `E2E_TEST_PASSWORD` are set in the shell.
 
 ## Database Setup
 
