@@ -8,11 +8,41 @@ function formatFile(file: File) {
   return `${file.name} (${(file.size / 1048576).toFixed(1)} MB)`;
 }
 
+type ApiErrorBody = {
+  error?: string;
+  code?: string;
+};
+
+async function readJson<T>(res: Response): Promise<T | ApiErrorBody> {
+  try {
+    return await res.json();
+  } catch {
+    return { error: "The server returned an unreadable response.", code: "invalid_response" };
+  }
+}
+
+function formatApiError(data: ApiErrorBody, fallback: string) {
+  const message = data.error || fallback;
+
+  if (data.code === "authentication_required") return "Your session expired. Sign in again, then retry.";
+  if (data.code === "rate_limit_exceeded") return message;
+  if (data.code === "provider_quota_exceeded") return `${message} This is a provider quota issue, not an audio-file problem.`;
+  if (data.code === "provider_timeout") return `${message} Try a shorter trimmed clip.`;
+  if (data.code === "provider_auth_error" || data.code === "server_not_configured") {
+    return "The analysis service needs owner attention. Contact support.";
+  }
+  if (data.code === "content_blocked") return message;
+  if (data.code === "upload_failed" || data.code === "provider_error") return `${message} Retry with a shorter clip or different file format.`;
+
+  return message;
+}
+
 export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
+  const [analysisError, setAnalysisError] = useState("");
   const [uploadProgress, setUploadProgress] = useState("");
   const [analysisCopied, setAnalysisCopied] = useState(false);
   const [analysisCopyFailed, setAnalysisCopyFailed] = useState(false);
@@ -51,6 +81,7 @@ export default function AnalyzePage() {
     if (!nextFile) return;
     setFile(nextFile);
     setAnalysisResult("");
+    setAnalysisError("");
     setAnalysisCopied(false);
     setAnalysisCopyFailed(false);
   };
@@ -59,6 +90,7 @@ export default function AnalyzePage() {
     if (!file) return;
     setAnalyzing(true);
     setAnalysisResult("");
+    setAnalysisError("");
     setAnalysisCopied(false);
     setAnalysisCopyFailed(false);
     setUploadProgress("Uploading audio...");
@@ -73,12 +105,12 @@ export default function AnalyzePage() {
       });
 
       if (!uploadRes.ok) {
-        const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
-        setAnalysisResult(errData.error || "Failed to upload audio.");
+        const errData = await readJson<ApiErrorBody>(uploadRes) as ApiErrorBody;
+        setAnalysisError(formatApiError(errData, "Failed to upload audio."));
         return;
       }
 
-      const { fileUri, mimeType } = await uploadRes.json();
+      const { fileUri, mimeType } = await uploadRes.json() as { fileUri: string; mimeType: string };
       setUploadProgress("Analyzing sonic DNA...");
 
       const analyzeRes = await fetch("/api/analyze", {
@@ -88,15 +120,20 @@ export default function AnalyzePage() {
       });
 
       if (!analyzeRes.ok) {
-        const errData = await analyzeRes.json().catch(() => ({ error: "Analysis failed" }));
-        setAnalysisResult(errData.error || "Analysis failed.");
+        const errData = await readJson<ApiErrorBody>(analyzeRes) as ApiErrorBody;
+        setAnalysisError(formatApiError(errData, "Analysis failed."));
         return;
       }
 
-      const data = await analyzeRes.json();
-      setAnalysisResult(data.prompt || data.generatedPrompt || data.error || "No result returned.");
+      const data = await analyzeRes.json() as { prompt?: string; generatedPrompt?: string; error?: string };
+      const prompt = data.prompt || data.generatedPrompt;
+      if (!prompt) {
+        setAnalysisError(data.error || "No usable prompt was returned. Try a shorter clip.");
+        return;
+      }
+      setAnalysisResult(prompt);
     } catch {
-      setAnalysisResult("Analysis failed. Check your connection and try again.");
+      setAnalysisError("Analysis failed. Check your connection and try again.");
     } finally {
       setAnalyzing(false);
       setUploadProgress("");
@@ -388,7 +425,8 @@ export default function AnalyzePage() {
 
         .input-panel,
         .guide-panel,
-        .analysis-result {
+        .analysis-result,
+        .analysis-error {
           border: 1px solid var(--line);
           border-radius: 10px;
           background: #0b0c12;
@@ -531,6 +569,28 @@ export default function AnalyzePage() {
         .analysis-result {
           grid-column: 1 / -1;
           padding: 18px;
+        }
+
+        .analysis-error {
+          grid-column: 1 / -1;
+          border-color: rgba(255,77,109,0.32);
+          padding: 18px;
+          background: rgba(255,77,109,0.07);
+        }
+
+        .analysis-error-title {
+          color: var(--red);
+          font-size: 12px;
+          font-weight: 800;
+          text-transform: uppercase;
+          margin-bottom: 8px;
+        }
+
+        .analysis-error p {
+          color: var(--text);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
         }
 
         .analysis-result pre {
@@ -749,6 +809,21 @@ export default function AnalyzePage() {
                 <li>Scarcity framing and loopable intent</li>
               </ul>
             </aside>
+
+            {analysisError && (
+              <section className="analysis-error" aria-live="polite" aria-label="Analysis error">
+                <div className="analysis-error-title">Analysis Failed</div>
+                <p>{analysisError}</p>
+                <button
+                  className="action-button secondary"
+                  onClick={handleAnalyze}
+                  disabled={!file || analyzing}
+                  type="button"
+                >
+                  Try Again
+                </button>
+              </section>
+            )}
 
             {analysisResult && (
               <section className="analysis-result" aria-label="Generated prompt">

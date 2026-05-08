@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
 import { recordAdminAuditEvent } from "@/lib/admin/audit";
+import { apiError } from "@/lib/api/errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,20 +28,20 @@ function generatePassword(): string {
 export async function POST(req: NextRequest) {
   const supabase = getServiceClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Server not configured" }, { status: 500 });
+    return apiError("Server not configured.", { status: 500, code: "server_not_configured" });
   }
 
   const activeUser = await getActiveUser(req);
   if (!activeUser.ok) return activeUserError(activeUser);
   if (!isOwnerEmail(activeUser.user.email)) {
-    return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    return apiError("Owner access required.", { status: 403 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return apiError("Invalid request body.", { status: 400 });
   }
 
   const email = (body.email as string || "").trim().toLowerCase();
@@ -48,10 +49,10 @@ export async function POST(req: NextRequest) {
   const displayName = (body.displayName as string || "").trim();
 
   if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+    return apiError("Valid email required.", { status: 400, code: "invalid_email" });
   }
   if (!TIERS.includes(tier)) {
-    return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+    return apiError("Invalid tier.", { status: 400, code: "invalid_tier" });
   }
 
   const password = generatePassword();
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 400 });
+    return apiError("Unable to create invited user.", { status: 400, code: "invite_create_failed" });
   }
 
   const userId = authData.user.id;
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
+    return apiError("Unable to create user profile.", { status: 500, code: "profile_create_failed" });
   }
 
   const audit = await recordAdminAuditEvent(supabase, {
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
     },
   });
   if (!audit.ok) {
-    return NextResponse.json({ error: "Invite created, but audit logging failed." }, { status: 500 });
+    return apiError("Invite created, but audit logging failed.", { status: 500, code: "audit_write_failed" });
   }
 
   // Return credentials (shown to admin only, never logged)

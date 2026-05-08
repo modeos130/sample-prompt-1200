@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { consumeRateLimit } from "@/lib/rate-limit";
+import { apiError, logApiError, providerError } from "@/lib/api/errors";
 
 export const maxDuration = 30;
 
@@ -105,13 +106,12 @@ export async function POST(req: NextRequest) {
     windowMs: RATE_LIMIT_WINDOW,
   });
   if (!limit.allowed) {
-    return NextResponse.json(
-      {
-        error: limit.error
-          ?? `Rate limit reached. You get ${RATE_LIMIT_CALLS} generations per day. Resets in ~${limit.resetInHours ?? 1}h.`,
-      },
+    return apiError(
+      limit.error
+        ?? `Rate limit reached. You get ${RATE_LIMIT_CALLS} generations per day. Resets in ~${limit.resetInHours ?? 1}h.`,
       {
         status: limit.error ? 503 : 429,
+        code: limit.error ? "rate_limit_unavailable" : "rate_limit_exceeded",
         headers: { "X-RateLimit-Remaining": "0" },
       }
     );
@@ -121,25 +121,25 @@ export async function POST(req: NextRequest) {
     // Body size check
     const contentLength = parseInt(req.headers.get("content-length") ?? "0");
     if (contentLength > 2048) {
-      return NextResponse.json({ error: "Request too large." }, { status: 413 });
+      return apiError("Request too large.", { status: 413 });
     }
 
     const body = await req.json() as { vibe?: string; genre?: string };
     const { vibe, genre } = body;
 
     if (!vibe?.trim()) {
-      return NextResponse.json({ error: "No vibe description provided." }, { status: 400 });
+      return apiError("No vibe description provided.", { status: 400, code: "missing_vibe" });
     }
     if (vibe.length > 500) {
-      return NextResponse.json({ error: "Vibe description too long. Max 500 characters." }, { status: 400 });
+      return apiError("Vibe description too long. Max 500 characters.", { status: 400, code: "vibe_too_long" });
     }
     if (!genre || !GENRE_RULES[genre]) {
-      return NextResponse.json({ error: "Invalid genre." }, { status: 400 });
+      return apiError("Invalid genre.", { status: 400, code: "invalid_genre" });
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "API not configured." }, { status: 500 });
+      return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
     }
 
     const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\nGENRE-SPECIFIC RULES FOR THIS REQUEST:\n${GENRE_RULES[genre]}`;
@@ -169,9 +169,7 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const msg = data.error?.message ?? `Claude API error ${response.status}`;
-      if (response.status === 429) {
-        return NextResponse.json({ error: "Claude API quota exceeded. Try again shortly." }, { status: 503 });
-      }
+      if ([401, 403, 408, 429, 502, 503, 504].includes(response.status)) return providerError("Anthropic", response.status);
       throw new Error(msg);
     }
 
@@ -184,8 +182,7 @@ export async function POST(req: NextRequest) {
     );
 
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    console.error("[vibe-prompt]", msg);
-    return NextResponse.json({ error: "An error occurred generating your prompt." }, { status: 500 });
+    logApiError("[vibe-prompt]", err);
+    return apiError("An error occurred generating your prompt.", { status: 500, code: "prompt_generation_failed" });
   }
 }

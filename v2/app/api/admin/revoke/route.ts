@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
 import { recordAdminAuditEvent } from "@/lib/admin/audit";
+import { apiError } from "@/lib/api/errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,32 +17,32 @@ function getServiceClient() {
 export async function POST(req: NextRequest) {
   const supabase = getServiceClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Server not configured" }, { status: 500 });
+    return apiError("Server not configured.", { status: 500, code: "server_not_configured" });
   }
 
   const activeUser = await getActiveUser(req);
   if (!activeUser.ok) return activeUserError(activeUser);
   if (!isOwnerEmail(activeUser.user.email)) {
-    return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    return apiError("Owner access required.", { status: 403 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return apiError("Invalid request body.", { status: 400 });
   }
 
   const userId = body.userId as string;
   const action = body.action as string; // "revoke" or "restore"
 
   if (!userId) {
-    return NextResponse.json({ error: "userId required" }, { status: 400 });
+    return apiError("userId required.", { status: 400, code: "missing_user_id" });
   }
 
   // Prevent revoking your own access
   if (userId === activeUser.user.id) {
-    return NextResponse.json({ error: "Cannot revoke your own access" }, { status: 400 });
+    return apiError("Cannot revoke your own access.", { status: 400, code: "self_revoke_blocked" });
   }
 
   const { data: targetProfile } = await supabase
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
       .update({ active: false })
       .eq("id", userId);
     if (profileErr) {
-      return NextResponse.json({ error: profileErr.message }, { status: 500 });
+      return apiError("Unable to update user profile.", { status: 500, code: "profile_update_failed" });
     }
 
     // Ban the user in Supabase Auth (prevents login)
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
       ban_duration: "876000h", // ~100 years
     });
     if (banErr) {
-      return NextResponse.json({ error: banErr.message }, { status: 500 });
+      return apiError("Unable to revoke Supabase Auth access.", { status: 500, code: "auth_revoke_failed" });
     }
 
     const audit = await recordAdminAuditEvent(supabase, {
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
       },
     });
     if (!audit.ok) {
-      return NextResponse.json({ error: "User revoked, but audit logging failed." }, { status: 500 });
+      return apiError("User revoked, but audit logging failed.", { status: 500, code: "audit_write_failed" });
     }
 
     return NextResponse.json({ ok: true, action: "revoked", userId });
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
       .update({ active: true })
       .eq("id", userId);
     if (profileErr) {
-      return NextResponse.json({ error: profileErr.message }, { status: 500 });
+      return apiError("Unable to update user profile.", { status: 500, code: "profile_update_failed" });
     }
 
     // Unban the user
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
       ban_duration: "none",
     });
     if (unbanErr) {
-      return NextResponse.json({ error: unbanErr.message }, { status: 500 });
+      return apiError("Unable to restore Supabase Auth access.", { status: 500, code: "auth_restore_failed" });
     }
 
     const audit = await recordAdminAuditEvent(supabase, {
@@ -114,11 +115,11 @@ export async function POST(req: NextRequest) {
       },
     });
     if (!audit.ok) {
-      return NextResponse.json({ error: "User restored, but audit logging failed." }, { status: 500 });
+      return apiError("User restored, but audit logging failed.", { status: 500, code: "audit_write_failed" });
     }
 
     return NextResponse.json({ ok: true, action: "restored", userId });
   }
 
-  return NextResponse.json({ error: "action must be 'revoke' or 'restore'" }, { status: 400 });
+  return apiError("action must be 'revoke' or 'restore'.", { status: 400, code: "invalid_admin_action" });
 }

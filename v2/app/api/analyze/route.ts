@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { consumeRateLimit } from "@/lib/rate-limit";
+import { apiError, logApiError, providerError } from "@/lib/api/errors";
 import { BOOM_BAP_ANALYSIS_PROMPT, buildBoomBapPrompt } from "@/lib/genres/boom-bap";
 import { HOUSE_ANALYSIS_PROMPT, buildHousePrompt } from "@/lib/genres/house";
 import { TRAP_ANALYSIS_PROMPT, buildTrapPrompt } from "@/lib/genres/trap";
@@ -198,12 +199,13 @@ export async function POST(req: NextRequest) {
     windowMs: ANALYZE_RATE_WINDOW,
   });
   if (!limit.allowed) {
-    return NextResponse.json(
+    return apiError(
+      limit.error
+        ?? `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day. Resets in ~${limit.resetInHours ?? 1}h.`,
       {
-        error: limit.error
-          ?? `Rate limit reached. You get ${ANALYZE_RATE_LIMIT} analyses per day. Resets in ~${limit.resetInHours ?? 1}h.`,
-      },
-      { status: limit.error ? 503 : 429 }
+        status: limit.error ? 503 : 429,
+        code: limit.error ? "rate_limit_unavailable" : "rate_limit_exceeded",
+      }
     );
   }
 
@@ -224,7 +226,7 @@ export async function POST(req: NextRequest) {
       genre = body.genre as string | null;
 
       if (!fileUri) {
-        return NextResponse.json({ error: "fileUri required" }, { status: 400 });
+        return apiError("fileUri required.", { status: 400, code: "missing_file_uri" });
       }
       audioPart = { file_data: { mime_type: mimeType, file_uri: fileUri } };
     } else {
@@ -234,14 +236,14 @@ export async function POST(req: NextRequest) {
       genre = formData.get("genre") as string | null;
 
       if (!file) {
-        return NextResponse.json({ error: "Audio file required" }, { status: 400 });
+        return apiError("Audio file required.", { status: 400, code: "missing_file" });
       }
 
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
       if (buffer.byteLength / 1_048_576 > MAX_FILE_MB) {
-        return NextResponse.json({ error: `File too large. Max ${MAX_FILE_MB} MB.` }, { status: 413 });
+        return apiError(`File too large. Max ${MAX_FILE_MB} MB.`, { status: 413 });
       }
 
       mimeType = getMimeType(file.name);
@@ -250,7 +252,7 @@ export async function POST(req: NextRequest) {
     }
 
     const apiKey = process.env.GEMINI_KEY;
-    if (!apiKey) return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
+    if (!apiKey) return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
 
     // Genre-free DNA analysis (used by /prompts page)
     if (!genre || !VALID_GENRES.includes(genre as Genre)) {
@@ -296,19 +298,25 @@ Analyze this audio and output the prompt now.`;
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("[analyze]", msg);
+    logApiError("[analyze]", err);
 
     let userMessage = "An error occurred processing your request.";
+    let status = 500;
+    let code = "analysis_failed";
     if (msg.includes("[429]") || msg.includes("RESOURCE_EXHAUSTED")) {
-      userMessage = "API quota exceeded. Try again later.";
+      return providerError("Gemini", 429);
     } else if (msg.includes("[403]") || msg.includes("API_KEY_INVALID")) {
       userMessage = "Service configuration error. Contact support.";
+      code = "provider_auth_error";
     } else if (msg.includes("[413]") || msg.includes("Request payload size")) {
       userMessage = `File too large. Keep clips under ${MAX_FILE_MB} MB.`;
+      status = 413;
     } else if (msg.includes("safety filters")) {
       userMessage = "Content was blocked by safety filters. Try different audio.";
+      status = 422;
+      code = "content_blocked";
     }
 
-    return NextResponse.json({ error: userMessage }, { status: 500 });
+    return apiError(userMessage, { status, code });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser, isOwnerEmail } from "@/lib/auth/active-user";
 import { recordAdminAuditEvent, type AdminAuditAction } from "@/lib/admin/audit";
+import { apiError } from "@/lib/api/errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ async function requireOwner(req: NextRequest) {
   if (!isOwnerEmail(activeUser.user.email)) {
     return {
       ok: false as const,
-      response: NextResponse.json({ error: "Owner access required" }, { status: 403 }),
+      response: apiError("Owner access required.", { status: 403 }),
     };
   }
   return { ok: true as const, activeUser: activeUser.user };
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
 
   const supabase = getServiceClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Server not configured" }, { status: 500 });
+    return apiError("Server not configured.", { status: 500, code: "server_not_configured" });
   }
 
   const { data, error } = await supabase
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: "Unable to load users" }, { status: 500 });
+    return apiError("Unable to load users.", { status: 500, code: "users_load_failed" });
   }
 
   return NextResponse.json({ users: data ?? [] });
@@ -54,39 +55,39 @@ export async function PATCH(req: NextRequest) {
 
   const supabase = getServiceClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Server not configured" }, { status: 500 });
+    return apiError("Server not configured.", { status: 500, code: "server_not_configured" });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return apiError("Invalid request body.", { status: 400 });
   }
 
   const userId = typeof body.userId === "string" ? body.userId : "";
   const updates: { tier?: string; active?: boolean } = {};
 
   if (!userId) {
-    return NextResponse.json({ error: "userId required" }, { status: 400 });
+    return apiError("userId required.", { status: 400, code: "missing_user_id" });
   }
 
   if (typeof body.tier === "string") {
     if (!TIERS.includes(body.tier)) {
-      return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+      return apiError("Invalid tier.", { status: 400, code: "invalid_tier" });
     }
     updates.tier = body.tier;
   }
 
   if (typeof body.active === "boolean") {
     if (userId === owner.activeUser.id && body.active === false) {
-      return NextResponse.json({ error: "Cannot deactivate your own account" }, { status: 400 });
+      return apiError("Cannot deactivate your own account.", { status: 400, code: "self_deactivate_blocked" });
     }
     updates.active = body.active;
   }
 
   if (!Object.keys(updates).length) {
-    return NextResponse.json({ error: "No valid updates supplied" }, { status: 400 });
+    return apiError("No valid updates supplied.", { status: 400, code: "empty_update" });
   }
 
   const { data: previous, error: previousError } = await supabase
@@ -96,7 +97,7 @@ export async function PATCH(req: NextRequest) {
     .single();
 
   if (previousError) {
-    return NextResponse.json({ error: "Unable to load user before update" }, { status: 500 });
+    return apiError("Unable to load user before update.", { status: 500, code: "user_load_failed" });
   }
 
   const { data, error } = await supabase
@@ -107,7 +108,7 @@ export async function PATCH(req: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: "Unable to update user" }, { status: 500 });
+    return apiError("Unable to update user.", { status: 500, code: "user_update_failed" });
   }
 
   let action: AdminAuditAction = "user_updated";
@@ -132,7 +133,7 @@ export async function PATCH(req: NextRequest) {
     },
   });
   if (!audit.ok) {
-    return NextResponse.json({ error: "User updated, but audit logging failed." }, { status: 500 });
+    return apiError("User updated, but audit logging failed.", { status: 500, code: "audit_write_failed" });
   }
 
   return NextResponse.json({ user: data });

@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { apiError } from "@/lib/api/errors";
 
 export interface ActiveUser {
   id: string;
@@ -66,6 +66,5 @@ export async function getActiveUser(req: NextRequest): Promise<ActiveUserResult>
 }
 
 export function activeUserError(result: Exclude<ActiveUserResult, { ok: true }>) {
-  return NextResponse.json({ error: result.error }, { status: result.status });
+  return apiError(result.error, { status: result.status });
 }
-

@@ -66,7 +66,22 @@ async function checkApi({ path, method, body }) {
   if (res.status !== 401) {
     failures.push(`${method} ${path} expected 401 for anonymous request, got ${res.status}`);
   }
-  console.log(`${method} ${path}: status=${res.status}`);
+
+  const text = await res.text();
+  let json = null;
+  if (text) {
+    try {
+      json = JSON.parse(text);
+    } catch {
+      failures.push(`${method} ${path} returned non-JSON API error body.`);
+    }
+  }
+
+  if (!json || json.ok !== false || typeof json.error !== "string" || typeof json.code !== "string") {
+    failures.push(`${method} ${path} missing standardized API error shape.`);
+  }
+
+  console.log(`${method} ${path}: status=${res.status} code=${json?.code || "n/a"}`);
 }
 
 console.log(`Verifying anonymous route gate at ${baseUrl}`);

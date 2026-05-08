@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ALL_PROMPTS } from "@/lib/prompts";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { consumeRateLimit } from "@/lib/rate-limit";
+import { apiError, logApiError, providerError } from "@/lib/api/errors";
 
 export const maxDuration = 120; // Music generation is slow
 
@@ -131,13 +132,12 @@ export async function POST(req: NextRequest) {
     bypass: activeUser.user.tier === "super_user" || activeUser.user.tier === "vip",
   });
   if (!limit.allowed) {
-    return NextResponse.json(
-      {
-        error: limit.error
-          ?? `You've used all ${tierLimit} generations today. Upgrade to VIP for unlimited generations. Resets in ~${limit.resetInHours ?? 1}h.`,
-      },
+    return apiError(
+      limit.error
+        ?? `You've used all ${tierLimit} generations today. Upgrade to VIP for unlimited generations. Resets in ~${limit.resetInHours ?? 1}h.`,
       {
         status: limit.error ? 503 : 429,
+        code: limit.error ? "rate_limit_unavailable" : "rate_limit_exceeded",
         headers: { "X-RateLimit-Remaining": "0" },
       }
     );
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
     // Body size check
     const contentLength = parseInt(req.headers.get("content-length") ?? "0");
     if (contentLength > 2048) {
-      return NextResponse.json({ error: "Request too large." }, { status: 413 });
+      return apiError("Request too large.", { status: 413 });
     }
 
     const body = await req.json() as GenerateMusicRequest;
@@ -155,13 +155,13 @@ export async function POST(req: NextRequest) {
 
     // Validate model
     if (model !== "clip" && model !== "pro") {
-      return NextResponse.json({ error: "Invalid model. Use 'clip' or 'pro'." }, { status: 400 });
+      return apiError("Invalid model. Use 'clip' or 'pro'.", { status: 400, code: "invalid_model" });
     }
 
     // Check Gemini key
     const apiKey = process.env.GEMINI_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "API not configured." }, { status: 500 });
+      return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
     }
 
     let promptText: string;
@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
     if (promptId) {
       const entry = PROVEN_PROMPTS[promptId];
       if (!entry) {
-        return NextResponse.json({ error: "Unknown sound." }, { status: 400 });
+        return apiError("Unknown sound.", { status: 400, code: "unknown_sound" });
       }
       promptText = entry.prompt;
       soundName = entry.name;
@@ -179,19 +179,19 @@ export async function POST(req: NextRequest) {
     // ─── PATH B: Create from vibe + genre ──────────────────────────────────
     } else {
       if (!vibe?.trim()) {
-        return NextResponse.json({ error: "Please describe the sound you want." }, { status: 400 });
+        return apiError("Please describe the sound you want.", { status: 400, code: "missing_vibe" });
       }
       if (vibe.length > 500) {
-        return NextResponse.json({ error: "Description too long. Max 500 characters." }, { status: 400 });
+        return apiError("Description too long. Max 500 characters.", { status: 400, code: "vibe_too_long" });
       }
       if (!genre || !GENRE_RULES[genre]) {
-        return NextResponse.json({ error: "Invalid genre." }, { status: 400 });
+        return apiError("Invalid genre.", { status: 400, code: "invalid_genre" });
       }
 
       // Call Claude Haiku to build the prompt (same pattern as vibe-prompt route)
       const anthropicKey = process.env.ANTHROPIC_API_KEY;
       if (!anthropicKey) {
-        return NextResponse.json({ error: "API not configured." }, { status: 500 });
+        return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
       }
 
       const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\nGENRE-SPECIFIC RULES FOR THIS REQUEST:\n${GENRE_RULES[genre]}`;
@@ -218,9 +218,7 @@ export async function POST(req: NextRequest) {
 
       if (!claudeResponse.ok) {
         const msg = claudeData.error?.message ?? `Claude API error ${claudeResponse.status}`;
-        if (claudeResponse.status === 429) {
-          return NextResponse.json({ error: "Claude API quota exceeded. Try again shortly." }, { status: 503 });
-        }
+        if ([401, 403, 408, 429, 502, 503, 504].includes(claudeResponse.status)) return providerError("Anthropic", claudeResponse.status);
         throw new Error(msg);
       }
 
@@ -249,12 +247,7 @@ export async function POST(req: NextRequest) {
     // Handle API-level errors
     if (!lyriaResponse.ok) {
       const msg = data.error?.message ?? `Lyria API error ${lyriaResponse.status}`;
-      if (lyriaResponse.status === 429) {
-        return NextResponse.json({ error: "Music generation quota exceeded. Try again later." }, { status: 429 });
-      }
-      if (lyriaResponse.status === 504 || lyriaResponse.status === 408) {
-        return NextResponse.json({ error: "Generation took too long. Try the 30-second preview mode." }, { status: 504 });
-      }
+      if ([401, 403, 408, 429, 502, 503, 504].includes(lyriaResponse.status)) return providerError("Lyria", lyriaResponse.status);
       throw new Error(msg);
     }
 
@@ -265,15 +258,15 @@ export async function POST(req: NextRequest) {
       const blocked = candidate?.finishReason === "SAFETY"
         || candidate?.safetyRatings?.some(r => r.probability === "HIGH");
       if (blocked) {
-        return NextResponse.json(
-          { error: "This description was blocked by content filters. Try a different vibe." },
-          { status: 422 }
-        );
+        return apiError("This description was blocked by content filters. Try a different vibe.", {
+          status: 422,
+          code: "content_blocked",
+        });
       }
-      return NextResponse.json(
-        { error: "No audio was generated. Try a different description." },
-        { status: 422 }
-      );
+      return apiError("No audio was generated. Try a different description.", {
+        status: 422,
+        code: "empty_generation",
+      });
     }
 
     // Extract audio from response parts
@@ -288,10 +281,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!audioData) {
-      return NextResponse.json(
-        { error: "No audio data in response. The model may have returned text only." },
-        { status: 422 }
-      );
+      return apiError("No audio data in response. The model may have returned text only.", {
+        status: 422,
+        code: "missing_audio",
+      });
     }
 
     // ─── RETURN (never include prompt text) ────────────────────────────────
@@ -313,13 +306,10 @@ export async function POST(req: NextRequest) {
 
     // Detect timeout errors from fetch
     if (msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("aborted")) {
-      return NextResponse.json(
-        { error: "Generation took too long. Try the 30-second preview mode." },
-        { status: 504 }
-      );
+      return apiError("Generation took too long. Try the 30-second preview mode.", { status: 504 });
     }
 
-    console.error("[generate-music]", msg);
-    return NextResponse.json({ error: "An error occurred generating music." }, { status: 500 });
+    logApiError("[generate-music]", err);
+    return apiError("An error occurred generating music.", { status: 500, code: "music_generation_failed" });
   }
 }

@@ -171,8 +171,8 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 ### Task 5.1: Standardize API Error Responses
 
 - Why it matters: Users should see safe messages; logs should contain enough detail for debugging without leaking secrets.
-- File paths involved: all `app/api/*/route.ts`.
-- Exact implementation steps: introduce shared error helpers and provider-error mapping.
+- File paths involved: all `app/api/*/route.ts`, `lib/api/errors.ts`, `lib/auth/active-user.ts`, `scripts/verify-routes.mjs`.
+- Exact implementation steps: shared `apiError` and provider mapping added; API failures keep the `error` string and now include `ok:false` plus a stable `code`; route verifier now fails if protected API errors do not use the standard shape.
 - Risk level: Medium.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: force missing env/provider errors.
@@ -182,7 +182,7 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: AI providers fail or hit quota; the UI needs clear recovery paths.
 - File paths involved: `public/studio.html`, `public/create.html`, `app/analyze/page.tsx`.
-- Exact implementation steps: improve retry/copy/error states.
+- Exact implementation steps: generation pages now map provider/rate/auth/content error codes to clearer retry/contact guidance; sample analysis now shows failures in a dedicated retryable error panel instead of the copyable prompt result.
 - Risk level: Medium.
 - Whether Codex can do it now: Yes after Phase 1.
 - How I test it: simulate 429/500 responses.

@@ -732,11 +732,11 @@ async function generateMusic(payload) {
       signal: abortController.signal
     });
 
-    const data = await res.json();
+    const data = await readJson(res);
     stopTimer();
 
     if (!res.ok) {
-      showError(data.error || 'Something went wrong');
+      showError(formatApiError(data, 'Generation failed. Try again shortly.'));
       return;
     }
     if (!data.audio) {
@@ -752,6 +752,28 @@ async function generateMusic(payload) {
     }
     showError('Network error. Please check your connection.');
   }
+}
+
+async function readJson(res) {
+  try {
+    return await res.json();
+  } catch (err) {
+    return { error: 'The server returned an unreadable response.', code: 'invalid_response' };
+  }
+}
+
+function formatApiError(data, fallback) {
+  const code = data && data.code;
+  const message = data && data.error ? data.error : fallback;
+
+  if (code === 'authentication_required') return 'Your session expired. Sign in again, then retry.';
+  if (code === 'rate_limit_exceeded') return message;
+  if (code === 'provider_quota_exceeded') return message + ' This is a provider quota issue, not your prompt.';
+  if (code === 'provider_timeout') return message + ' The 30-second preview mode is the safest retry.';
+  if (code === 'provider_auth_error' || code === 'server_not_configured') return 'The generation service needs owner attention. Contact support.';
+  if (code === 'content_blocked') return message;
+  if (code === 'empty_generation' || code === 'missing_audio') return message + ' Revise the vibe or switch model length.';
+  return message;
 }
 
 function cancelGeneration() {

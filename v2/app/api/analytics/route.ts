@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
+import { apiError } from "@/lib/api/errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = getServiceClient();
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: "Not configured" }, { status: 500 });
+    return apiError("Server not configured.", { status: 500, code: "server_not_configured" });
   }
 
   // Extract country from headers (Vercel sets x-vercel-ip-country)
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error("Analytics insert error:", error.message);
-    return NextResponse.json({ ok: false }, { status: 500 });
+    return apiError("Unable to record analytics event.", { status: 500, code: "analytics_write_failed" });
   }
 
   return NextResponse.json({ ok: true });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
+import { apiError, logApiError, providerError } from "@/lib/api/errors";
 
 export const runtime = "edge";
 export const maxDuration = 60;
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.GEMINI_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "GEMINI_KEY not configured" }, { status: 500 });
+    return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
   }
 
   try {
@@ -45,33 +46,31 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return apiError("No file provided.", { status: 400, code: "missing_file" });
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
     const mimeType = MIME_MAP[ext];
     if (!mimeType) {
-      return NextResponse.json(
-        { error: `Unsupported audio type. Use: ${Object.keys(MIME_MAP).join(", ")}` },
-        { status: 400 }
-      );
+      return apiError(`Unsupported audio type. Use: ${Object.keys(MIME_MAP).join(", ")}.`, {
+        status: 400,
+        code: "unsupported_audio_type",
+      });
     }
 
     const limitBytes = maxUploadBytes();
     if (file.size > limitBytes) {
-      return NextResponse.json(
-        { error: `Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.` },
-        { status: 413 }
-      );
+      return apiError(`Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.`, {
+        status: 413,
+      });
     }
 
     const bytes = await file.arrayBuffer();
     const numBytes = bytes.byteLength;
     if (numBytes > limitBytes) {
-      return NextResponse.json(
-        { error: `Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.` },
-        { status: 413 }
-      );
+      return apiError(`Audio file is too large. Maximum upload is ${Math.round(limitBytes / 1024 / 1024)}MB.`, {
+        status: 413,
+      });
     }
 
     // Step 1: Start resumable upload
@@ -95,12 +94,12 @@ export async function POST(req: NextRequest) {
     if (!startRes.ok) {
       const errText = await startRes.text();
       console.error("[upload-audio] start failed:", startRes.status, errText.slice(0, 200));
-      return NextResponse.json({ error: "Failed to start upload to Gemini" }, { status: 502 });
+      return providerError("Gemini", startRes.status, "Unable to start audio upload. Try again shortly.");
     }
 
     const uploadUrl = startRes.headers.get("X-Goog-Upload-URL");
     if (!uploadUrl) {
-      return NextResponse.json({ error: "No upload URL returned from Gemini" }, { status: 502 });
+      return apiError("Unable to start audio upload. Try again shortly.", { status: 502, code: "provider_missing_upload_url" });
     }
 
     // Step 2: Upload the file bytes
@@ -117,7 +116,7 @@ export async function POST(req: NextRequest) {
     if (!uploadRes.ok) {
       const errText = await uploadRes.text();
       console.error("[upload-audio] upload failed:", uploadRes.status, errText.slice(0, 200));
-      return NextResponse.json({ error: "Failed to upload file to Gemini" }, { status: 502 });
+      return providerError("Gemini", uploadRes.status, "Unable to upload audio. Try again shortly.");
     }
 
     const uploadData = await uploadRes.json();
@@ -126,7 +125,10 @@ export async function POST(req: NextRequest) {
 
     if (!fileUri) {
       console.error("[upload-audio] no URI in response:", JSON.stringify(uploadData).slice(0, 300));
-      return NextResponse.json({ error: "No file URI returned" }, { status: 502 });
+      return apiError("Audio upload completed without a usable file reference. Try again.", {
+        status: 502,
+        code: "provider_missing_file_uri",
+      });
     }
 
     // Step 3: Poll until file is ACTIVE (processing can take a few seconds)
@@ -145,16 +147,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (state !== "ACTIVE") {
-      return NextResponse.json(
-        { error: "File processing timed out. Try a smaller file." },
-        { status: 504 }
-      );
+      return apiError("File processing timed out. Try a smaller file.", { status: 504 });
     }
 
     return NextResponse.json({ fileUri, mimeType, fileName });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[upload-audio]", msg);
-    return NextResponse.json({ error: "Upload failed: " + msg }, { status: 500 });
+    logApiError("[upload-audio]", err);
+    return apiError("Upload failed. Try again shortly.", { status: 500, code: "upload_failed" });
   }
 }
