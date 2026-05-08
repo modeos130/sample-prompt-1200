@@ -3,6 +3,10 @@ const baseUrl = (process.env.ROUTE_BASE_URL || "http://localhost:3029").replace(
 const pageChecks = [
   { path: "/login", expect: "public" },
   { path: "/vibe-to-prompt.html", expect: "public" },
+  { path: "/terms", expect: "public" },
+  { path: "/privacy", expect: "public" },
+  { path: "/acceptable-use", expect: "public" },
+  { path: "/copyright", expect: "public" },
   { path: "/robots.txt", expect: "public" },
   { path: "/vibe-to-prompt-dev.html", expect: "login-redirect" },
   { path: "/home", expect: "login-redirect" },

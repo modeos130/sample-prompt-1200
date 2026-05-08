@@ -1,6 +1,6 @@
 # BOOMAN LAB Completion Punch List
 
-Date: 2026-05-06
+Date: 2026-05-08
 
 ## Must Fix Before Beta
 
@@ -16,7 +16,7 @@ Date: 2026-05-06
 
 | Priority | File / area | Task | Difficulty | Business impact | Technical risk | Estimate | Acceptance criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P0 | Legal pages | Terms, Privacy, Copyright/DMCA, Acceptable Use, AI/audio disclaimer | Medium | Reduces legal exposure | High | 0.5-2 days plus legal review | Pages exist and are linked |
+| P0 | Legal pages | Owner/counsel review of draft Terms, Privacy, Copyright, Acceptable Use, and AI/audio disclaimer | Low | Reduces legal exposure | High | 0.5-2 days plus legal review | Draft pages are approved or revised before public launch |
 | P0 | Security | No high/critical dependency advisories | Medium | Reduces known exploit exposure | Medium | Depends on Next release | `npm audit` has no high/critical findings |
 | P1 | Monitoring | Add error tracking and uptime checks | Medium | Faster incident response | Medium | 0.5 day | Owner gets alerts on API/page failures |
 | P1 | CI/CD | Add GitHub Actions or Vercel checks for lint/build/audit/tests | Medium | Prevents broken deploys | Medium | 0.5 day | PR checks block failed builds |

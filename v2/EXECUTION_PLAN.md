@@ -215,12 +215,12 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 ### Task 7.1: Add Public Legal Pages
 
 - Why it matters: Public launch requires clear terms around privacy, uploads, AI output, and copyrights.
-- File paths involved: `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/acceptable-use/page.tsx`, `app/copyright/page.tsx`.
-- Exact implementation steps: draft founder-friendly pages, add footer links, review with counsel.
+- File paths involved: `app/legal/LegalPage.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/acceptable-use/page.tsx`, `app/copyright/page.tsx`, `lib/supabase/middleware.ts`, `app/login/LoginInner.tsx`, `public/vibe-to-prompt.html`.
+- Exact implementation steps: draft founder-friendly pages, add footer links, expose the legal routes through middleware, and keep owner/counsel review as the remaining legal approval gate.
 - Risk level: High for public launch.
-- Whether Codex can do it now: Draft yes; legal approval requires owner/counsel.
-- How I test it: route/page review.
-- Acceptance criteria: pages exist and are linked from public/login surfaces.
+- Whether Codex can do it now: Draft pages and route/test coverage completed; legal approval still requires owner/counsel.
+- How I test it: route/page review, `npm run test:e2e`, `npm run test:a11y`, `npm run verify:security`.
+- Acceptance criteria: pages exist, are public without exposing private app routes, are linked from public/login surfaces, and pass automated route/accessibility checks.
 
 ## Phase 8: Performance/SEO
 

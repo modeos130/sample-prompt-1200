@@ -304,6 +304,42 @@ body {
 .signal-bars span:nth-child(5n) { animation-duration: 980ms; animation-delay: -460ms; }
 .signal-bars span:nth-child(7n) { animation-duration: 1280ms; animation-delay: -620ms; }
 
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: #09090e;
+  color: #8e90a8;
+  padding: 18px clamp(16px, 5vw, 44px);
+  font-size: 12px;
+}
+
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.legal-links a {
+  color: #c4b8a6;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.legal-links a:hover,
+.legal-links a:focus-visible {
+  color: #fff8ed;
+  outline: 2px solid rgba(255, 184, 92, 0.5);
+  outline-offset: 5px;
+}
+
 @keyframes eqPulse {
   0%, 100% { transform: scaleY(0.38); filter: saturate(0.92); }
   36% { transform: scaleY(1); filter: saturate(1.16); }
@@ -436,6 +472,16 @@ body {
     </div>
   </div>
 </section>
+
+<footer class="site-footer">
+  <span>Private invite-only beta. Draft policies pending owner review.</span>
+  <nav class="legal-links" aria-label="Legal links">
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/acceptable-use">Acceptable Use</a>
+    <a href="/copyright">Copyright</a>
+  </nav>
+</footer>
 
 </body>
 </html>

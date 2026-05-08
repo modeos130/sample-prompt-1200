@@ -1,6 +1,6 @@
 # BOOMAN LAB Launch Checklist
 
-Date: 2026-05-06
+Date: 2026-05-08
 
 ## Before Private Beta
 
@@ -22,16 +22,17 @@ Date: 2026-05-06
 
 ## Before Public Launch
 
-- [ ] Add Terms of Service.
-- [ ] Add Privacy Policy.
+- [x] Add draft Terms of Service.
+- [x] Add draft Privacy Policy.
 - [ ] Add Cookie Policy if analytics/cookies beyond auth are used.
-- [ ] Add AI music/audio usage disclaimer.
-- [ ] Add copyright/DMCA contact language.
-- [ ] Add acceptable use rules for uploaded audio.
-- [ ] Add contact/support page or support email.
-- [ ] Add automated Playwright route/auth tests.
-- [ ] Add Supabase RLS regression tests.
-- [ ] Move rate limits from memory to Supabase or Redis.
+- [x] Add AI music/audio usage disclaimer.
+- [x] Add copyright/DMCA contact language.
+- [x] Add acceptable use rules for uploaded audio.
+- [x] Add contact/support email.
+- [x] Add automated Playwright route/auth tests.
+- [x] Add Supabase RLS regression tests.
+- [x] Move rate limits from memory to Supabase or Redis.
+- [ ] Owner/counsel review of draft legal pages.
 - [ ] Add monitoring/error tracking.
 - [ ] Add uptime monitoring.
 - [ ] Add structured server logs without secrets.

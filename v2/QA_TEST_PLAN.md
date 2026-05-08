@@ -12,8 +12,8 @@ Validated during phased hardening:
 - `npm run build` passes.
 - Build output includes all expected Next app routes.
 - `npm run verify:security` passes RLS, persistent rate-limit, admin-audit, route-gate, and protected API error-shape checks.
-- `npm run test:e2e` passes public/login UI, anonymous route gates, and protected API auth tests.
-- `npm run test:a11y` passes axe checks for the public entry page, login page, and protected-route login redirect.
+- `npm run test:e2e` passes public/login/legal UI, anonymous route gates, and protected API auth tests.
+- `npm run test:a11y` passes axe checks for the public entry page, login page, public legal pages, and protected-route login redirect.
 
 Not validated end-to-end in this audit:
 
@@ -52,7 +52,7 @@ Not validated end-to-end in this audit:
 | Mobile layout | 375px, 768px, desktop | Visual/manual | No overlapping text, no broken CTAs |
 | Provider failure | Gemini/Claude failures | Integration/manual | Friendly errors, no secret leakage |
 | Dependency audit | npm audit | Security | No high/critical advisories |
-| Legal pages | Terms/privacy/license/contact | Manual | Public pages exist and are linked where required |
+| Legal pages | Terms/privacy/acceptable use/copyright | Automated + manual legal review | Public pages exist, are linked, and pass accessibility smoke checks |
 | Rollback | Vercel rollback | DevOps drill | Known prior deploy can be restored quickly |
 
 ## Automated Test Commands

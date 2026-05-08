@@ -2,6 +2,7 @@ import { expect, Page, test } from "@playwright/test";
 import axe from "axe-core";
 
 const axeSource = axe.source;
+const legalPaths = ["/terms", "/privacy", "/acceptable-use", "/copyright"];
 
 type AxeViolation = {
   id: string;
@@ -53,6 +54,14 @@ test.describe("accessibility", () => {
     await expect(page.getByLabel(/password/i)).toBeVisible();
     await expectNoSeriousAxeViolations(page);
   });
+
+  for (const path of legalPaths) {
+    test(`${path} has no serious or critical axe violations`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByText(/draft owner review required/i)).toBeVisible();
+      await expectNoSeriousAxeViolations(page);
+    });
+  }
 
   test("protected pages redirect to an accessible login surface", async ({ page }) => {
     await page.goto("/studio.html");

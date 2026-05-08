@@ -79,7 +79,19 @@ export default function LoginInner() {
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#8e90a8" }}>Invite only — no signup</p>
+        <p style={{ textAlign: "center", marginTop: 20, fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#8e90a8" }}>Invite only - no signup</p>
+        <nav aria-label="Legal links" style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "10px 14px", marginTop: 14 }}>
+          {[
+            { href: "/terms", label: "Terms" },
+            { href: "/privacy", label: "Privacy" },
+            { href: "/acceptable-use", label: "Acceptable Use" },
+            { href: "/copyright", label: "Copyright" },
+          ].map((link) => (
+            <a key={link.href} href={link.href} style={{ color: "#c4b8a6", fontFamily: "'Space Grotesk',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 1.1, textDecoration: "none", textTransform: "uppercase" }}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
       </div>
     </div>
   );

@@ -23,6 +23,13 @@ const protectedApis = [
   { path: "/api/vibe-prompt", method: "POST", data: {} },
 ];
 
+const legalPages = [
+  { path: "/terms", heading: /terms/i },
+  { path: "/privacy", heading: /privacy/i },
+  { path: "/acceptable-use", heading: /acceptable use/i },
+  { path: "/copyright", heading: /copyright/i },
+];
+
 test.describe("anonymous route gates", () => {
   test("public entry and login pages render", async ({ page }) => {
     await page.goto("/");
@@ -34,7 +41,17 @@ test.describe("anonymous route gates", () => {
     await expect(page.getByRole("heading", { name: /booman lab/i })).toBeVisible();
     await expect(page.getByLabel(/email/i)).toBeVisible();
     await expect(page.getByLabel(/password/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: /terms/i })).toHaveAttribute("href", "/terms");
   });
+
+  for (const legalPage of legalPages) {
+    test(`${legalPage.path} renders as a public legal page`, async ({ page }) => {
+      await page.goto(legalPage.path);
+      await expect(page.getByRole("heading", { name: legalPage.heading })).toBeVisible();
+      await expect(page.getByText(/draft owner review required/i)).toBeVisible();
+      await expect(page.getByRole("link", { name: /sign in/i })).toHaveAttribute("href", "/login");
+    });
+  }
 
   for (const path of protectedPages) {
     test(`${path} redirects anonymous users to login`, async ({ request }) => {

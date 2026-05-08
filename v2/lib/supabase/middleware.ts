@@ -10,6 +10,10 @@ export async function updateSession(request: NextRequest) {
     pathname === "/" ||
     pathname === "/login" ||
     pathname === "/vibe-to-prompt.html" ||
+    pathname === "/terms" ||
+    pathname === "/privacy" ||
+    pathname === "/acceptable-use" ||
+    pathname === "/copyright" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon") ||

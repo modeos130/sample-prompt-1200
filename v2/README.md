@@ -18,6 +18,10 @@ Private AI music production studio for sample-minded producers. The app combines
 | `/` | Redirects public visitors to `/vibe-to-prompt.html` | Public |
 | `/vibe-to-prompt.html` | Branded coming-soon/private-beta page | Public |
 | `/login` | Invite-only login | Public |
+| `/terms` | Draft terms for private beta use | Public |
+| `/privacy` | Draft privacy policy for account, upload, and AI request data | Public |
+| `/acceptable-use` | Draft usage rules for uploads and AI music tools | Public |
+| `/copyright` | Draft copyright and takedown guidance | Public |
 | `/home` | Private tool hub | Active invited user |
 | `/studio.html` | Sound Studio generation UI | Active invited user |
 | `/prompts` | Prompt Library | Active invited user |
@@ -101,7 +105,7 @@ Production deployment should only happen after:
 3. Supabase RLS policies are verified.
 4. Protected routes redirect unauthenticated visitors to `/login`.
 5. Owner-only admin routes reject non-owner users.
-6. Public legal/privacy posture is accepted for the current private-beta stage.
+6. Draft legal/privacy pages are reviewed and accepted for the current private-beta stage.
 
 ## Common Troubleshooting
 
