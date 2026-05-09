@@ -227,22 +227,22 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 ### Task 8.1: Add Launch-Mode SEO Controls
 
 - Why it matters: Private beta should be noindex; public launch should have clean metadata.
-- File paths involved: `app/layout.tsx`, `public/robots.txt`, future `app/sitemap.ts`.
-- Exact implementation steps: keep private noindex now; add public metadata and sitemap when launch mode changes.
+- File paths involved: `lib/seo.ts`, `app/layout.tsx`, `app/robots.ts`, `app/sitemap.ts`, `scripts/verify-seo.mjs`.
+- Exact implementation steps: centralized private-beta SEO metadata, replaced static robots with a Next metadata route, added an empty private-beta sitemap, and added `npm run verify:seo` to test the private noindex posture.
 - Risk level: Low.
-- Whether Codex can do it now: Private noindex is done; public SEO waits.
-- How I test it: inspect `/robots.txt` and page metadata.
-- Acceptance criteria: private site is not indexed; public launch has correct indexable pages.
+- Whether Codex can do it now: Private noindex controls completed; public indexing still waits for an explicit launch-mode decision.
+- How I test it: `npm run verify:seo`, inspect `/robots.txt`, `/sitemap.xml`, and page metadata.
+- Acceptance criteria: private site is not indexed; sitemap has no URL entries while private; public launch has a clear code path for indexable pages.
 
 ### Task 8.2: Profile Bundle and Audio Payloads
 
 - Why it matters: Long audio/base64 payloads can hurt speed and reliability.
-- File paths involved: `app/api/generate-music/route.ts`, `public/*.html`.
-- Exact implementation steps: add bundle analyzer, evaluate audio storage/signed URL approach.
+- File paths involved: `app/api/generate-music/route.ts`, `public/studio.html`, `public/create.html`, `scripts/verify-performance.mjs`.
+- Exact implementation steps: generated-audio JSON responses are marked `no-store`; Studio/Create now convert base64 to Blob object URLs for playback and revoke old object URLs; `npm run verify:performance` checks static page/image budgets and audio payload handling. Longer-term signed storage remains a public-scale follow-up.
 - Risk level: Medium.
-- Whether Codex can do it now: Yes after Phase 1.
-- How I test it: Lighthouse/bundle report.
-- Acceptance criteria: no major mobile performance bottlenecks.
+- Whether Codex can do it now: Private-beta performance hardening completed; full Lighthouse/bundle analyzer and signed audio storage remain launch-scale follow-ups.
+- How I test it: `npm run verify:performance`, `npm run build`, manual generation playback/download smoke.
+- Acceptance criteria: no oversized static assets, no direct base64 audio data URI playback, generated-audio responses are not cached, and no major mobile performance bottlenecks are visible.
 
 ## Phase 9: Deployment Readiness
 

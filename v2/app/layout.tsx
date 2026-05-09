@@ -1,21 +1,8 @@
+import { defaultMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "BOOMAN LAB — AI Music Production Studio",
-  description:
-    "Private AI music production tools for sample-minded producers: sound generation, prompt design, sample analysis, and crate-inspired creative workflows.",
-  openGraph: {
-    title: "BOOMAN LAB — AI Music Production Studio",
-    description:
-      "Private AI music production tools for sample-minded producers: sound generation, prompt design, sample analysis, and crate-inspired creative workflows.",
-    type: "website",
-  },
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

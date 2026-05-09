@@ -12,6 +12,8 @@ Validated during phased hardening:
 - `npm run build` passes.
 - Build output includes all expected Next app routes.
 - `npm run verify:security` passes RLS, persistent rate-limit, admin-audit, route-gate, and protected API error-shape checks.
+- `npm run verify:seo` passes private-beta robots, sitemap, and page noindex checks.
+- `npm run verify:performance` passes static page/image budgets and generated-audio payload checks.
 - `npm run test:e2e` passes public/login/legal UI, anonymous route gates, and protected API auth tests.
 - `npm run test:a11y` passes axe checks for the public entry page, login page, public legal pages, and protected-route login redirect.
 
@@ -59,6 +61,8 @@ Not validated end-to-end in this audit:
 
 ```bash
 npm run verify:security
+npm run verify:seo
+npm run verify:performance
 npm run test:e2e
 npm run test:a11y
 ```

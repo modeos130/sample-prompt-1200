@@ -800,7 +800,24 @@ function stopTimer() {
   }
 }
 
+function base64ToBlob(base64, mimeType) {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+  return new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+}
+
+function releaseCurrentAudio() {
+  if (currentAudio && currentAudio.url) {
+    URL.revokeObjectURL(currentAudio.url);
+  }
+  currentAudio = null;
+  audioPlayer.removeAttribute('src');
+  audioPlayer.load();
+}
+
 function clearOutput() {
+  releaseCurrentAudio();
   outputArea.classList.remove('visible');
   stateLoading.classList.add('hidden');
   stateSuccess.classList.add('hidden');
@@ -808,6 +825,7 @@ function clearOutput() {
 }
 
 function showLoading() {
+  releaseCurrentAudio();
   outputArea.classList.add('visible');
   stateLoading.classList.remove('hidden');
   stateSuccess.classList.add('hidden');
@@ -825,8 +843,10 @@ function showResult(data) {
   resultBadge.textContent = currentModel === 'clip' ? '30s Preview' : 'Full Track';
 
   const mimeType = data.mimeType || 'audio/mpeg';
-  audioPlayer.src = `data:${mimeType};base64,${data.audio}`;
-  currentAudio = { base64: data.audio, mimeType, name };
+  const blob = base64ToBlob(data.audio, mimeType);
+  const audioUrl = URL.createObjectURL(blob);
+  audioPlayer.src = audioUrl;
+  currentAudio = { blob, url: audioUrl, mimeType, name };
 
   if (data.remaining !== undefined) {
     remainingText.textContent = `${data.remaining} generations remaining today`;
@@ -845,11 +865,7 @@ function showError(msg) {
 
 function downloadAudio() {
   if (!currentAudio) return;
-  const byteChars = atob(currentAudio.base64);
-  const byteNumbers = new Array(byteChars.length);
-  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
-  const blob = new Blob([new Uint8Array(byteNumbers)], { type: currentAudio.mimeType });
-  const url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(currentAudio.blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = `boomanlab-${(currentAudio.name || 'custom').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}.mp3`;

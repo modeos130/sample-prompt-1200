@@ -21,7 +21,7 @@ Date: 2026-05-08
 | P1 | Monitoring | Add error tracking and uptime checks | Medium | Faster incident response | Medium | 0.5 day | Owner gets alerts on API/page failures |
 | P1 | CI/CD | Add GitHub Actions or Vercel checks for lint/build/audit/tests | Medium | Prevents broken deploys | Medium | 0.5 day | PR checks block failed builds |
 | P1 | Next migration | Move `middleware.ts` to `proxy.ts` | Low | Future Next compatibility | Low | 1-2 hr | Build has no middleware deprecation warning |
-| P1 | Public SEO | Add robots/sitemap/canonicals/OG image | Low | Brand trust and share quality | Low | 2-4 hr | Social previews render correctly |
+| P1 | Public SEO | Approve public launch mode, final sitemap/canonicals, and branded OG image | Low | Brand trust and share quality | Low | 2-4 hr | Social previews render correctly and only intended public pages are indexable |
 
 ## Should Fix Soon After Launch
 

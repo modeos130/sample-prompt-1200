@@ -18,6 +18,8 @@ Date: 2026-05-08
 - [ ] Manually smoke-test Lyria generation from Sound Studio.
 - [ ] Manually smoke-test custom Create Your Own generation.
 - [ ] Verify mobile layout on iPhone-sized viewport.
+- [ ] Run `npm run verify:seo` and confirm private beta remains noindex.
+- [ ] Run `npm run verify:performance`.
 - [ ] Create a simple incident/rollback note for the owner.
 
 ## Before Public Launch
@@ -40,7 +42,8 @@ Date: 2026-05-08
 - [ ] Decide whether `/vibe-to-prompt-dev.html` should be removed or blocked.
 - [ ] Migrate `middleware.ts` to the Next 16 `proxy.ts` convention.
 - [ ] Replace inline-page CSP dependencies where practical, then remove `unsafe-inline`.
-- [ ] Add sitemap and robots policy matching the private/public launch state.
+- [x] Add private-beta sitemap and robots policy.
+- [ ] Approve public indexing mode and final public sitemap before opening access.
 - [ ] Add branded Open Graph image and metadata per page.
 
 ## After Launch

@@ -75,6 +75,8 @@ cd /Users/booman/Documents/sample-prompt-1200/v2
 npm run lint
 npm run build
 npm run verify:security
+npm run verify:seo
+npm run verify:performance
 npm run test:e2e
 npm run test:a11y
 npm audit --audit-level=moderate
@@ -106,6 +108,8 @@ Production deployment should only happen after:
 4. Protected routes redirect unauthenticated visitors to `/login`.
 5. Owner-only admin routes reject non-owner users.
 6. Draft legal/privacy pages are reviewed and accepted for the current private-beta stage.
+7. `npm run verify:seo` confirms the private beta remains noindex until the owner intentionally changes launch mode.
+8. `npm run verify:performance` confirms static page/image budgets and generated-audio payload handling.
 
 ## Common Troubleshooting
 

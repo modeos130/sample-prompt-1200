@@ -297,7 +297,10 @@ export async function POST(req: NextRequest) {
         remaining: limit.remaining ?? 0,
       },
       {
-        headers: { "X-RateLimit-Remaining": String(limit.remaining ?? 0) },
+        headers: {
+          "Cache-Control": "no-store",
+          "X-RateLimit-Remaining": String(limit.remaining ?? 0),
+        },
       }
     );
 
