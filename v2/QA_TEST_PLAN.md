@@ -63,6 +63,8 @@ Not validated end-to-end in this audit:
 npm run verify:security
 npm run verify:seo
 npm run verify:performance
+npm run verify:deployment
+npm run verify:ci
 npm run test:e2e
 npm run test:a11y
 ```

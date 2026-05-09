@@ -20,7 +20,8 @@ Date: 2026-05-08
 - [ ] Verify mobile layout on iPhone-sized viewport.
 - [ ] Run `npm run verify:seo` and confirm private beta remains noindex.
 - [ ] Run `npm run verify:performance`.
-- [ ] Create a simple incident/rollback note for the owner.
+- [ ] Confirm GitHub Actions CI passes on the launch branch.
+- [ ] Review `DEPLOYMENT_RUNBOOK.md` before first production promotion.
 
 ## Before Public Launch
 
@@ -38,7 +39,8 @@ Date: 2026-05-08
 - [ ] Add monitoring/error tracking.
 - [ ] Add uptime monitoring.
 - [ ] Add structured server logs without secrets.
-- [ ] Add CI for lint/build/audit/test.
+- [x] Add CI for lint/build/audit/test.
+- [ ] Configure GitHub branch protection to require CI before merge.
 - [ ] Decide whether `/vibe-to-prompt-dev.html` should be removed or blocked.
 - [ ] Migrate `middleware.ts` to the Next 16 `proxy.ts` convention.
 - [ ] Replace inline-page CSP dependencies where practical, then remove `unsafe-inline`.
@@ -58,11 +60,14 @@ Date: 2026-05-08
 
 ## Emergency Rollback
 
-1. Identify last known good Vercel deployment.
-2. Use Vercel dashboard rollback or CLI promote for the last good deployment.
-3. If database policy caused the incident, revert only the policy change, not table data.
-4. If a secret leaked, rotate it immediately in Supabase/Gemini/Anthropic/Vercel.
-5. Re-run route-gate checks before announcing recovery.
+Use `DEPLOYMENT_RUNBOOK.md` as the source of truth.
+
+1. Identify the current production Vercel deployment.
+2. Identify the last known-good deployment.
+3. Use Vercel dashboard rollback or `vercel promote <last-known-good-deployment-url> --yes`.
+4. If database policy caused the incident, revert only the policy change, not table data.
+5. If a secret leaked, rotate it immediately in Supabase/Gemini/Anthropic/Vercel.
+6. Re-run route-gate checks before announcing recovery.
 
 ## Production Deployment Command
 

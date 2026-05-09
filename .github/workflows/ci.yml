@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "codex/**", "feature/**", "fix/**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Next.js app gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: v2
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ADMIN_OWNER_EMAIL: ${{ secrets.ADMIN_OWNER_EMAIL }}
+      GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CI: "true"
+      ROUTE_BASE_URL: http://localhost:3029
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: v2/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify required CI secrets
+        run: |
+          test -n "$NEXT_PUBLIC_SUPABASE_URL"
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$ADMIN_OWNER_EMAIL"
+
+      - name: Block high and critical dependency advisories
+        run: npm audit --audit-level=high
+
+      - name: Lint, build, and static performance checks
+        run: npm run verify:ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local server for route verification
+        run: |
+          npm run dev -- --port 3029 > /tmp/booman-ci-next.log 2>&1 &
+          echo $! > /tmp/booman-ci-next.pid
+          for attempt in {1..60}; do
+            if curl -fsS http://localhost:3029/vibe-to-prompt.html > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/booman-ci-next.log
+          exit 1
+
+      - name: Verify SEO controls
+        run: npm run verify:seo
+
+      - name: Verify security controls
+        run: npm run verify:security
+
+      - name: Stop route verification server
+        if: always()
+        run: |
+          if [ -f /tmp/booman-ci-next.pid ]; then
+            kill "$(cat /tmp/booman-ci-next.pid)" || true
+          fi
+
+      - name: Run E2E smoke tests
+        run: npm run test:e2e
+
+      - name: Run accessibility smoke tests
+        run: npm run test:a11y

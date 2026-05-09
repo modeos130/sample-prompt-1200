@@ -19,7 +19,7 @@ Date: 2026-05-08
 | P0 | Legal pages | Owner/counsel review of draft Terms, Privacy, Copyright, Acceptable Use, and AI/audio disclaimer | Low | Reduces legal exposure | High | 0.5-2 days plus legal review | Draft pages are approved or revised before public launch |
 | P0 | Security | No high/critical dependency advisories | Medium | Reduces known exploit exposure | Medium | Depends on Next release | `npm audit` has no high/critical findings |
 | P1 | Monitoring | Add error tracking and uptime checks | Medium | Faster incident response | Medium | 0.5 day | Owner gets alerts on API/page failures |
-| P1 | CI/CD | Add GitHub Actions or Vercel checks for lint/build/audit/tests | Medium | Prevents broken deploys | Medium | 0.5 day | PR checks block failed builds |
+| P1 | CI/CD | Configure GitHub branch protection and repository secrets for the new CI workflow | Low | Prevents broken deploys | Medium | 20-40 min | PR checks block failed builds |
 | P1 | Next migration | Move `middleware.ts` to `proxy.ts` | Low | Future Next compatibility | Low | 1-2 hr | Build has no middleware deprecation warning |
 | P1 | Public SEO | Approve public launch mode, final sitemap/canonicals, and branded OG image | Low | Brand trust and share quality | Low | 2-4 hr | Social previews render correctly and only intended public pages are indexable |
 

@@ -250,21 +250,21 @@ Operating rule: phases are sequential. Do not begin Phase 2 until Phase 1 is com
 
 - Why it matters: Broken builds or security regressions should not deploy.
 - File paths involved: `.github/workflows/ci.yml`, `package.json`.
-- Exact implementation steps: run lint, build, audit, E2E smoke in CI.
+- Exact implementation steps: GitHub Actions workflow added for npm install, high/critical audit gate, lint, build, performance verification, local route server, SEO verification, security verification, E2E smoke, and accessibility smoke.
 - Risk level: Medium.
-- Whether Codex can do it now: Yes after Phase 1.
-- How I test it: GitHub Actions pass/fail.
-- Acceptance criteria: PR cannot merge with failed checks.
+- Whether Codex can do it now: Workflow added. GitHub repository secrets must be configured for Supabase-backed verification.
+- How I test it: Local equivalent commands and GitHub Actions pass/fail.
+- Acceptance criteria: PR cannot merge with failed checks after branch protection is configured.
 
 ### Task 9.2: Add Rollback Runbook
 
 - Why it matters: The owner needs a fast recovery path.
-- File paths involved: `LAUNCH_CHECKLIST.md`, Vercel dashboard.
-- Exact implementation steps: document last-good deploy, rollback command, incident steps.
+- File paths involved: `DEPLOYMENT_RUNBOOK.md`, `LAUNCH_CHECKLIST.md`, `scripts/verify-deployment-docs.mjs`.
+- Exact implementation steps: documented pre-deploy checks, production deploy command, identifying current/previous Vercel deployments, dashboard rollback, CLI rollback, post-rollback verification, RLS incident handling, secret-rotation incident handling, and a verification script for deployment docs.
 - Risk level: Medium.
-- Whether Codex can do it now: Mostly done; refine after deployment flow.
-- How I test it: dry-run rollback plan.
-- Acceptance criteria: owner can identify and restore last good deploy.
+- Whether Codex can do it now: Completed as documentation and local verification. Live rollback remains an owner-approved operational action.
+- How I test it: `npm run verify:deployment` and dry-run review of commands.
+- Acceptance criteria: owner can identify and restore last good deploy without exposing secrets.
 
 ## Phase 10: Final Launch Checklist
 

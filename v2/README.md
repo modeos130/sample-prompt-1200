@@ -77,6 +77,8 @@ npm run build
 npm run verify:security
 npm run verify:seo
 npm run verify:performance
+npm run verify:deployment
+npm run verify:ci
 npm run test:e2e
 npm run test:a11y
 npm audit --audit-level=moderate
@@ -111,6 +113,19 @@ Production deployment should only happen after:
 7. `npm run verify:seo` confirms the private beta remains noindex until the owner intentionally changes launch mode.
 8. `npm run verify:performance` confirms static page/image budgets and generated-audio payload handling.
 
+## CI Requirements
+
+The GitHub Actions gate runs from `v2/` and expects these repository secrets:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_OWNER_EMAIL`
+- `GEMINI_KEY`
+- `ANTHROPIC_API_KEY`
+
+The workflow blocks high and critical dependency advisories. The known moderate Next/PostCSS advisory remains tracked separately because `npm audit fix --force` suggests an unsafe downgrade.
+
 ## Common Troubleshooting
 
 - Login says Supabase URL/API key are missing: restart the dev server after creating `.env.local`, then hard-refresh the browser.
@@ -125,6 +140,7 @@ Production deployment should only happen after:
 - `SECURITY_AUDIT.md`
 - `QA_TEST_PLAN.md`
 - `LAUNCH_CHECKLIST.md`
+- `DEPLOYMENT_RUNBOOK.md`
 - `COMPLETION_PUNCH_LIST.md`
 - `PROFESSIONAL_READINESS_AUDIT_REPORT.md`
 - `PAYMENT_MODEL.md`
