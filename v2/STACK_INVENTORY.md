@@ -15,9 +15,8 @@ The production app lives in `v2/`. The repository root also contains older/unrel
 | Supabase Auth | Login/session handling | `lib/supabase/*`, `middleware.ts`, `app/login` | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | High | Invite-only access depends on `profiles.active`. |
 | Supabase Postgres | Profiles and analytics data | `scripts/setup.sql`, API routes | Supabase vars | Critical | Live policy shape allowed anonymous reads and update attempts during audit. Apply `scripts/rls_hardening.sql`. |
 | Supabase service role | Server-side admin and analytics writes | `app/api/admin/*`, `app/api/analytics` | `SUPABASE_SERVICE_ROLE_KEY` | High | Must remain server-only. Never expose in client code. |
-| Google Gemini | Sample analysis and file upload | `app/api/analyze`, `app/api/upload-audio` | `GEMINI_KEY`, `GEMINI_MODEL` | Medium | Upload route now enforces size and extension checks. |
+| Google Gemini | Prompt synthesis, sample analysis, and file upload | `app/api/vibe-prompt`, `app/api/generate-music`, `app/api/analyze`, `app/api/upload-audio` | `GEMINI_KEY`, `GEMINI_PROMPT_MODEL`, `GEMINI_MODEL` | Medium | Prompt rules are server-side; upload route enforces size and extension checks. |
 | Google Lyria via Gemini API | Music/audio generation | `app/api/generate-music` | `GEMINI_KEY`, `LYRIA_*` | Medium | Generation returns base64 audio; no persistent job queue or storage. |
-| Anthropic Claude | Custom prompt synthesis | `app/api/vibe-prompt`, `app/api/generate-music` | `ANTHROPIC_API_KEY`, `CLAUDE_MODEL` | Medium | Prompt rules are server-side. |
 | Vercel | Hosting/deployment | `vercel.json`, deployment history | Vercel project env vars | Medium | Manual production promotion/deploy has been used. |
 | Static HTML pages | Studio/Create/Vibe surfaces | `public/studio.html`, `public/create.html`, `public/vibe-to-prompt.html` | API routes only | Medium | Large inline CSS/JS; protected by middleware except public vibe page. |
 | Security headers | Baseline browser hardening | `next.config.ts` | None | Medium | CSP added; uses `unsafe-inline` because current pages rely on inline scripts/styles. |

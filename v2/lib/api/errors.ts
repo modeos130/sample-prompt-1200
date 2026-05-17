@@ -35,7 +35,7 @@ export function apiError(message: string, init: ErrorInit = {}) {
 }
 
 export function providerError(
-  provider: "Anthropic" | "Gemini" | "Lyria",
+  provider: "Gemini" | "Lyria",
   status: number,
   fallback = `${provider} request failed. Try again shortly.`
 ) {

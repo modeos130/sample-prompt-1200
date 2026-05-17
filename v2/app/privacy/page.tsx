@@ -24,7 +24,7 @@ const sections = [
   {
     title: "Third-Party Services",
     body: [
-      "Booman Lab uses services such as Supabase for authentication and database functions, Google AI services for music generation and sample analysis, Anthropic for prompt synthesis, Vercel for hosting, and GitHub/Vercel tooling for deployment.",
+      "Booman Lab uses services such as Supabase for authentication and database functions, Google AI services for prompt synthesis, music generation, and sample analysis, Vercel for hosting, and GitHub/Vercel tooling for deployment.",
       "Information sent to third-party providers is handled under those providers' terms and privacy practices. Do not upload sensitive, confidential, or uncleared material unless you have the right to do so.",
     ],
   },

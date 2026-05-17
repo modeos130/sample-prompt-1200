@@ -10,7 +10,7 @@ Date: 2026-05-08
 | P0 | Auth/Admin | Verify owner-only admin in production | Low | Prevents unauthorized invites/revokes | High | 20 min | Non-owner gets 403/redirect; owner succeeds |
 | P1 | API limits | Move generation/analyze/vibe limits from memory to database/Redis | Medium | Controls provider spend | High | 0.5-1 day | Limits persist across serverless cold starts |
 | P1 | QA | Add minimum Playwright auth route tests | Medium | Reduces launch regressions | Medium | 0.5-1 day | CI can prove private routes are gated |
-| P1 | Providers | Manual smoke-test Gemini, Lyria, and Claude with production env | Low | Confirms core product works | Medium | 30-60 min | Each core workflow returns expected result or clear quota error |
+| P1 | Providers | Manual smoke-test Gemini prompt/analysis and Lyria audio generation with production env | Low | Confirms core product works | Medium | 30-60 min | Each core workflow returns expected result or clear quota error |
 
 ## Must Fix Before Public Launch
 

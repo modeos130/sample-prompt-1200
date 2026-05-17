@@ -15,8 +15,9 @@
     "verify:routes": "node scripts/verify-routes.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "verify:performance": "node scripts/verify-performance.mjs",
+    "verify:google-only": "node scripts/verify-google-only.mjs",
     "verify:deployment": "node scripts/verify-deployment-docs.mjs",
-    "verify:ci": "npm run lint && npm run build && npm run verify:performance",
+    "verify:ci": "npm run lint && npm run build && npm run verify:performance && npm run verify:google-only",
     "verify:security": "npm run verify:rls && npm run verify:rate-limit && npm run verify:admin-audit && npm run verify:routes"
   },
   "dependencies": {

@@ -21,7 +21,7 @@ Not validated end-to-end in this audit:
 
 - Real authenticated browser session unless `E2E_TEST_EMAIL` and `E2E_TEST_PASSWORD` are set.
 - Real Gemini/Lyria generation.
-- Real Claude prompt synthesis.
+- Real Gemini prompt synthesis.
 - Mobile visual QA.
 - Keyboard-only navigation.
 
@@ -52,7 +52,7 @@ Not validated end-to-end in this audit:
 | Rate limit persistence | Multi-request and cold-start simulation | Integration | Limits persist across instances |
 | Accessibility | Axe/Playwright | Automated | No serious or critical violations |
 | Mobile layout | 375px, 768px, desktop | Visual/manual | No overlapping text, no broken CTAs |
-| Provider failure | Gemini/Claude failures | Integration/manual | Friendly errors, no secret leakage |
+| Provider failure | Gemini/Lyria failures | Integration/manual | Friendly errors, no secret leakage |
 | Dependency audit | npm audit | Security | No high/critical advisories |
 | Legal pages | Terms/privacy/acceptable use/copyright | Automated + manual legal review | Public pages exist, are linked, and pass accessibility smoke checks |
 | Rollback | Vercel rollback | DevOps drill | Known prior deploy can be restored quickly |

@@ -36,7 +36,7 @@ Before production, manually confirm:
 - Active invited user can reach `/home`, `/studio.html`, `/prompts`, `/analyze`, `/create.html`, and `/account`.
 - Inactive user is blocked.
 - Owner can reach `/admin/invite` and `/admin/users`.
-- Gemini, Lyria, and Claude provider flows return either a valid result or a clear provider/quota error.
+- Gemini prompt/sample-analysis and Lyria provider flows return either a valid result or a clear provider/quota error.
 
 ## Production Deploy
 

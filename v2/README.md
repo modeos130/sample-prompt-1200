@@ -8,7 +8,7 @@ Private AI music production studio for sample-minded producers. The app combines
 - Runtime target: Vercel, with this `v2/` folder as the project root
 - Access model: private invite-only app, with `/vibe-to-prompt.html` intentionally public as the branded coming-soon/private-beta page
 - Database/auth: Supabase Auth plus `profiles` and `analytics` tables
-- AI providers: Google Gemini/Lyria and Anthropic Claude
+- AI providers: Google Gemini for prompt/sample analysis and Google Lyria for music generation
 - Payments: not implemented yet
 
 ## Main Routes
@@ -41,10 +41,9 @@ Copy `.env.example` to `.env.local` for local development. Never commit `.env.lo
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Browser and server Supabase auth |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-side admin, invite, revoke, analytics writes |
 | `ADMIN_OWNER_EMAIL` | Yes for production | Owner-only admin authorization |
-| `GEMINI_KEY` | Yes | Gemini sample analysis and Lyria generation |
-| `ANTHROPIC_API_KEY` | Yes | Claude prompt creation |
-| `CLAUDE_MODEL` | Optional | Claude model override |
-| `GEMINI_MODEL` | Optional | Gemini analysis model override |
+| `GEMINI_KEY` | Yes | Gemini prompt creation, sample analysis, and Lyria generation |
+| `GEMINI_PROMPT_MODEL` | Optional | Gemini prompt-creation model override |
+| `GEMINI_MODEL` | Optional | Gemini analysis model override and prompt fallback |
 | `LYRIA_CLIP_MODEL` | Optional | Lyria clip model override |
 | `LYRIA_PRO_MODEL` | Optional | Lyria full/pro model override |
 | `RATE_LIMIT_CALLS` | Optional | Vibe prompt daily in-memory rate limit |
@@ -122,7 +121,6 @@ The GitHub Actions gate runs from `v2/` and expects these repository secrets:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_OWNER_EMAIL`
 - `GEMINI_KEY`
-- `ANTHROPIC_API_KEY`
 
 The workflow blocks high and critical dependency advisories. The known moderate Next/PostCSS advisory remains tracked separately because `npm audit fix --force` suggests an unsafe downgrade.
 
@@ -132,7 +130,7 @@ The workflow blocks high and critical dependency advisories. The known moderate 
 - Protected page redirects to login after valid login: check `profiles.active` for that user.
 - Admin page redirects to `/home`: set `ADMIN_OWNER_EMAIL` to the owner account email in Vercel and local `.env.local`.
 - Gemini/Lyria generation fails: confirm `GEMINI_KEY`, model availability, and provider quota.
-- Claude prompt generation fails: confirm `ANTHROPIC_API_KEY` and `CLAUDE_MODEL`.
+- Custom prompt generation fails: confirm `GEMINI_KEY`, `GEMINI_PROMPT_MODEL` or `GEMINI_MODEL`, and provider quota.
 
 ## Launch Documents
 

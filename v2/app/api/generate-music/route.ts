@@ -3,6 +3,7 @@ import { ALL_PROMPTS } from "@/lib/prompts";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import { apiError, logApiError, providerError } from "@/lib/api/errors";
+import { GeminiPromptError, generatePromptWithGemini } from "@/lib/google/prompt-synthesis";
 
 export const maxDuration = 120; // Music generation is slow
 
@@ -112,11 +113,6 @@ interface LyriaApiResponse {
   };
 }
 
-interface ClaudeApiResponse {
-  content?: Array<{ text: string }>;
-  error?: { message: string };
-}
-
 // ─── HANDLER ─────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const activeUser = await getActiveUser(req);
@@ -188,42 +184,16 @@ export async function POST(req: NextRequest) {
         return apiError("Invalid genre.", { status: 400, code: "invalid_genre" });
       }
 
-      // Call Claude Haiku to build the prompt (same pattern as vibe-prompt route)
-      const anthropicKey = process.env.ANTHROPIC_API_KEY;
-      if (!anthropicKey) {
-        return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
-      }
-
+      // Use Google Gemini to build the prompt, then Google Lyria to generate audio.
       const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\nGENRE-SPECIFIC RULES FOR THIS REQUEST:\n${GENRE_RULES[genre]}`;
-
-      const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": anthropicKey,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: process.env.CLAUDE_MODEL ?? "claude-haiku-4-5-20251001",
-          max_tokens: 400,
-          system: systemPrompt,
-          messages: [{
-            role: "user",
-            content: `Producer vibe: "${vibe.trim()}"\n\nWrite the Suno prompt now. Remember: one paragraph, under 1000 characters, no real names, no drums.`,
-          }],
-        }),
-      });
-
-      const claudeData = await claudeResponse.json() as ClaudeApiResponse;
-
-      if (!claudeResponse.ok) {
-        const msg = claudeData.error?.message ?? `Claude API error ${claudeResponse.status}`;
-        if ([401, 403, 408, 429, 502, 503, 504].includes(claudeResponse.status)) return providerError("Anthropic", claudeResponse.status);
-        throw new Error(msg);
+      try {
+        promptText = await generatePromptWithGemini({ apiKey, systemPrompt, vibe });
+      } catch (err) {
+        if (err instanceof GeminiPromptError && [401, 403, 408, 429, 502, 503, 504].includes(err.status)) {
+          return providerError("Gemini", err.status);
+        }
+        throw err;
       }
-
-      promptText = claudeData.content?.[0]?.text?.trim() ?? "";
-      if (!promptText) throw new Error("Empty response from Claude.");
     }
 
     // ─── CALL LYRIA 3 ──────────────────────────────────────────────────────

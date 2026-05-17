@@ -20,7 +20,7 @@ BOOMAN LAB is a private creative tool for producers. Invited users log in, brows
 
 ## 3. Technical Site Description
 
-The deployed app is a Next.js 16 App Router project in `v2/`. It uses Supabase Auth for login, a `profiles` table to decide whether a user is active and what tier they have, and API routes for AI workflows. Google Gemini handles sample analysis and file uploads; Google Lyria is called through the Gemini API for audio generation; Anthropic Claude writes custom prompt text. Vercel hosts the app, and middleware protects private pages by checking Supabase session plus `profiles.active`.
+The deployed app is a Next.js 16 App Router project in `v2/`. It uses Supabase Auth for login, a `profiles` table to decide whether a user is active and what tier they have, and API routes for AI workflows. Google Gemini handles prompt synthesis, sample analysis, and file uploads; Google Lyria is called through the Gemini API for audio generation. Vercel hosts the app, and middleware protects private pages by checking Supabase session plus `profiles.active`.
 
 ## 4. Complete Stack Inventory
 
@@ -33,8 +33,7 @@ See `STACK_INVENTORY.md` for the full table. Summary:
 | Supabase Auth | Login/session | `lib/supabase/*`, `middleware.ts` | Supabase URL/anon key | High |
 | Supabase Postgres | Profiles/analytics | `scripts/setup.sql`, API routes | Supabase keys | Critical |
 | Supabase service role | Admin server actions | `app/api/admin/*` | `SUPABASE_SERVICE_ROLE_KEY` | High |
-| Gemini/Lyria | Analysis/audio | `app/api/analyze`, `generate-music` | `GEMINI_KEY`, model vars | Medium |
-| Anthropic Claude | Prompt synthesis | `app/api/vibe-prompt`, `generate-music` | `ANTHROPIC_API_KEY` | Medium |
+| Gemini/Lyria | Prompt synthesis/analysis/audio | `app/api/vibe-prompt`, `app/api/analyze`, `generate-music` | `GEMINI_KEY`, model vars | Medium |
 | Vercel | Hosting | `vercel.json` | Vercel env | Medium |
 | Stripe/payments | Not implemented | None found | None | Medium |
 | Tests | Not implemented | None found | None | High |
@@ -54,10 +53,10 @@ See `STACK_INVENTORY.md` for the full table. Summary:
 | `/account` | Password/account | Active user | Supabase auth/profile | Improved | Needs session behavior test | Add tests |
 | `/admin/invite` | Invite users | Owner only | Admin APIs/service role | Improved | Needs owner/non-owner tests | Add tests |
 | `/admin/users` | Manage tier/active | Owner only | Admin users API/service role | Improved | Needs owner/non-owner tests | Add tests |
-| `/api/generate-music` | Generate audio | Active user | Gemini/Lyria, Claude, prompts | Mostly complete | In-memory limits | Persistent limits |
+| `/api/generate-music` | Generate audio | Active user | Gemini/Lyria, prompts | Mostly complete | In-memory limits | Persistent limits |
 | `/api/analyze` | Analyze sample | Active user | Gemini | Mostly complete | In-memory limits | Persistent limits |
 | `/api/upload-audio` | Upload to Gemini File API | Active user | Gemini | Improved | No virus scan | Consider deeper scanning |
-| `/api/vibe-prompt` | Generate prompt | Active user | Claude | Mostly complete | In-memory limits | Persistent limits |
+| `/api/vibe-prompt` | Generate prompt | Active user | Gemini | Mostly complete | In-memory limits | Persistent limits |
 | `/api/analytics` | Studio visit logging | Active user | Supabase service role | Fixed | Needs RLS verification | Apply DB policies |
 | `/api/admin/invite` | Create auth/profile user | Owner only | Supabase service role | Good | Needs audit log | Add audit logs |
 | `/api/admin/revoke` | Revoke/restore user | Owner only | Supabase service role | Good | Needs audit log | Add audit logs |
@@ -455,7 +454,7 @@ Next exact tasks:
 
 1. Apply and verify `scripts/rls_hardening.sql`.
 2. Run auth route checks for anonymous, active user, inactive user, and owner.
-3. Smoke-test Gemini/Lyria/Claude workflows in production environment.
+3. Smoke-test Gemini prompt/analysis and Lyria workflows in production environment.
 4. Add minimum Playwright and RLS tests.
 5. Add legal/privacy/acceptable-use pages before public launch.
 

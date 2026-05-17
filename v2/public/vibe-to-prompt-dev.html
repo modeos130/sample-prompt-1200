@@ -1862,7 +1862,7 @@ async function generatePrompt() {
   loadingInterval = setInterval(() => {
     const elapsed = Math.round((Date.now() - startTime) / 1000);
     timerEl.textContent = `${elapsed}s`;
-    if (elapsed >= 5) subEl.textContent = 'Still working — Claude is writing your prompt...';
+    if (elapsed >= 5) subEl.textContent = 'Still working — Google is writing your prompt...';
     if (elapsed >= 15) subEl.textContent = 'Taking longer than usual...';
     if (elapsed >= 22) subEl.textContent = 'Almost at timeout — hang tight...';
   }, 1000);
@@ -1962,10 +1962,10 @@ function showError(msg) {
   let message = msg;
   let hint = '';
 
-  if (msg.includes('API not configured')) {
+  if (msg.includes('API not configured') || msg.includes('Service is not configured')) {
     title = 'API Key Missing';
-    message = 'The Anthropic API key has not been configured on the server.';
-    hint = 'The site owner needs to add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy.';
+    message = 'The Google API key has not been configured on the server.';
+    hint = 'The site owner needs to add GEMINI_KEY in Vercel → Settings → Environment Variables, then redeploy.';
   } else if (msg.includes('Rate limit') || msg.includes('429')) {
     title = 'Rate Limit Reached';
     message = msg;

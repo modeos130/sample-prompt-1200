@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { activeUserError, getActiveUser } from "@/lib/auth/active-user";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import { apiError, logApiError, providerError } from "@/lib/api/errors";
+import { GeminiPromptError, generatePromptWithGemini } from "@/lib/google/prompt-synthesis";
 
 export const maxDuration = 30;
 
@@ -137,44 +138,21 @@ export async function POST(req: NextRequest) {
       return apiError("Invalid genre.", { status: 400, code: "invalid_genre" });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_KEY;
     if (!apiKey) {
       return apiError("Service is not configured. Contact support.", { status: 500, code: "server_not_configured" });
     }
 
     const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\nGENRE-SPECIFIC RULES FOR THIS REQUEST:\n${GENRE_RULES[genre]}`;
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: process.env.CLAUDE_MODEL ?? "claude-haiku-4-5-20251001",
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: [{
-          role: "user",
-          content: `Producer vibe: "${vibe.trim()}"\n\nWrite the Suno prompt now. Remember: one paragraph, under 1000 characters, no real names, no drums.`,
-        }],
-      }),
-    });
-
-    const data = await response.json() as {
-      content?: Array<{ text: string }>;
-      error?: { message: string };
-    };
-
-    if (!response.ok) {
-      const msg = data.error?.message ?? `Claude API error ${response.status}`;
-      if ([401, 403, 408, 429, 502, 503, 504].includes(response.status)) return providerError("Anthropic", response.status);
-      throw new Error(msg);
+    let prompt: string;
+    try {
+      prompt = await generatePromptWithGemini({ apiKey, systemPrompt, vibe });
+    } catch (err) {
+      if (err instanceof GeminiPromptError && [401, 403, 408, 429, 502, 503, 504].includes(err.status)) {
+        return providerError("Gemini", err.status);
+      }
+      throw err;
     }
-
-    const prompt = data.content?.[0]?.text?.trim() ?? "";
-    if (!prompt) throw new Error("Empty response from Claude.");
 
     return NextResponse.json(
       { prompt, remaining: limit.remaining ?? 0 },

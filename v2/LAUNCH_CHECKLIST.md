@@ -66,7 +66,7 @@ Use `DEPLOYMENT_RUNBOOK.md` as the source of truth.
 2. Identify the last known-good deployment.
 3. Use Vercel dashboard rollback or `vercel promote <last-known-good-deployment-url> --yes`.
 4. If database policy caused the incident, revert only the policy change, not table data.
-5. If a secret leaked, rotate it immediately in Supabase/Gemini/Anthropic/Vercel.
+5. If a secret leaked, rotate it immediately in Supabase/Google AI/Vercel.
 6. Re-run route-gate checks before announcing recovery.
 
 ## Production Deployment Command
